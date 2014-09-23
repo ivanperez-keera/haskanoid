@@ -40,7 +40,7 @@ $ cabal configure && cabal build    # ...idem with cabal-dev
 $ ./dist/build/haskanoid/haskanoid
 ```
 
-To run it with the wiimote, you need to run the program with the special
+To play it with the wiimote, you need to run the program with the special
 arguments +RTS -V0. See http://github.com/ivanperez-keera/hcwiid for an
 explanation.
 
