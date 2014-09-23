@@ -47,9 +47,9 @@ explanation.
 ## Limitations
 
 The game expects to find sources in ```data/```, inside the current
-working directory. Data files are not copied.
+working directory. Data files are not copied over when the game is installed.
 
-(If it bugs you too much, add the data files to the cabal file and change the
+(If it bugs you too much, add the data file names to the cabal file and change the
 code to use the appropriate ```haskanoid_Paths``` functions when resources are
 loaded.)
 
