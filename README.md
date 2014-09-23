@@ -112,7 +112,7 @@ There are a few obvious ways to improve this code:
 
 * If you are interested in game design: this game is quite simplistic,
   consisting only of blocks that must be hit. Some ideas for improvements:
-  things could fall when a block is hit; some blocks might be ``poisonous'';
+  things could fall when a block is hit; some blocks might be "poisonous";
   the ball could go faster or slower with time; each level might have
   a timer to complete it; the paddle might tilt to the sides as it moves,
   the inclination depending on the acceleration (or the Wiimote roll).
