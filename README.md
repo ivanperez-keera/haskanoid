@@ -26,21 +26,18 @@ details). Slides are available on that website.
 
 # Installation
 
-The game is also available on hackage. All the media resources are included
-with the distribution (see LICENCE for redistribution terms).
+The game will also be available on hackage. All the media resources are
+included with the distribution (see LICENCE for redistribution terms).  I
+personally recommend using sandboxes (either with cabal or with cabal-dev);
 
 ```
 $ cabal update
-$ cabal install haskanoid
-$ haskanoid
-```
-
-I personally recommend using sandboxes (either with cabal or with cabal-dev);
-
-```
-$ cabal update
-$ cabal init
-$ cabal install haskanoid
+$ cabal sandbox init                # skip if you are using cabal-dev
+$ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
+$ cd haskanoid-*                    # Game resources are here
+$ cabal install --only-dependencies # ...or cabal-dev install --only-dependencies
+$ cabal configure && cabal build    # ...idem with cabal-dev
+$ ./dist/build/haskanoid/haskanoid
 ```
 
 To run it with the wiimote, you need to run the program with the special
