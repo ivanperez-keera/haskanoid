@@ -12,7 +12,7 @@ particular:
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
 
-![GitHub Logo](/screenshots/desktop.png)
+![GitHub Logo](/images/logo.png)
 
 We would like to call on Haskell programmers, game developers and anyone with
 an interest in Functional Reactive Programming and/or Game Programming to
