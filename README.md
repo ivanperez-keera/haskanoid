@@ -115,10 +115,17 @@ There are a few obvious ways to improve this code:
   to try and think about the following: The resource manager is very
   simplistic: resouce loading happens at level transition, resources are
   unloaded only by the garbage collector as references to them are removed from
-  memory. This overly-simplistic work might not scale well for more complex
+  memory. This overly-simplistic work might not scale well for complex
   games. The problem, once again, of implementing such a subsystem is that it's
   an IO component that may fail and must work asynchronously, yet synchronise
-  with a pure game component. 
+  with a pure game component. The following are suggested:
+
+  * Implement a loading message, and make the game wait until resources
+    are loaded.
+
+  * Make the resource manager asynchronous, so that resources can
+    be loaded/unloaded in the background, even before the next
+    level starts, and making the display responsive (again).
 
 * If you are interesting in Input/Output: adding support for new devices
   is really simple. Using a kinect, for instance, requires minimal
