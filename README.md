@@ -80,7 +80,9 @@ the cwiid library to communicate with Wiimotes.
 # Other links
 
 Keera Studios is developing a complete version of this game that runs
-on Android. It is **also written in Haskell**.
+on Android. It is **also written in Haskell**. You can see their
+announcement [here](http://keera.co.uk/blog/?p=690&preview=true),
+and followup on their progress on facebook and twitter.
 
 # Homework
 
