@@ -77,19 +77,19 @@ There are a few obvious ways to improve this code:
   of frames per second. In FRP there is little control over the delta
   times used for the simulation. Implement a better system.
 
-** NOTE: Maths are used for physics and collisions all the time. Matrices are
-  your friends. Don't reinvent the wheel, just recall freshman algebra.
+* * NOTE: Maths are used for physics and collisions all the time. Matrices are
+    your friends. Don't reinvent the wheel, just recall freshman algebra.
 
-** NOTE: I recommend the following introductory book, which also
-  has really good pointers: Jason Gregory's Game Engine Architecture.
+* * NOTE: I recommend the following introductory book, which also
+    has really good pointers: Jason Gregory's Game Engine Architecture.
 
-** NOTE: when programming such a system, it's incredibly easy to get
-  caught up in tiny details that provoke huge increases in the complexity of
-  the problem. The kinds of shapes you allow matter. Whether they are concave or
-  convex matter. Whether you allow rotation matter.  Don't underestimate this
-  problem: professional engines such as AndEngine get this wrong as well (see a
-  pinball video on Keera Studios' facebook page for details).
-  Start small, try to simplify, and grow steady.
+* * NOTE: when programming such a system, it's incredibly easy to get
+    caught up in tiny details that provoke huge increases in the complexity of
+    the problem. The kinds of shapes you allow matter. Whether they are concave or
+    convex matter. Whether you allow rotation matter.  Don't underestimate this
+    problem: professional engines such as AndEngine get this wrong as well (see a
+    pinball video on Keera Studios' facebook page for details).
+    Start small, try to simplify, and grow steady.
 
 * If you are interested in performance: you'll notice that this game has
   growing memory demands.  There's a trivial change to one module that makes
