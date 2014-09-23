@@ -1,0 +1,145 @@
+This game uses components from different origins, and as such
+has a complex licence.
+
+Please, take into account that some of the resources used are only free for
+non-commercial purposes. People have worked hard to create them, and we'd like
+to honour their work by respecting their terms and ask you to do the same.
+
+Graphics
+========
+Each graphic has its own licence. If you redistribute the graphics,
+with out without the rest of the code, in any form, you must follow
+their licence.
+
+The game assets are part of Kenney's Puzzle Game Art set,
+together with the licence terms, and can be seen at:
+http://opengameart.org/content/puzzle-game-art
+
+Kenney happens to be a Game development studio. Their website is:
+http://www.kenney.nl/
+
+Backgrounds:
+
+ - Level0.png is a modification of:
+   http://lyshastra.deviantart.com/art/Free-Space-Galaxy-Texture-435800028
+   The author authorises any use, but wishes to be credited for it.
+
+ - Level1.png is a picture of Abell 2744 (Pandora's Cluster), it's a composite
+   of images taken with the Hubble, the VLT and Chandra ACIS detector.
+   It's in the public domain.
+   http://hubblesite.org/newscenter/archive/releases/2011/17/
+   http://commons.wikimedia.org/wiki/File:Pandora%27s_Cluster_%E2%80%93_Abell_2744.jpg
+
+ - Level2.png is also attributed to Nasa:
+   http://hubblesite.org/newscenter/archive/releases/2012/10/image/c/
+   If I am not mistaken, it is also in the public domain
+   (http://hubblesite.org/about_us/copyright.php).
+
+Fonts
+
+The font that accompanies this game is Lacuna, designed by Peter Hoffmann.
+The following note accompanied that font:
+
+  © 2003 Glashaus, designed by Peter Hoffmann
+  
+  LACUNA is freeware! You have the permission to use the font for every kind of
+  publication (electronic/print), it doesn't matter if its commercial or not. You
+  can copy and give it away to your friends as long as the font-info-file is
+  included with the postscript or true type data.
+  
+  Lacuna may not be sold or redesigned without permission of the designer! If you
+  do so – we have uncanny voodoo-powers and friends in Moscow.
+  
+  We are looking forward to your comments, suggestions and to any information
+  if/how you incorporated this font.
+  
+  www.glashaus-design.com
+  peter.hoffmann@glashaus-design.com
+
+Music and sound
+===============
+Each sound file has its own licence. If you redistribute the graphics,
+with out without the rest of the code, in any form, you must follow
+their licence.
+
+The following music files are used:
+
+ - Space arpeggio, by mmb digidesigns
+   Licence: CC-BY-NC-SA
+   https://www.jamendo.com/en/track/79664/space-arpeggio
+ 
+ - Move, by mmb digidesigns
+   Licence: CC-BY-NC-SA
+   https://www.jamendo.com/en/track/79669/move
+ 
+ - Peanuts groove, by Spintronic 
+   Licence: CC-BY-NC-SA
+   https://www.jamendo.com/en/track/230855/peanuts-groove
+
+The following soundfx files are included in this distribution:
+
+ - The sound played when a block is hit is attributed to Aiwha, and can be
+   redistributed under the terms of the CC-BY-3.0 licence.
+   http://www.freesound.org/people/Aiwha/sounds/196106/
+
+Code
+====
+
+The purpose of this publication is to allow studying FRP, Game Programming and
+Functional Programming. 
+
+The module Data/IdentityList.hs is Copyright (c) Henrik Nilsson, Antony
+Courtney (Yale), and can be redistributed under the terms of the BSD licence.
+
+The Audio module is Copyright 2010-2014 Keera Studios, redistributed with
+permission under the terms of the 3-clause BSD licence. If (when) the file is
+redistributed, even if it is in binary form as part of another program, a
+mention (without any implication of endorsement from Keera Studios) wouldn't
+hurt.
+
+The remained of the code is Copyright 2014 Ivan Perez & Henrik Nilsson.
+and the following licence applies to it:
+
+    Redistribution and use of the haskanoid code or any derivative works are
+    permitted provided that all the following conditions are met:
+    
+    Redistributions may not be sold, nor may they be used in a commercial
+    product or activity.
+    
+    Redistributions that are modified from the original source must include the
+    complete source code, including the source code for all components used by a
+    binary built from the modified sources. However, as a special exception, the
+    source code distributed need not include anything that is normally distributed
+    (in either source or binary form) with the major components (compiler, kernel,
+    and so on) of the operating system on which the executable runs, unless that
+    component itself accompanies the executable.
+    
+    Redistributions must reproduce the above copyright notice, this list of
+    conditions and the following disclaimer in the documentation and/or other
+    materials provided with the distribution.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+===============
+
+* Credits
+
+Inspiration has been drawn from Antony Courtney and Henrik Nilsson's asteroids
+game. This is mainly present in the definition of ObjectSF and in the main game
+loop, which uses a structure similar to the one described in the paper ``The
+Yampa Arcade''. Other than that, the code is our own (IP & HN).
+
+Also, if you are using this for a course, or a talk, or something like that; it
+would be great if you could let us know ( psxip1@nott.ac.uk or
+nhn@cs.nott.ac.uk). Just to know how it has been useful. We have additional
+resources that you may find useful for your talk, including videos of this game
+running on different platforms, statistics/benchmarks, etc.
