@@ -16,7 +16,8 @@ version:             0.1.2
 synopsis:            A breakout game written in Yampa using SDL
 
 -- A longer description of the package.
--- description:         
+description:         An arkanoid game featuring SDL graphics and sound and
+                     Wiimote support, implemented using Yampa. 
 
 -- URL for the project homepage or repository.
 homepage:            http://github.com/ivanperez-keera/haskanoid
@@ -43,6 +44,8 @@ build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.8
+
+data-files: data/* data/audio/*
 
 
 executable haskanoid
