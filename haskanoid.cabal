@@ -45,7 +45,7 @@ build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.8
 
-data-files: data/* data/audio/*
+data-files: data/*.png data/*.wav data/*.mp3
 
 
 executable haskanoid

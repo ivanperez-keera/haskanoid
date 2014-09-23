@@ -34,7 +34,7 @@ loadResources = runMaybeT $ do
   font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
   let myFont = fmap (Font gameFont) font
 
-  blockHit <- liftIO $ loadAudio "data/196106__aiwha__ding-cc-by-3.0.wav"
+  blockHit <- liftIO $ loadAudio "data/196106_aiwha_ding-cc-by.wav"
 
   -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
   -- bgM <- liftIO $ loadMusic "data/level0.mp3"
