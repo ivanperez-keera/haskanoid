@@ -113,3 +113,17 @@ There are a few obvious ways to improve this code:
   games. The problem, once again, of implementing such a subsystem is that it's
   an IO component that may fail and must work asynchronously, yet synchronise
   with a pure game component. 
+
+* If you are interesting in Input/Output: adding support for new devices
+  is really simple. Using a kinect, for instance, requires minimal
+  changes (we have code that works with the freenect library). But maybe
+  you can connect it to more interesting devices, such as mobile phones,
+  or brain sensors, webcams, or the new Kinect, which will do eye
+  tracking!
+
+# Educators
+
+If you find this game attractive and would like to use it to teach functional
+programming or other subjects, we'd be very happy to know about it. We can
+provide extra material that you can show to students (videos, screenshots,
+etc.).
