@@ -49,7 +49,7 @@ explanation.
 
 ## Limitations
 
-The game expects to find sources in data/, inside the current
+The game expects to find sources in ```data/```, inside the current
 working directory. Data files are not copied.
 
 (If it bugs you too much, add the data files to the cabal file and change the
