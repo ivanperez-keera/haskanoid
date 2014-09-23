@@ -47,6 +47,15 @@ To run it with the wiimote, you need to run the program with the special
 arguments +RTS -V0. See http://github.com/ivanperez-keera/hcwiid for an
 explanation.
 
+## Limitations
+
+The game expects to find sources in data/, inside the current
+working directory. Data files are not copied.
+
+(If it bugs you too much, add the data files to the cabal file and change the
+code to use the appropriate ```haskanoid_Paths``` functions when resources are
+loaded.)
+
 # Documentation
 
 To try and make things as clear as possible, the code includes a much haddock
