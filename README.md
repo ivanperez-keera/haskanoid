@@ -35,9 +35,11 @@ $ haskanoid
 
 I personally recommend using sandboxes (either with cabal or with cabal-dev);
 
+```
 $ cabal update
 $ cabal init
 $ cabal install haskanoid
+```
 
 To run it with the wiimote, you need to run the program with the special
 arguments +RTS -V0. See http://github.com/ivanperez-keera/hcwiid for an
@@ -49,11 +51,13 @@ To try and make things as clear as possible, the code includes a much haddock
 documentation and comments as we could reasonably fit. You can compile
 those with:
 
+```
 $ cabal unpack haskanoid     ## Or git clone this-repo
 $ cd haskanoid-*
 $ cabal init
 $ cabal install --only-dependencies
 $ cabal configure && cabal haddock --executables --internal
+```
 
 # Related projects
 
