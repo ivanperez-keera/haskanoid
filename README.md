@@ -30,7 +30,7 @@ details). Slides are available on that website.
 
 The game will also be available on hackage. All the media resources are
 included with the distribution (see LICENCE for redistribution terms).  I
-personally recommend using sandboxes (either with cabal or with cabal-dev);
+personally recommend using sandboxes (either with cabal or with cabal-dev)*:
 
 ```
 $ cabal update
@@ -45,6 +45,11 @@ $ ./dist/build/haskanoid/haskanoid
 To play it with the wiimote, you need to run the program with the special
 arguments +RTS -V0. See http://github.com/ivanperez-keera/hcwiid for an
 explanation.
+
+*__Two additional notes__:
+
+ * Users of GHC 7.8 need to run additional steps. See issue [#2](../../issues/2) for instructions.
+ * MacOSX users (or anyone without a wiimote) might want to disable wiimote support. You'll need to comment a few things in the code and the cabal files. Issue [#1](../../issues/1) has been opened to deal with this possibility.
 
 ## Limitations
 
