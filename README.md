@@ -56,7 +56,7 @@ explanation.
 The game expects to find sources in ```data/```, inside the current
 working directory. (That's true even though data files are copied
 over when the game is installed. If curious, see commit
-0913c4102ed4b8b6eaa9a13d37eaa81ac77d9154 .)
+[0913c41](../../commit/0913c4102ed4b8b6eaa9a13d37eaa81ac77d9154).)
 
 If it bugs you too much, change the code to use the appropriate
 ```haskanoid_Paths``` functions when resources are loaded. 
