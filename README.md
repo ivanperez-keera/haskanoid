@@ -143,12 +143,12 @@ There are a few obvious ways to improve this code:
     be loaded/unloaded in the background, even before the next
     level starts, and making the display responsive (again).
 
-* If you are interesting in Input/Output: adding support for new devices
-  is really simple. Using a kinect, for instance, requires minimal
-  changes (we have code that works with the freenect library). But maybe
-  you can connect it to more interesting devices, such as mobile phones,
-  or brain sensors, webcams, or the new Kinect, which will do eye
-  tracking!
+* If you are interested in Human-Computer Interaction and Input/Output:
+  adding support for new devices is really simple. Using a kinect,
+  for instance, requires minimal changes (we have code that works with
+  the freenect library). But maybe you can connect it to more interesting
+  devices, such as mobile phones, or brain sensors, webcams, or the new
+  (upcoming) Kinect, which will do eye tracking!
 
 # Educators
 
