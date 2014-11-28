@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE CPP                       #-}
 -- | Defines an abstraction for the game controller and the functions to read
 -- it.
 --
@@ -34,7 +35,9 @@ import Control.Monad.IfElse
 import Data.IORef
 import Data.Maybe (fromJust)
 import Graphics.UI.SDL as SDL
+#ifdef wiimote
 import System.CWiid
+#endif
 
 import Control.Extra.Monad
 import Graphics.UI.Extra.SDL
@@ -64,10 +67,14 @@ newtype ControllerRef =
 -- not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
+#ifdef wiimote
   dev <- do wm <- wiimoteDev
             case wm of
               Nothing  -> fmap fromJust sdlMouseKB
               Just wm' -> return wm'
+#else
+  let dev = sdlGetController
+#endif
   nr <- newIORef defaultInfo
   return $ ControllerRef (nr, dev)
  where defaultInfo = Controller (0,0) False False
@@ -89,6 +96,7 @@ senseInput (ControllerRef (cref, sensor)) = do
 type ControllerDev = IO (Maybe (Controller -> IO Controller))
 
 -- * WiiMote API (mid-level)
+#ifdef wiimote
 
 -- | The wiimote controller as defined using this
 -- abstract interface. See 'initializeWiimote'.
@@ -160,6 +168,7 @@ senseWiimote wiimote controller = do
   return (controller { controllerPos   = (finX, finY) -- pos'
                      , controllerClick = isClick
                      })
+#endif
 
 -- * SDL API (mid-level)
 

@@ -47,6 +47,9 @@ cabal-version:       >=1.8
 
 data-files: data/*.png data/*.wav data/*.mp3
 
+Flag wiimote
+  Description: Enable Wiimote support with hcwiid
+  Default: True
 
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
@@ -86,7 +89,8 @@ executable haskanoid
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.10,
-                       hcwiid, 
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse
-  
+
+  if flag(wiimote)
+    build-depends: hcwiid
