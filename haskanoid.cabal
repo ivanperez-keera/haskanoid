@@ -10,14 +10,14 @@ name:                haskanoid
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.2
+version:             0.1.3
 
 -- A short (one-line) description of the package.
 synopsis:            A breakout game written in Yampa using SDL
 
 -- A longer description of the package.
-description:         An arkanoid game featuring SDL graphics and sound and
-                     Wiimote support, implemented using Yampa. 
+description:         An arkanoid game featuring SDL graphics and sound, and
+                     Wiimote & Kinect support, implemented using Yampa. 
 
 -- URL for the project homepage or repository.
 homepage:            http://github.com/ivanperez-keera/haskanoid
