@@ -37,8 +37,7 @@ $ cabal update
 $ cabal sandbox init                # skip if you are using cabal-dev
 $ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
 $ cd haskanoid-*                    # Game resources are here
-$ cabal install --only-dependencies # ...or cabal-dev install --only-dependencies
-$ cabal configure && cabal build    # ...idem with cabal-dev
+$ cabal install                     # ...or cabal-dev install
 $ ./dist/build/haskanoid/haskanoid
 ```
 
@@ -49,17 +48,7 @@ explanation.
 *__Two additional notes__:
 
  * Users of GHC 7.8 need to run additional steps. See issue [#2](../../issues/2) for instructions.
- * MacOSX users (or anyone without a wiimote) might want to disable wiimote and kinect support. You can do so with the cabal flags wiimote and kinect, running cabal configure --flags="-kinect -wiimote" before building.
-
-## Limitations
-
-The game expects to find sources in ```data/```, inside the current
-working directory. (That's true even though data files are copied
-over when the game is installed. If curious, see commit
-[0913c41](../../commit/0913c4102ed4b8b6eaa9a13d37eaa81ac77d9154).)
-
-If it bugs you too much, change the code to use the appropriate
-```haskanoid_Paths``` functions when resources are loaded. 
+ * MacOSX users (or anyone without a wiimote) might want to disable wiimote and kinect support. You can do so with the cabal flags wiimote and kinect, by running cabal install --flags="-kinect -wiimote".
 
 # Documentation
 
