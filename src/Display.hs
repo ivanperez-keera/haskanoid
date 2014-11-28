@@ -17,6 +17,7 @@ import GameState
 import Objects
 import Resources hiding (audio)
 import Levels
+import Paths_haskanoid
 
 -- | Ad-hoc resource loading
 -- This function is ad-hoc in two senses: first, because it
@@ -29,12 +30,12 @@ loadResources = runMaybeT $ do
   -- Font initialization
   ttfOk <- lift TTF.init
   
-  let gameFont = "data/lacuna.ttf"
+  gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
   -- Load the fonts we need
   font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
   let myFont = fmap (Font gameFont) font
 
-  blockHit <- liftIO $ loadAudio "data/196106_aiwha_ding-cc-by.wav"
+  blockHit <- liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
 
   -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
   -- bgM <- liftIO $ loadMusic "data/level0.mp3"
@@ -42,19 +43,19 @@ loadResources = runMaybeT $ do
   -- let levelBg = "data/level0.png"
   -- img <- lift $ fmap (Image levelBg) $ load levelBg
 
-  let ballImg = "data/ball2.png"
+  ballImg <- liftIO $ getDataFileName "data/ball2.png"
   ball <- lift $ fmap (Image ballImg) $ load ballImg
 
-  let b1Img = "data/block1.png"
+  b1Img <- liftIO $ getDataFileName "data/block1.png"
   b1 <- lift $ fmap (Image b1Img) $ load b1Img
 
-  let b2Img = "data/block2.png"
+  b2Img <- liftIO $ getDataFileName "data/block2.png"
   b2 <- lift $ fmap (Image b2Img) $ load b2Img
 
-  let b3Img = "data/block3.png"
+  b3Img <- liftIO $ getDataFileName "data/block3.png"
   b3 <- lift $ fmap (Image b3Img) $ load b3Img
 
-  let paddleImg = "data/paddleBlu.png"
+  paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
   paddle <- lift $ fmap (Image paddleImg) $ load paddleImg
 
   -- Start playing music
@@ -255,8 +256,10 @@ loadNewResources mgr state = do
 updateAllResources :: Resources -> GameStatus -> IO Resources
 updateAllResources res (GameLoading n) = do
   -- Load new music
-  let newMusicFP = _resourceFP $ levelMusic $ levels !! n
-      oldMusic   = bgMusic res
+  let newMusicFP' = _resourceFP $ levelMusic $ levels !! n
+  newMusicFP <- getDataFileName newMusicFP'
+
+  let oldMusic   = bgMusic res
       oldMusicFP = maybe "" musicName oldMusic
 
   newMusic <- if (oldMusicFP == newMusicFP)
@@ -271,8 +274,11 @@ updateAllResources res (GameLoading n) = do
                                return bgM
 
   -- Load new background
-  let newBgFP = _resourceFP $ levelBg $ levels !! n
-      oldBg   = bgImage res
+  let newBgFP' = _resourceFP $ levelBg $ levels !! n
+
+  newBgFP <- getDataFileName newBgFP'
+
+  let oldBg   = bgImage res
       oldBgFP = maybe "" imgName oldBg
 
   newBg <- if oldBgFP == newBgFP
