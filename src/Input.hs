@@ -30,10 +30,7 @@
 --
 module Input where
 
-import Control.Monad
-import Control.Monad.IfElse
 import Data.IORef
-import Data.Maybe (fromJust)
 import Graphics.UI.SDL as SDL
 #ifdef wiimote
 import System.CWiid
@@ -41,8 +38,6 @@ import System.CWiid
 
 import Control.Extra.Monad
 import Graphics.UI.Extra.SDL
-
-import Constants
 
 -- * Game controller
 
@@ -113,9 +108,7 @@ initializeWiimote = do
   putStrLn "Initializing WiiMote. Please press 1+2 to connect."
   wm <- cwiidOpen
   awhen wm (void . (`cwiidSetRptMode` 15)) -- Enable button reception, acc and IR
-  case wm of
-    Nothing  -> return Nothing
-    Just wm' -> return $ Just $ senseWiimote wm'
+  return $ fmap senseWiimote wm            -- Apply sensor to wiimote if available
 
 -- ** Sensing
 
