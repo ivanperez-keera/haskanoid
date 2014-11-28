@@ -9,7 +9,7 @@ particular:
 
 * SDL 1.2 graphics and sound.
 
-* Multiple input devices (keyboard, mouse, Wiimote Ir).
+* Multiple input devices (keyboard, mouse, Wiimote IR, Kinect).
 
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
@@ -49,7 +49,7 @@ explanation.
 *__Two additional notes__:
 
  * Users of GHC 7.8 need to run additional steps. See issue [#2](../../issues/2) for instructions.
- * MacOSX users (or anyone without a wiimote) might want to disable wiimote support. You'll need to comment a few things in the code and the cabal files. Issue [#1](../../issues/1) has been opened to deal with this possibility.
+ * MacOSX users (or anyone without a wiimote) might want to disable wiimote and kinect support. You can do so with the cabal flags wiimote and kinect, running cabal configure --flags="-kinect -wiimote" before building.
 
 ## Limitations
 
@@ -83,12 +83,18 @@ Reactive Programming implementation created by Antony Courtney and Henrik Nilsso
 * hcwiid (http://github.com/ivanperez-keera/hcwiid), a wrapper around
 the cwiid library to communicate with Wiimotes.
 
+* freenect (https://hackage.haskell.org/package/freenect), bindings to
+communicate with kinect devices.
+
 # Other links
 
-Keera Studios is developing a complete version of this game that runs
-on Android. It is **also written in Haskell**. You can see their
-announcement [here](http://keera.co.uk/blog/?p=690&preview=true),
-and followup on their progress on facebook and twitter.
+Keera Studios is developing a complete version of this game that runs on
+Android. This version is already available for selected beta testers on Google
+Play. It is **also written in Haskell**. You can see their announcement
+[here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/) and
+[here](http://keera.co.uk/blog/?p=690),
+and followup on their progress on facebook (http://facebook.com/keerastudios)
+and twitter (http://twitter.com/KeeraStudios).
 
 # Homework
 
@@ -119,6 +125,8 @@ There are a few obvious ways to improve this code:
 * If you are interested in performance: you'll notice that this game has
   growing memory demands.  There's a trivial change to one module that makes
   the game run in constant memory per level (using only 3M).
+
+  See also: http://keera.co.uk/blog/2014/10/15/from-60-fps-to-500/
 
 * If you are interested in game design: this game is quite simplistic,
   consisting only of blocks that must be hit. Some ideas for improvements:
