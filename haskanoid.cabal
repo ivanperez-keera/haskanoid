@@ -51,9 +51,19 @@ Flag wiimote
   Description: Enable Wiimote support with hcwiid
   Default: True
 
+Flag kinect
+  Description: Enable Kinect support (with freenect)
+  Default: True
+
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
   main-is: Main.hs
+
+  if flag(wiimote)
+    cpp-options: -Dwiimote
+
+  if flag(kinect)
+    cpp-options: -Dkinect
 
   ghc-options: -Wall -threaded
 
@@ -94,3 +104,6 @@ executable haskanoid
 
   if flag(wiimote)
     build-depends: hcwiid
+
+  if flag(kinect)
+    build-depends: freenect, vector
