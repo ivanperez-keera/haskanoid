@@ -101,7 +101,7 @@ audio :: Resources -> GameState -> IO()
 audio resources shownState = do
   -- Start bg music if necessary
   playing <- musicPlaying
-  when (not playing) $ awhen (bgMusic resources) playMusic 
+  unless playing $ awhen (bgMusic resources) playMusic 
 
   -- Play object hits
   mapM_ (audioObject resources) $ gameObjects shownState

@@ -304,7 +304,7 @@ gamePlay' objs = loopPre ([],[],0) $
          -- Turn every object that wants to kill itself into
          -- a function that removes it from the list
          where es :: [Event (IL ObjectSF -> IL ObjectSF)]
-               es = [ (harakiri oo `tag` (deleteIL k))
+               es = [ harakiri oo `tag` (deleteIL k)
                     | (k,oo) <- assocsIL oos ]
 
        -- From the actual objects, detect which ones collide
