@@ -10,14 +10,14 @@ name:                haskanoid
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.2
+version:             0.1.3
 
 -- A short (one-line) description of the package.
 synopsis:            A breakout game written in Yampa using SDL
 
 -- A longer description of the package.
-description:         An arkanoid game featuring SDL graphics and sound and
-                     Wiimote support, implemented using Yampa. 
+description:         An arkanoid game featuring SDL graphics and sound, and
+                     Wiimote & Kinect support, implemented using Yampa. 
 
 -- URL for the project homepage or repository.
 homepage:            http://github.com/ivanperez-keera/haskanoid
@@ -45,12 +45,25 @@ build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.8
 
-data-files: data/*.png data/*.wav data/*.mp3
+data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
 
+Flag wiimote
+  Description: Enable Wiimote support with hcwiid
+  Default: True
+
+Flag kinect
+  Description: Enable Kinect support (with freenect)
+  Default: True
 
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
   main-is: Main.hs
+
+  if flag(wiimote)
+    cpp-options: -Dwiimote
+
+  if flag(kinect)
+    cpp-options: -Dkinect
 
   ghc-options: -Wall -threaded
 
@@ -86,7 +99,11 @@ executable haskanoid
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.10,
-                       hcwiid, 
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse
-  
+
+  if flag(wiimote)
+    build-depends: hcwiid
+
+  if flag(kinect)
+    build-depends: freenect, vector

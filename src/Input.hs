@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE CPP                       #-}
 -- | Defines an abstraction for the game controller and the functions to read
 -- it.
 --
@@ -29,13 +30,29 @@
 --
 module Input where
 
-import Control.Monad
-import Control.Monad.IfElse
+-- External imports
 import Data.IORef
-import Data.Maybe (fromJust)
 import Graphics.UI.SDL as SDL
-import System.CWiid
 
+-- External imports (Wiimote)
+#ifdef wiimote
+import Control.Monad.IfElse (awhen)
+import Data.Maybe (fromMaybe)
+import System.CWiid
+#endif
+
+-- External imports (Kinect)
+#ifdef kinect
+import Control.Concurrent
+import Control.Monad
+import Data.Maybe (fromJust)
+import Data.Vector.Storable (Vector,(!))
+import Data.Word
+import Freenect
+import qualified Data.Vector.Storable as V
+#endif
+
+-- Internal imports
 import Control.Extra.Monad
 import Graphics.UI.Extra.SDL
 
@@ -64,12 +81,29 @@ newtype ControllerRef =
 -- not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
-  dev <- do wm <- wiimoteDev
-            case wm of
-              Nothing  -> fmap fromJust sdlMouseKB
-              Just wm' -> return wm'
+  let baseDev = sdlGetController
+
+-- Fall back to mouse/kb is no kinect is present
+#ifdef kinect
+  print "Kinecting"
+  dev <- do kn <- kinectController
+            case kn of
+              Nothing  -> return baseDev
+              Just kn' -> return kn'
+#else
+  let dev = baseDev
+#endif
+
+-- Fall back to kinect or mouse/kb is no wiimote is present
+#ifdef wiimote
+  dev' <- do wm <- wiimoteDev
+             return $ fromMaybe dev wm
+#else
+  let dev' = dev
+#endif
+
   nr <- newIORef defaultInfo
-  return $ ControllerRef (nr, dev)
+  return $ ControllerRef (nr, dev')
  where defaultInfo = Controller (0,0) False False
 
 -- | Sense from the controller, providing its current
@@ -89,6 +123,7 @@ senseInput (ControllerRef (cref, sensor)) = do
 type ControllerDev = IO (Maybe (Controller -> IO Controller))
 
 -- * WiiMote API (mid-level)
+#ifdef wiimote
 
 -- | The wiimote controller as defined using this
 -- abstract interface. See 'initializeWiimote'.
@@ -106,8 +141,8 @@ initializeWiimote = do
   wm <- cwiidOpen
   awhen wm (void . (`cwiidSetRptMode` 15)) -- Enable button reception, acc and IR
   case wm of
-    Nothing  -> return Nothing
-    Just wm' -> return $ Just $ senseWiimote wm'
+   Nothing -> return Nothing
+   Just wm' -> return $ Just $ senseWiimote wm'
 
 -- ** Sensing
 
@@ -122,9 +157,9 @@ initializeWiimote = do
 -- TODO: This should be split in two operations. One that presents a nice
 -- Wii-like interface and one that actually updates the controller
 senseWiimote :: CWiidWiimote -> Controller -> IO Controller
-senseWiimote wiimote controller = do
-  flags <- cwiidGetBtnState wiimote
-  irs   <- cwiidGetIR wiimote
+senseWiimote wmdev controller = do
+  flags <- cwiidGetBtnState wmdev
+  irs   <- cwiidGetIR wmdev
 
   -- Obtain positions of leds 1 and 2 (with a normal wii bar, those
   -- will be the ones we use).
@@ -160,6 +195,7 @@ senseWiimote wiimote controller = do
   return (controller { controllerPos   = (finX, finY) -- pos'
                      , controllerClick = isClick
                      })
+#endif
 
 -- * SDL API (mid-level)
 
@@ -186,8 +222,111 @@ sdlGetController info =
 handleEvent :: Controller -> SDL.Event -> Controller
 handleEvent c e =
   case e of
-    MouseMotion x y _ _                -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
-    MouseButtonDown _ _ ButtonLeft     -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft     -> c { controllerClick = False} 
-    KeyUp (Keysym { symKey = SDLK_p }) -> c { controllerPause = not (controllerPause c) }
-    _                                  -> c
+    MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
+    MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
+    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
+    KeyUp (Keysym { symKey = SDLK_p })       -> c { controllerPause = not (controllerPause c) }
+    KeyDown (Keysym { symKey = SDLK_SPACE }) -> c { controllerClick = True  }
+    KeyUp (Keysym { symKey = SDLK_SPACE })   -> c { controllerClick = False }
+    _                                        -> c
+
+
+-- Kinect
+
+#ifdef kinect
+kinectController :: ControllerDev
+kinectController = do
+  kref <- initializeKinect (gameWidth, gameHeight)
+  return $ Just $ kinectGetController kref
+
+kinectGetController :: KinectPosRef -> Controller -> IO Controller
+kinectGetController kinectPosRef c = do
+  kinectPos  <- readIORef kinectPosRef
+  c' <- sdlGetController c
+  let c'' = maybe c' (\p -> c' { controllerPos = p }) kinectPos
+  return c''
+
+-- TODO Use these instead of hard-coded values
+kinectWidth, kinectHeight :: Int
+kinectWidth  = 640
+kinectHeight = 480
+
+type KinectPosRef = IORef KinectPos
+type KinectPos = Maybe (Double, Double)
+
+initializeKinect :: (Double, Double) -> IO KinectPosRef
+initializeKinect screenSize = do
+  lastPos <- newIORef Nothing
+  _ <- getDepthThread screenSize lastPos
+  return lastPos
+
+getDepthThread :: (Double, Double) -> KinectPosRef -> IO ThreadId
+getDepthThread screenSize lastPos = forkIO $ do
+  withContext $ \context -> do
+    setLogLevel LogFatal context
+    selectSubdevices context devices
+    withDevice context index $ \device -> do
+      setDepthMode device Medium ElevenBit
+      setDepthCallback device $ \payload _timestamp -> do
+        maybe (print ".") -- Too far or too close
+              (updatePos lastPos)
+              (calculateMousePos screenSize payload)
+        return ()
+      startDepth device
+      forever $ processEvents context
+
+  where devices = [Camera]
+        index = 0 :: Integer
+
+updatePos :: IORef (Maybe (Double, Double)) -> (Double, Double) -> IO ()
+updatePos lastPosRef newPos@(nx,ny) = do
+  lastPosM <- readIORef lastPosRef
+  let (mx, my) = case lastPosM of
+                   Nothing        -> newPos
+                   (Just (lx,ly)) -> (adjust 50 lx nx, adjust 50 ly ny)
+  writeIORef lastPosRef (Just (mx, my))
+  mx `seq` my `seq` return ()
+
+calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double) 
+calculateMousePos (width, height) payload =
+  fmap g (findFirst payload)
+  where g (px,py) = (mousex, mousey)
+         where
+           pointerx = fromIntegral (640 - px)
+           pointery = fromIntegral py
+           mousex   = pointerx -- pointerx * adjx
+           mousey   = pointery -- pointery * adjy
+           adjx     = width  / 630.0
+           adjy     = height / 470.0
+
+mat :: Vector Float
+mat = V.generate 2048 (\i -> let v :: Float
+                                 v = ((fromIntegral i/2048.0)^3)*6.0 in v * 6.0 * 256.0)
+
+findFirst :: Vector Word16 -> Maybe (Int, Int)
+findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
+ where i  = V.findIndex (\x -> mat!(fromIntegral x) < 512) vs
+
+processPayload :: Vector Word16 -> [(Float, Int, Int)]
+processPayload ps = [(pval, tx, ty) | i <- [0..640*480-1]
+                                    , let pval = mat!(fromIntegral (ps!i))
+                                    , pval < 300
+                                    , let ty = i `div` 640
+                                          tx = i `mod` 640
+                                    ]
+
+-- Drop the fst elem, calculate the avg of snd and trd over the whole list
+avg :: [(Float, Int, Int)] -> (Int, Int)
+avg ls = (sumx `div` l, sumy `div` l)
+  where l = length ls
+        (sumx, sumy) = foldr (\(_,x,y) (rx,ry) -> (x+rx,y+ry)) (0,0) ls
+
+-- Update a value, with a max cap
+adjust :: (Num a, Ord a) => a -> a -> a -> a
+adjust maxD old new
+  | abs (old - new) < maxD = new
+  | old < new              = old + maxD
+  | otherwise              = old - maxD
+
+#endif
+
