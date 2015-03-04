@@ -1,4 +1,3 @@
-{-# LANGUAGE Arrows #-}
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
 
