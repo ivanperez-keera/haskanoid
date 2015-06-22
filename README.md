@@ -75,6 +75,12 @@ the cwiid library to communicate with Wiimotes.
 * freenect (https://hackage.haskell.org/package/freenect), bindings to
 communicate with kinect devices.
 
+* FRP Collisions (https://github.com/keera-studios/haskell-frp-yampa-physics),
+an introductory example of how to do sphere collisions in Yampa.
+
+* Magic Cookies (https://github.com/keera-studios/magic-cookies), a commercial
+FRP game written in Haskell using Yampa that's available on Google Play.
+
 # Other links
 
 Keera Studios is developing a complete version of this game that runs on

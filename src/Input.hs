@@ -36,6 +36,7 @@ import Graphics.UI.SDL as SDL
 
 -- External imports (Wiimote)
 #ifdef wiimote
+import Control.Monad(void)
 import Control.Monad.IfElse (awhen)
 import Data.Maybe (fromMaybe)
 import System.CWiid
