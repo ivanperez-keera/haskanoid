@@ -10,7 +10,7 @@ name:                haskanoid
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.4
+version:             0.1.5
 
 -- A short (one-line) description of the package.
 synopsis:            A breakout game written in Yampa using SDL
@@ -95,7 +95,7 @@ executable haskanoid
                  Resources
 
   -- Other library packages from which modules are imported.
-  build-depends:       base ==4.6.*,
+  build-depends:       base > 4.6 && < 5,
                        transformers >= 0.3 && < 0.5,
                        mtl,
                        MissingH,
