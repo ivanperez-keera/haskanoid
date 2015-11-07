@@ -510,8 +510,11 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   -- velocity.
 
   rec
-      let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
+      -- let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
+      -- let p = refPosPaddle ci -- (initPosPaddle ^+^) ^<< integral -< v
+      let v = 100.00 *^ (refPosPaddle ci ^-^ p)
       p <- (initPosPaddle ^+^) ^<< integral -< v
+      -- let p = refPosPaddle ci
 
   --  Use this code if you want instantaneous movement,
   --  particularly cool with the Wiimote, but remember to cap
@@ -525,7 +528,7 @@ objPaddle = proc (ObjectInput ci cs os) -> do
                Object{ objectName           = name
                      , objectKind           = Paddle (paddleWidth,paddleHeight)
                      , objectPos            = p
-                     , objectVel            = v
+                     , objectVel            = (0,0)
                      , objectAcc            = (0,0)
                      , objectDead           = False
                      , objectHit            = isHit

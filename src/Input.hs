@@ -33,6 +33,7 @@ module Input where
 -- External imports
 import Data.IORef
 import Graphics.UI.SDL as SDL
+import Control.Monad
 
 -- External imports (Wiimote)
 #ifdef wiimote
@@ -44,7 +45,6 @@ import System.CWiid
 -- External imports (Kinect)
 #ifdef kinect
 import Control.Concurrent
-import Control.Monad
 import Data.Maybe (fromJust)
 import Data.Vector.Storable (Vector,(!))
 import Data.Word
