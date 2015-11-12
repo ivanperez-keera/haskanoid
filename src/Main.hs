@@ -1,10 +1,16 @@
+{-# LANGUAGE CPP #-}
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
+import Control.Concurrent
 
 import Game
 import Display
 import Input
+#ifdef sdl
 import Graphics.UI.Extra.SDL
+#elif ghcjs
+import GHCJSNow
+#endif
 
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()
@@ -24,6 +30,6 @@ main = do
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ e -> render res' e >> return False)
+               (\_ e -> render res' e >> threadDelay 100 >> return False)
                wholeGame
  

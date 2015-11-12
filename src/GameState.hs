@@ -20,8 +20,8 @@ import Objects
 -- therefore convenient to group them in subtrees, even if there's no
 -- substantial difference betweem them.
 data GameState = GameState
-  { gameObjects :: Objects
-  , gameInfo    :: GameInfo
+  { gameObjects :: !Objects
+  , gameInfo    :: !GameInfo
   }
 
 -- | Initial (default) game state.
@@ -38,10 +38,10 @@ neutralGameState = GameState
 -- Since this info is then presented together to the users in a top panel, it
 -- is convenient to give this product of values a proper name.
 data GameInfo = GameInfo
-  { gameStatus :: GameStatus
-  , gameLives  :: Int
-  , gameLevel  :: Int
-  , gamePoints :: Int
+  { gameStatus :: !GameStatus
+  , gameLives  :: !Int
+  , gameLevel  :: !Int
+  , gamePoints :: !Int
   }
 
 -- | Initial (default) game info (no points, no lives, no level).

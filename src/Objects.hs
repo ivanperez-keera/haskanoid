@@ -17,16 +17,16 @@ type ObjectName = String
 -- | Objects have logical properties (ID, kind, dead, hit), shape properties
 -- (kind), physical properties (kind, pos, vel, acc) and collision properties
 -- (hit, 'canCauseCollisions', energy, displaced).
-data Object = Object { objectName           :: ObjectName
-                     , objectKind           :: ObjectKind
-                     , objectPos            :: Pos2D
-                     , objectVel            :: Vel2D
-                     , objectAcc            :: Acc2D
-                     , objectDead           :: Bool
-                     , objectHit            :: Bool
-                     , canCauseCollisions   :: Bool
-                     , collisionEnergy      :: Double
-                     , displacedOnCollision :: Bool       -- Theoretically, setting cE == 0 should suffice
+data Object = Object { objectName           :: !ObjectName
+                     , objectKind           :: !ObjectKind
+                     , objectPos            :: !Pos2D
+                     , objectVel            :: !Vel2D
+                     , objectAcc            :: !Acc2D
+                     , objectDead           :: !Bool
+                     , objectHit            :: !Bool
+                     , canCauseCollisions   :: !Bool
+                     , collisionEnergy      :: !Double
+                     , displacedOnCollision :: !Bool       -- Theoretically, setting cE == 0 should suffice
                      }
  deriving (Show)
 
@@ -36,10 +36,10 @@ type Objects   = [Object]
 --
 -- TODO: Use a GADT to separate these properties in two types and guarantee a
 -- proper correspondence in 'Object'.
-data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D 
-                | Block   Energy Size2D
-                | Side    Side
+data ObjectKind = Ball    !Double -- radius?
+                | Paddle  !Size2D 
+                | Block   !Energy Size2D
+                | Side    !Side
   deriving (Show,Eq)
 
 type Energy = Int
