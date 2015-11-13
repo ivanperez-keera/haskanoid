@@ -30,6 +30,6 @@ main = do
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ e -> render res' e >> threadDelay 100 >> return False)
+               (\_ e -> render res' e >> threadDelay 1000 >> return False)
                wholeGame
  
