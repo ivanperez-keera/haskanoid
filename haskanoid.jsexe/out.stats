@@ -1,0 +1,141 @@
+code size summary per package:
+
+Yampa_6eT8WjH1dJ5FtAsAqWdivE:250323
+base:                    385749
+deeps_IA8DgGbqfWcHYE0vChdRyn:834
+ghc-prim:                15322
+ghcjs_B7KLFJ07Vte3zPHAgRIBTb:10573
+ghcjs_D7BYGeMTlMGF2My8KZzKUS:11650
+ghcjs_Kc7TQ2cEDg1F5e5cgY2Vuk:7907
+integer-gmp:             23047
+main:                    412355
+trans_KzbnBSIEqPI2eU1Inn4mzm:552
+
+
+code size per module:
+
+Yampa_6eT8WjH1dJ5FtAsAqWdivE
+    FRP.Yampa.Delays:                   536
+    FRP.Yampa.Diagnostics:              1068
+    FRP.Yampa.Event:                    820
+    FRP.Yampa.EventS:                   11377
+    FRP.Yampa.Hybrid:                   2789
+    FRP.Yampa.InternalCore:             195971
+    FRP.Yampa.Loop:                     2182
+    FRP.Yampa.Miscellany:               171
+    FRP.Yampa.Simulation:               3581
+    FRP.Yampa.Switches:                 28025
+    FRP.Yampa.VectorSpace:              3803
+
+base
+    Control.Exception.Base:             5509
+    Data.Maybe:                         173
+    Data.OldList:                       953
+    Data.Tuple:                         334
+    Data.Typeable:                      885
+    Data.Typeable.Internal:             1418
+    Data.Version:                       215
+    Foreign.C.Error:                    9812
+    Foreign.Marshal.Alloc:              375
+    Foreign.Marshal.Array:              2038
+    Foreign.Storable:                   2680
+    GHC.Arr:                            3667
+    GHC.Base:                           7096
+    GHC.Conc.Sync:                      4451
+    GHC.Enum:                           1605
+    GHC.Err:                            382
+    GHC.Exception:                      6359
+    GHC.Float:                          79796
+    GHC.Foreign:                        12136
+    GHC.ForeignPtr:                     1265
+    GHC.IO:                             3605
+    GHC.IO.Buffer:                      1276
+    GHC.IO.BufferedIO:                  864
+    GHC.IO.Device:                      1297
+    GHC.IO.Encoding:                    1030
+    GHC.IO.Encoding.Failure:            724
+    GHC.IO.Encoding.Types:              1032
+    GHC.IO.Encoding.UTF8:               61149
+    GHC.IO.Exception:                   19322
+    GHC.IO.FD:                          37215
+    GHC.IO.Handle:                      416
+    GHC.IO.Handle.FD:                   6981
+    GHC.IO.Handle.Internals:            27136
+    GHC.IO.Handle.Types:                3571
+    GHC.Int:                            802
+    GHC.List:                           14283
+    GHC.MVar:                           188
+    GHC.Num:                            2077
+    GHC.Ptr:                            188
+    GHC.Real:                           5607
+    GHC.ST:                             186
+    GHC.STRef:                          194
+    GHC.Show:                           25247
+    GHC.Storable:                       1084
+    GHC.TopHandler:                     10349
+    GHC.Word:                           350
+    System.Environment:                 2308
+    System.Posix.Internals:             16119
+
+deeps_IA8DgGbqfWcHYE0vChdRyn
+    Control.DeepSeq:                    834
+
+ghc-prim
+    GHC.CString:                        4515
+    GHC.Classes:                        8441
+    GHC.IntWord64:                      146
+    GHC.Tuple:                          1080
+    GHC.Types:                          1140
+
+ghcjs_B7KLFJ07Vte3zPHAgRIBTb
+    GHCJS.Prim:                         6147
+    GHCJS.Prim.Internal:                4426
+
+ghcjs_D7BYGeMTlMGF2My8KZzKUS
+    GHCJS.DOM:                          457
+    GHCJS.DOM.JSFFI.Generated.Document: 2081
+    GHCJS.DOM.Types:                    9112
+
+ghcjs_Kc7TQ2cEDg1F5e5cgY2Vuk
+    Data.JSString:                      3959
+    Data.JSString.Internal.Type:        242
+    GHCJS.Marshal:                      2344
+    GHCJS.Marshal.Internal:             899
+    GHCJS.Marshal.Pure:                 463
+
+integer-gmp
+    GHC.Integer.GMP.Prim:               172
+    GHC.Integer.Type:                   22875
+
+main
+    Constants:                          417
+    Control.Extra.Monad:                2692
+    Data.Extra.Num:                     1692
+    Data.Extra.Ord:                     467
+    Data.Extra.VectorSpace:             928
+    Data.IdentityList:                  20233
+    Display:                            23412
+    FRP.Extra.Yampa:                    10054
+    GHCJSNow:                           1779
+    Game:                               166868
+    GameCollisions:                     18595
+    GameState:                          6444
+    Input:                              8867
+    JsImports:                          163
+    Levels:                             8842
+    Main:                               4462
+    ObjectSF:                           1726
+    Objects:                            115903
+    Paths_haskanoid:                    6044
+    Physics.TwoDimensions.Collisions:   7513
+    Physics.TwoDimensions.Dimensions:   1
+    Physics.TwoDimensions.Physics:      3864
+    Resources:                          1389
+
+trans_KzbnBSIEqPI2eU1Inn4mzm
+    Control.Monad.IO.Class:             552
+
+
+
+packed metadata: 199909
+
