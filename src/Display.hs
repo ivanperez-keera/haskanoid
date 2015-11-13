@@ -7,6 +7,7 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.IO.Class
 import Data.IORef
 import Data.Maybe
+import Data.String (fromString)
 import           GHCJS.DOM                     ( currentDocument
                                                , currentWindow )
 import           GHCJS.DOM.Document            ( getBody
@@ -155,11 +156,11 @@ display resources shownState = do
   C.fillStyle 25 25 25 1 ctx
   C.fillRect 0 0 width height ctx
 
-  -- HUD
-  paintGeneral ctx resources (gameInfo shownState)
-
   -- paintGeneralMsg surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources ctx) $ gameObjects shownState
+
+  -- HUD
+  paintGeneral ctx resources (gameInfo shownState)
 
   -- Double buffering
   -- C.fill ctx
@@ -188,15 +189,14 @@ paintGeneral screen resources over = void $ do
 --   SDL.blitSurface message Nothing screen $ Just (SDL.Rect x y w h)
 
 paintGeneralHUD screen resources over = void $ do
-  -- C.fillStyle 128 128 128 1.0 screen
-  -- C.textAlign C.Left screen
-  putStrLn $ show (gameLevel over)
-  putStrLn $ show (gamePoints over)
-  putStrLn $ show (gameLives over)
-  -- C.fillText ( "Level: " ++ 
-  -- C.fillText ( "Points: " ++ show (gamePoints over)) 10 50 screen
-  -- C.textAlign C.Right screen
-  -- C.fillText ( "Lives: " ++ show (gameLives over)) 10 10 screen
+  C.fillStyle 228 228 228 1.0 screen
+  C.font (fromString "30px Arial") screen
+  C.textBaseline C.Top screen
+  C.textAlign C.Left screen
+  C.fillText (fromString $ "Level: " ++ show (gameLevel over)) 10 10 screen
+  C.fillText (fromString $ "Points: " ++ show (gamePoints over)) 10 50 screen
+  C.textAlign C.Right screen
+  C.fillText (fromString $ "Lives: " ++ show (gameLives over)) width 10 screen
 
 paintObject resources screen object = do
   case objectKind object of
