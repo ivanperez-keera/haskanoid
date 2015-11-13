@@ -29015,7 +29015,7 @@ function h$$FO()
 {
   --h$sp;
   h$p1(h$$FP);
-  return h$delayThread(100);
+  return h$delayThread(1000);
 };
 function h$mainZCMainzimain3_e()
 {
