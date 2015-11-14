@@ -174,7 +174,7 @@ paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resou
 
 paintGeneralMsg' screen resources msg = void $ do
   C.fillStyle 94 65 47 1 screen
-  C.font (fromString "30px Arial") screen
+  C.font (fromString "34px Arial") screen
   C.textBaseline C.Top screen
   C.textAlign C.Center screen
   C.fillText (fromString msg) (width / 2) (height / 2) screen
@@ -188,13 +188,13 @@ paintGeneral screen resources over = void $ do
 
 paintGeneralHUD screen resources over = void $ do
   C.fillStyle 252 235 182 1.0 screen
-  C.font (fromString "30px Arial") screen
+  C.font (fromString "34px Arial") screen
   C.textBaseline C.Top screen
   C.textAlign C.Left screen
   C.fillText (fromString $ "Level: " ++ show (gameLevel over)) 10 10 screen
   C.fillText (fromString $ "Points: " ++ show (gamePoints over)) 10 50 screen
   C.textAlign C.Right screen
-  C.fillText (fromString $ "Lives: " ++ show (gameLives over)) width 10 screen
+  C.fillText (fromString $ "Lives: " ++ show (gameLives over)) (width-10) 10 screen
 
 paintObject (bx, by) resources screen object = do
   case objectKind object of
