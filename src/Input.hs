@@ -49,7 +49,7 @@ import           GHCJS.DOM.Element             ( getOffsetLeft
                                                , getInnerHTML )
 import           GHCJS.DOM.Element             ( setInnerHTML )
 import           GHCJS.DOM.EventTarget         ( addEventListener )
-import           GHCJS.DOM.EventTargetClosures ( eventListenerNew )
+import           GHCJS.DOM.EventTargetClosures ( eventListenerNewSync )
 import           GHCJS.DOM.Types               ( Element, IsDocument
                                                , MouseEvent, unElement )
 import           GHCJS.DOM.UIEvent             ( getPageX, getPageY )
@@ -279,44 +279,43 @@ type GHCJSController = IORef (Double, Double, Bool)
 
 ghcjsController :: IO (Controller -> IO Controller)
 ghcjsController = do
-  cvs <- initializeCanvasSense
+  cvs <- initializeCanvasSense (width, height)
   return $ ghcjsGetController cvs
 
-initializeCanvasSense :: IO GHCJSController
-initializeCanvasSense = do
+initializeCanvasSense :: (Double, Double) -> IO GHCJSController
+initializeCanvasSense dim = do
   ref <- newIORef (0, 0, False)
 
   Just doc    <- currentDocument
   Just canvas <- getElementById doc "dia"
   ctx         <- getContext canvas
 
-  listenerM   <- eventListenerNew (updateMove    ref canvas)
-  listenerC   <- eventListenerNew (updateClick   ref canvas)
-  listenerR   <- eventListenerNew (updateRelease ref canvas)
+  listenerM   <- eventListenerNewSync (updateMove    dim ref canvas)
+  listenerC   <- eventListenerNewSync (updateClick   ref canvas)
+  listenerR   <- eventListenerNewSync (updateRelease ref canvas)
   addEventListener canvas "mousemove" (Just listenerM) False
   addEventListener canvas "mousedown" (Just listenerC) False
   addEventListener canvas "mouseup"   (Just listenerR) False
 
   return ref
- where updateMove :: GHCJSController -> Element -> MouseEvent -> IO ()
-       updateMove ref canvas ev = do
-         Just win <- currentWindow
+ where updateMove :: (Double, Double) -> GHCJSController -> Element -> MouseEvent -> IO ()
+       updateMove (w, h) ref canvas ev = do
          x <- fromIntegral <$> getPageX ev
          y <- fromIntegral <$> getPageY ev
          x0 <- getOffsetLeft canvas
          y0 <- getOffsetTop canvas
-         let x' = (x - x0)
-         let y' = (y - y0)
-         modifyIORef ref (\(_,_,click) -> (x', y', click))
+         let x' = min (max 0 (x - x0)) w
+         let y' = min (max 0 (y - y0)) h
+         x' `seq` y' `seq` modifyIORef' ref (\(_,_,click) -> (x', y', click))
          return ()
 
        updateClick :: GHCJSController -> Element -> MouseEvent -> IO ()
-       updateClick ref canvas _ = void $ 
-         modifyIORef ref (\(x,y,_) -> (x, y, True))
+       updateClick ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, True))
 
        updateRelease :: GHCJSController -> Element -> MouseEvent -> IO ()
-       updateRelease ref canvas _ = void $ 
-         modifyIORef ref (\(x,y,_) -> (x, y, False))
+       updateRelease ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, False))
 
 ghcjsGetController ref co = do
   (px,py,c) <- readIORef ref

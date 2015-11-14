@@ -10,6 +10,7 @@ import Input
 import Graphics.UI.Extra.SDL
 #elif ghcjs
 import GHCJSNow
+import System.Mem
 #endif
 
 -- TODO: Use MaybeT or ErrorT to report errors

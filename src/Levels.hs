@@ -58,7 +58,8 @@ blockPosS :: Int -> [Pos2D]
 blockPosS 0 = map (adjustHPos *** adjustVPos) allBlocks
 
  where allBlocks :: (Enum a, Num a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1]]
+       -- allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1]]
+       allBlocks = [(x,y) | x <- [0..3], y <- [0..2]]
 
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)

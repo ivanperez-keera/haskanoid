@@ -509,11 +509,11 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   -- Try to get to the mouse position, but with a capped
   -- velocity.
 
-  rec
+  -- rec
       -- let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
       -- let p = refPosPaddle ci -- (initPosPaddle ^+^) ^<< integral -< v
-      let v = 100.00 *^ (refPosPaddle ci ^-^ p)
-      p <- (initPosPaddle ^+^) ^<< integral -< v
+      -- let v = 100.00 *^ (refPosPaddle ci ^-^ p)
+      -- p <- (initPosPaddle ^+^) ^<< integral -< v
       -- let p = refPosPaddle ci
 
   --  Use this code if you want instantaneous movement,
@@ -521,8 +521,8 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   --  the balls velocity or you will get incredibly high
   --  velocities when the paddle hits the ball.
   --
-  --  let p = refPosPaddle ci
-  --  v <- derivative -< p
+  let p = refPosPaddle ci
+  v <- derivative -< p
 
   returnA -< livingObject $
                Object{ objectName           = name

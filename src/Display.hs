@@ -8,6 +8,7 @@ import Control.Monad.IO.Class
 import Data.IORef
 import Data.Maybe
 import Data.String (fromString)
+import           GHCJS.Concurrent              ( synchronously )
 import           GHCJS.DOM                     ( currentDocument
                                                , currentWindow )
 import           GHCJS.DOM.Document            ( getBody
@@ -146,50 +147,47 @@ audio resources shownState = do
 --     _           -> return ()
 
 display :: Resources -> GameState -> IO()
-display resources shownState = do 
+display resources shownState = synchronously $ do 
   -- Obtain surface
   Just doc <- currentDocument
   Just canvas <- getElementById doc "dia"
   ctx <- getContext canvas
 
   -- Paint background
-  C.fillStyle 25 25 25 1 ctx
+  C.fillStyle 252 235 182 1.0 ctx
   C.fillRect 0 0 width height ctx
 
-  -- paintGeneralMsg surface resources (gameStatus (gameInfo shownState))
-  mapM_ (paintObject resources ctx) $ gameObjects shownState
+  mapM_ (paintObject (gameLeft, gameTop) resources ctx) $ gameObjects shownState
 
   -- HUD
   paintGeneral ctx resources (gameInfo shownState)
+  paintGeneralMsg ctx resources (gameStatus (gameInfo shownState))
 
   -- Double buffering
   -- C.fill ctx
 
+paintGeneralMsg screen resources GamePlaying     = return ()
+paintGeneralMsg screen resources GamePaused      = paintGeneralMsg' screen resources "Paused"
+paintGeneralMsg screen resources (GameLoading n) = paintGeneralMsg' screen resources ("Level " ++ show n)
+paintGeneralMsg screen resources GameOver        = paintGeneralMsg' screen resources "GAME OVER!!!"
+paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resources "You won!!! Well done :)"
+
+paintGeneralMsg' screen resources msg = void $ do
+  C.fillStyle 94 65 47 1 screen
+  C.font (fromString "30px Arial") screen
+  C.textBaseline C.Top screen
+  C.textAlign C.Center screen
+  C.fillText (fromString msg) (width / 2) (height / 2) screen
+
 paintGeneral screen resources over = void $ do
-  -- -- Paint screen green
-  -- let format = surfaceGetPixelFormat screen
-  -- bgColor <- mapRGB format 0x11 0x22 0x33
-  -- fillRect screen Nothing bgColor
+  -- Paint background
+  C.fillStyle 94 65 47 1 screen
+  C.fillRect 0 0 width gameTop screen
+  -- Paint HUG
   paintGeneralHUD screen resources over
 
--- paintGeneralMsg screen resources GamePlaying     = return ()
--- paintGeneralMsg screen resources GamePaused      = paintGeneralMsg' screen resources "Paused"
--- paintGeneralMsg screen resources (GameLoading n) = paintGeneralMsg' screen resources ("Level " ++ show n)
--- paintGeneralMsg screen resources GameOver        = paintGeneralMsg' screen resources "GAME OVER!!!"
--- paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resources "You won!!! Well done :)"
--- 
--- paintGeneralMsg' screen resources msg = void $ do
---   C.fillStyle 128 128 128 1.0 ctx
---   let font = resFont resources
---   message <- TTF.renderTextSolid (unFont font) msg (SDL.Color 128 128 128)
---   let x = (SDL.surfaceGetWidth  screen - w) `div` 2
---       y = (SDL.surfaceGetHeight screen - h) `div` 2
---       w = SDL.surfaceGetWidth  message
---       h = SDL.surfaceGetHeight message
---   SDL.blitSurface message Nothing screen $ Just (SDL.Rect x y w h)
-
 paintGeneralHUD screen resources over = void $ do
-  C.fillStyle 228 228 228 1.0 screen
+  C.fillStyle 252 235 182 1.0 screen
   C.font (fromString "30px Arial") screen
   C.textBaseline C.Top screen
   C.textAlign C.Left screen
@@ -198,23 +196,23 @@ paintGeneralHUD screen resources over = void $ do
   C.textAlign C.Right screen
   C.fillText (fromString $ "Lives: " ++ show (gameLives over)) width 10 screen
 
-paintObject resources screen object = do
+paintObject (bx, by) resources screen object = do
   case objectKind object of
-    (Paddle (w,h))  -> void $ do C.fillStyle 35 99 200 1.0 screen
+    (Paddle (w,h))  -> void $ do C.fillStyle 120 192 168 1.0 screen
                                  C.fillRect x y w h screen
     (Block e (w,h)) -> void $ do case e of
-                                   3 -> C.fillStyle 200 99 35 1.0 screen
-                                   2 -> C.fillStyle 100 99 35 1.0 screen
-                                   n -> C.fillStyle 0   99 35 1.0 screen
+                                   3 -> C.fillStyle 240 120 24 1.0 screen
+                                   2 -> C.fillStyle 220 108 21 1.0 screen
+                                   n -> C.fillStyle 200  99 19 1.0 screen
                                  C.fillRect x y w h screen
     (Ball r)        -> void $ do C.beginPath screen
                                  C.arc x y r 0 (2*pi) False screen
-                                 C.fillStyle 255 255 255 1.0 screen
+                                 C.fillStyle 240 168 48 1.0 screen
                                  C.fill screen
     _               -> return ()
-  where p      = objectPos object
-        x      = (fst p)
-        y      = (snd p)
+  where p = objectPos object
+        x = bx + fst p
+        y = by + snd p
 
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 
