@@ -66743,7 +66743,7 @@ function h$$aeH()
   h$sp -= 3;
   var c = h$jsstringPack(b);
   var d = c;
-  a.fillText(d, 640.0, 10.0);
+  a.fillText(d, 630.0, 10.0);
   h$r1 = h$ghczmprimZCGHCziTupleziZLZR;
   return h$stack[h$sp];
 };
@@ -66919,7 +66919,7 @@ function h$mainZCDisplayzipaintGeneralMsg2_e()
   h$r1 = h$baseZCControlziExceptionziBasezipatError;
   return h$ap_1_2_fast();
 };
-var h$$mainZCDisplay_bg = h$str("30px Arial");
+var h$$mainZCDisplay_bg = h$str("34px Arial");
 function h$mainZCDisplayzipaintGeneralMsg8_e()
 {
   h$bh();
