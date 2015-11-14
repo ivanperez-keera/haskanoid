@@ -1,14 +1,14 @@
 code size summary per package:
 
-Yampa_6eT8WjH1dJ5FtAsAqWdivE:250323
-base:                    385749
+Yampa_6eT8WjH1dJ5FtAsAqWdivE:254142
+base:                    393932
 deeps_IA8DgGbqfWcHYE0vChdRyn:834
 ghc-prim:                15322
 ghcjs_B7KLFJ07Vte3zPHAgRIBTb:10573
 ghcjs_D7BYGeMTlMGF2My8KZzKUS:11650
 ghcjs_Kc7TQ2cEDg1F5e5cgY2Vuk:7907
-integer-gmp:             23047
-main:                    412356
+integer-gmp:             23566
+main:                    410979
 trans_KzbnBSIEqPI2eU1Inn4mzm:552
 
 
@@ -20,15 +20,16 @@ Yampa_6eT8WjH1dJ5FtAsAqWdivE
     FRP.Yampa.Event:                    820
     FRP.Yampa.EventS:                   11377
     FRP.Yampa.Hybrid:                   2789
+    FRP.Yampa.Integration:              2527
     FRP.Yampa.InternalCore:             195971
     FRP.Yampa.Loop:                     2182
     FRP.Yampa.Miscellany:               171
     FRP.Yampa.Simulation:               3581
     FRP.Yampa.Switches:                 28025
-    FRP.Yampa.VectorSpace:              3803
+    FRP.Yampa.VectorSpace:              5095
 
 base
-    Control.Exception.Base:             5509
+    Control.Exception.Base:             7309
     Data.Maybe:                         173
     Data.OldList:                       953
     Data.Tuple:                         334
@@ -45,7 +46,8 @@ base
     GHC.Enum:                           1605
     GHC.Err:                            382
     GHC.Exception:                      6359
-    GHC.Float:                          79796
+    GHC.Float:                          82009
+    GHC.Float.ConversionUtils:          3383
     GHC.Foreign:                        12136
     GHC.ForeignPtr:                     1265
     GHC.IO:                             3605
@@ -67,7 +69,7 @@ base
     GHC.MVar:                           188
     GHC.Num:                            2077
     GHC.Ptr:                            188
-    GHC.Real:                           5607
+    GHC.Real:                           6394
     GHC.ST:                             186
     GHC.STRef:                          194
     GHC.Show:                           25247
@@ -104,8 +106,8 @@ ghcjs_Kc7TQ2cEDg1F5e5cgY2Vuk
     GHCJS.Marshal.Pure:                 463
 
 integer-gmp
-    GHC.Integer.GMP.Prim:               172
-    GHC.Integer.Type:                   22875
+    GHC.Integer.GMP.Prim:               333
+    GHC.Integer.Type:                   23233
 
 main
     Constants:                          417
@@ -114,15 +116,15 @@ main
     Data.Extra.Ord:                     467
     Data.Extra.VectorSpace:             928
     Data.IdentityList:                  20233
-    Display:                            23412
+    Display:                            32032
     FRP.Extra.Yampa:                    10054
     GHCJSNow:                           1779
-    Game:                               166868
+    Game:                               155889
     GameCollisions:                     18595
     GameState:                          6444
-    Input:                              8867
+    Input:                              10571
     JsImports:                          163
-    Levels:                             8842
+    Levels:                             8120
     Main:                               4463
     ObjectSF:                           1726
     Objects:                            115903
@@ -137,5 +139,5 @@ trans_KzbnBSIEqPI2eU1Inn4mzm
 
 
 
-packed metadata: 199909
+packed metadata: 203839
 
