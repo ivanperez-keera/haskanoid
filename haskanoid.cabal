@@ -55,6 +55,14 @@ Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
 
+Flag sdl
+  Description: Enable SDL multimedia
+  Default: True
+
+Flag ghcjs
+  Description: Enable compilation using GHCJS and HTML5 Canvas
+  Default: False
+
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
   main-is: Main.hs
@@ -62,17 +70,30 @@ executable haskanoid
   if flag(wiimote)
     cpp-options: -Dwiimote
     ghc-options: -rtsopts
+    build-depends: hcwiid
 
   if flag(kinect)
     cpp-options: -Dkinect
+    build-depends: freenect, vector
+
+  if flag(sdl)
+    cpp-options: -Dsdl
+    other-modules: Graphics.UI.Extra.SDL
+    build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf
+
+  if flag(ghcjs)
+    cpp-options: -Dghcjs
+    other-extensions: JavaScriptFFI, CPP, OverloadedStrings
+    other-modules: GHCJSNow JsImports
+    build-depends: ghcjs-dom, ghcjs-base, linear, semigroups
+    default-language:    Haskell2010
 
   ghc-options: -Wall -threaded
 
   hs-source-dirs: src/
 
   -- Modules included in this executable, other than Main.
-  other-modules: Audio
-                 Constants
+  other-modules: Constants
                  Control.Extra.Monad
                  Data.Extra.List
                  Data.Extra.Num
@@ -84,7 +105,6 @@ executable haskanoid
                  Game
                  GameCollisions
                  GameState
-                 Graphics.UI.Extra.SDL
                  Input
                  Levels
                  Objects
@@ -100,11 +120,5 @@ executable haskanoid
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.11,
-                       SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse
 
-  if flag(wiimote)
-    build-depends: hcwiid
-
-  if flag(kinect)
-    build-depends: freenect, vector

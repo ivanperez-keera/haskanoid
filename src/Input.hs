@@ -32,8 +32,42 @@ module Input where
 
 -- External imports
 import Data.IORef
-import Graphics.UI.SDL as SDL
 import Control.Monad
+
+#ifdef sdl
+import Graphics.UI.SDL as SDL
+import Graphics.UI.Extra.SDL
+#endif
+
+#ifdef ghcjs
+import           GHCJS.DOM                     ( currentDocument
+                                               , currentWindow )
+import           GHCJS.DOM.Document            ( getBody
+                                               , getElementById )
+import           GHCJS.DOM.Element             ( getOffsetLeft
+                                               , getOffsetTop
+                                               , getInnerHTML )
+import           GHCJS.DOM.Element             ( setInnerHTML )
+import           GHCJS.DOM.EventTarget         ( addEventListener )
+import           GHCJS.DOM.EventTargetClosures ( eventListenerNewSync )
+import           GHCJS.DOM.Types               ( Element, IsDocument
+                                               , MouseEvent, unElement )
+import           GHCJS.DOM.UIEvent             ( getPageX, getPageY )
+import           GHCJS.Foreign
+import           GHCJS.Types
+import qualified JavaScript.Web.Canvas         as C
+import           JsImports                     (now)
+
+
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Concurrent.MVar
+import           Control.Monad                 hiding (sequence_)
+import           Data.Foldable                 (minimumBy)
+import           Data.Ord
+import           Data.Semigroup
+import           Linear
+#endif
 
 -- External imports (Wiimote)
 #ifdef wiimote
@@ -55,7 +89,6 @@ import qualified Data.Vector.Storable as V
 
 -- Internal imports
 import Control.Extra.Monad
-import Graphics.UI.Extra.SDL
 
 import Constants
 
@@ -82,7 +115,12 @@ newtype ControllerRef =
 -- not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
+
+#ifdef sdl
   let baseDev = sdlGetController
+#elif ghcjs
+  baseDev <- ghcjsController
+#endif
 
 -- Fall back to mouse/kb is no kinect is present
 #ifdef kinect
@@ -199,6 +237,7 @@ senseWiimote wmdev controller = do
 #endif
 
 -- * SDL API (mid-level)
+#ifdef sdl
 
 -- ** Initialization
 
@@ -230,9 +269,63 @@ handleEvent c e =
     KeyDown (Keysym { symKey = SDLK_SPACE }) -> c { controllerClick = True  }
     KeyUp (Keysym { symKey = SDLK_SPACE })   -> c { controllerClick = False }
     _                                        -> c
+#endif
 
 
 -- Kinect
+
+#ifdef ghcjs
+type GHCJSController = IORef (Double, Double, Bool)
+
+ghcjsController :: IO (Controller -> IO Controller)
+ghcjsController = do
+  cvs <- initializeCanvasSense (width, height)
+  return $ ghcjsGetController cvs
+
+initializeCanvasSense :: (Double, Double) -> IO GHCJSController
+initializeCanvasSense dim = do
+  ref <- newIORef (0, 0, False)
+
+  Just doc    <- currentDocument
+  Just canvas <- getElementById doc "dia"
+  ctx         <- getContext canvas
+
+  listenerM   <- eventListenerNewSync (updateMove    dim ref canvas)
+  listenerC   <- eventListenerNewSync (updateClick   ref canvas)
+  listenerR   <- eventListenerNewSync (updateRelease ref canvas)
+  addEventListener canvas "mousemove" (Just listenerM) False
+  addEventListener canvas "mousedown" (Just listenerC) False
+  addEventListener canvas "mouseup"   (Just listenerR) False
+
+  return ref
+ where updateMove :: (Double, Double) -> GHCJSController -> Element -> MouseEvent -> IO ()
+       updateMove (w, h) ref canvas ev = do
+         x <- fromIntegral <$> getPageX ev
+         y <- fromIntegral <$> getPageY ev
+         x0 <- getOffsetLeft canvas
+         y0 <- getOffsetTop canvas
+         let x' = min (max 0 (x - x0)) w
+         let y' = min (max 0 (y - y0)) h
+         x' `seq` y' `seq` modifyIORef' ref (\(_,_,click) -> (x', y', click))
+         return ()
+
+       updateClick :: GHCJSController -> Element -> MouseEvent -> IO ()
+       updateClick ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, True))
+
+       updateRelease :: GHCJSController -> Element -> MouseEvent -> IO ()
+       updateRelease ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, False))
+
+ghcjsGetController ref co = do
+  (px,py,c) <- readIORef ref
+  let c' = co { controllerPos = (px, py), controllerClick = c }  
+  return c'
+
+getContext :: Element -> IO C.Context
+getContext el = do
+  C.getContext . C.unsafeToCanvas. unElement $ el
+#endif
 
 #ifdef kinect
 kinectController :: ControllerDev
