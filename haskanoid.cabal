@@ -96,7 +96,7 @@ executable haskanoid
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
-                       transformers >= 0.3 && < 0.5,
+                       transformers >= 0.3 && < 0.6,
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.11,
