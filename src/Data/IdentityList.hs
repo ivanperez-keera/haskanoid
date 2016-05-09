@@ -37,6 +37,20 @@ module Data.IdentityList (
 
 import Data.List (find)
 
+import Data.Foldable
+import Data.Traversable
+import Control.Applicative
+import Prelude hiding (foldr)
+
+instance Traversable IL where
+  traverse f (IL nextK assocs) = pure f' <*> traverse f vals
+     where (keys, vals) = unzip assocs
+           f' vs        = IL nextK (zip keys vs)
+
+instance Foldable IL where
+  foldr f b = foldr f b . elemsIL
+  foldMap f = foldMap f . elemsIL
+
 
 ------------------------------------------------------------------------------
 -- Data type definitions
