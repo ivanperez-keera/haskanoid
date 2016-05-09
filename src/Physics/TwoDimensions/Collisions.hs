@@ -4,7 +4,7 @@
 -- between shapes.
 module Physics.TwoDimensions.Collisions where
 
-import FRP.Yampa           as Yampa
+import FRP.Yampa.VectorSpace as Yampa
 import Physics.TwoDimensions.Physics
 
 -- * Collision sides

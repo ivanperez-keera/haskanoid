@@ -4,7 +4,7 @@
 -- derivatives.
 module Physics.TwoDimensions.Physics where
 
-import FRP.Yampa           as Yampa
+import FRP.Yampa.VectorSpace as Yampa
 import Physics.TwoDimensions.Dimensions
 
 data Shape = Rectangle Pos2D Size2D     -- A corner and the whole size
