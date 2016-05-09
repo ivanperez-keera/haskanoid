@@ -2,7 +2,6 @@ module FRP.Extra.Yampa where
 
 import Control.Arrow
 import FRP.Yampa
-import FRP.Yampa.Event
 
 -- Auxiliary Yampa stuff
 
