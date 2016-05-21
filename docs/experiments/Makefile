@@ -1,6 +1,6 @@
 .PHONY: default
 
-default: haskanoid.pdf
+default: bearriver.pdf
 
 %.pdf: %.ps
 	ps2pdf $<
