@@ -40,30 +40,32 @@ import Graphics.UI.Extra.SDL
 #endif
 
 #ifdef ghcjs
-import           GHCJS.DOM                     ( currentDocument
-                                               , currentWindow )
-import           GHCJS.DOM.Document            ( getBody
-                                               , getElementById )
-import           GHCJS.DOM.Element             ( getOffsetLeft
-                                               , getOffsetTop
-                                               , getInnerHTML )
-import           GHCJS.DOM.Element             ( setInnerHTML )
-import           GHCJS.DOM.EventTarget         ( addEventListener )
-import           GHCJS.DOM.EventTargetClosures ( eventListenerNewSync )
-import           GHCJS.DOM.Types               ( Element, IsDocument
-                                               , MouseEvent, unElement )
-import           GHCJS.DOM.UIEvent             ( getPageX, getPageY )
+import           Data.Coerce
+import           GHCJS.DOM                      ( currentDocument
+                                                , currentWindow )
+import           GHCJS.DOM.Document             ( getBody
+                                                , getElementById )
+import           GHCJS.DOM.Element              ( getOffsetLeft
+                                                , getOffsetTop
+                                                , getInnerHTML )
+import           GHCJS.DOM.Element              ( setInnerHTML )
+import           GHCJS.DOM.EventTarget          ( addEventListener )
+import           GHCJS.DOM.EventTargetClosures  ( eventListenerNewSync )
+import           GHCJS.DOM.Types                ( Element(..), IsDocument
+                                                , MouseEvent, unElement )
+import           GHCJS.DOM.UIEvent              ( getPageX, getPageY )
 import           GHCJS.Foreign
 import           GHCJS.Types
-import qualified JavaScript.Web.Canvas         as C
-import           JsImports                     (now)
+import qualified JavaScript.Web.Canvas          as C
+import qualified JavaScript.Web.Canvas.Internal as C
+import           JsImports                      (now)
 
 
 import           Control.Applicative
 import           Control.Concurrent
 import           Control.Concurrent.MVar
-import           Control.Monad                 hiding (sequence_)
-import           Data.Foldable                 (minimumBy)
+import           Control.Monad                  hiding (sequence_)
+import           Data.Foldable                  (minimumBy)
 import           Data.Ord
 import           Data.Semigroup
 import           Linear
@@ -323,8 +325,7 @@ ghcjsGetController ref co = do
   return c'
 
 getContext :: Element -> IO C.Context
-getContext el = do
-  C.getContext . C.unsafeToCanvas. unElement $ el
+getContext = C.getContext . coerce
 #endif
 
 #ifdef kinect

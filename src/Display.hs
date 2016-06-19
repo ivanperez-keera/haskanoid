@@ -8,6 +8,7 @@ import Control.Monad.IO.Class
 import Data.IORef
 import Data.Maybe
 import Data.String (fromString)
+import           Data.Coerce
 import           GHCJS.Concurrent              ( synchronously )
 import           GHCJS.DOM                     ( currentDocument
                                                , currentWindow )
@@ -19,12 +20,13 @@ import           GHCJS.DOM.Element             ( getOffsetLeft
 import           GHCJS.DOM.Element             ( setInnerHTML )
 import           GHCJS.DOM.EventTarget         ( addEventListener )
 import           GHCJS.DOM.EventTargetClosures ( eventListenerNew )
-import           GHCJS.DOM.Types               ( Element, IsDocument
+import           GHCJS.DOM.Types               ( Element(..), IsDocument
                                                , MouseEvent, unElement )
 import           GHCJS.DOM.UIEvent             ( getPageX, getPageY )
 import           GHCJS.Foreign
 import           GHCJS.Types
 import qualified JavaScript.Web.Canvas         as C
+import qualified JavaScript.Web.Canvas.Internal as C
 import           JsImports                     (now)
 
 
@@ -234,8 +236,7 @@ data Resources = Resources
   -- }
 
 getContext :: Element -> IO C.Context
-getContext el = do
-  C.getContext . C.unsafeToCanvas. unElement $ el
+getContext = C.getContext . coerce
 
 
 -- data Image = Image { imgName  :: String, imgSurface :: Surface }

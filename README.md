@@ -50,6 +50,16 @@ explanation.
  * Users of GHC 7.8 need to run additional steps. See issue [#2](../../issues/2) for instructions.
  * MacOSX users (or anyone without a wiimote) might want to disable wiimote and kinect support. You can do so with the cabal flags wiimote and kinect, by running cabal install --flags="-kinect -wiimote".
 
+## Compilation of GHCJS branch
+
+This game works on browsers (sound and kinect/wiimote are not supported).  To
+compile it with GHCJS, you need to have GHCJS installed and compile haskanoid
+with the following line:
+
+```
+$ cabal install --ghcjs -fghcjs -f-sdl -f-kinect -f-wiimote
+```
+
 # Documentation
 
 To try and make things as clear as possible, the code includes a much haddock
