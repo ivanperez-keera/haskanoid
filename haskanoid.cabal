@@ -108,3 +108,7 @@ executable haskanoid
 
   if flag(kinect)
     build-depends: freenect, vector
+
+source-repository head
+  type:     git
+  location: git://github.com/ivanperez-keera/haskanoid.git
