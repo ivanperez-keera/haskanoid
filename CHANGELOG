@@ -1,4 +1,8 @@
+2017-04-26 Ivan Perez <ivan.perez@keera.co.uk>:
+        * Enables compilation and upload to hackage using Travis CI.
+        * Version bump (0.1.5.1).
+
 2015-06-23 Ivan Perez <ivan.perez@keera.co.uk>:
 
 	* Version bump (0.1.5).
-    * Bumps base upper bound (now compiles with GHC 7.10).
+        * Bumps base upper bound (now compiles with GHC 7.10).
