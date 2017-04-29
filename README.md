@@ -14,6 +14,16 @@ particular:
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
 
+A slightly different version of this game, with SDL2, has been made available
+to play by [Keera Studios](https://facebook.com/keerastudios) for free on on
+[Google Play for
+Android](https://play.google.com/store/apps/details?id=uk.co.keera.games.breakout.beta).
+There is a bug that makes the app not close or save the game when you exit it.
+I know how to solve it, I just haven't found the time to push that change.
+Please, report other bugs of that Android app here. You can follow the progress
+of the port for Android on [facebook](http://facebook.com/keerastudios) and
+[twitter](http://twitter.com/KeeraStudios).
+
 ![GitHub Logo](screenshots/desktop.png?raw=true)
 
 We would like to call on Haskell programmers, game developers and anyone with
@@ -81,15 +91,15 @@ an introductory example of how to do sphere collisions in Yampa.
 * Magic Cookies (https://github.com/keera-studios/magic-cookies), a commercial
 FRP game written in Haskell using Yampa that's available on Google Play.
 
-# Other links
-
-Keera Studios is developing a complete version of this game that runs on
-Android. This version is already available for selected beta testers on Google
-Play. It is **also written in Haskell**. You can see their announcement
-[here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/) and
-[here](http://keera.co.uk/blog/?p=690),
-and followup on their progress on facebook (http://facebook.com/keerastudios)
-and twitter (http://twitter.com/KeeraStudios).
+<!-- 
+ # Other links
+ 
+ It is **also written in Haskell**. You can see their announcement
+ [here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/) and
+ [here](http://keera.co.uk/blog/?p=690),
+ and followup on their progress on facebook (http://facebook.com/keerastudios)
+ and twitter (http://twitter.com/KeeraStudios).
+-->
 
 # Homework
 
