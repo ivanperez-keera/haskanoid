@@ -15,7 +15,7 @@ particular:
   rendering/multimedia, logic, etc.
 
 A slightly different version of this game, with SDL2, has been made available
-to play by [Keera Studios](https://facebook.com/keerastudios) for free on on
+to play by [Keera Studios](https://facebook.com/keerastudios) for free on
 [Google Play for
 Android](https://play.google.com/store/apps/details?id=uk.co.keera.games.breakout.beta).
 There is a bug that makes the app not close or save the game when you exit it.
