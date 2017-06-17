@@ -23,8 +23,8 @@ help us improve the game, and the state of FRP/Yampa programming as well.
 
 This game was used to present a Declarative Game Programming tutorial at PPDP
 14 (see
-http://fplab.bitbucket.org/posts/2014-09-23-declarative-game-programm.html for
-details). Slides are available on that website.
+http://keera.co.uk/blog/2014/09/24/game-programming-videos-code/ for
+details). Slides are linked from that website.
 
 # Installation
 
@@ -83,13 +83,13 @@ FRP game written in Haskell using Yampa that's available on Google Play.
 
 # Other links
 
-Keera Studios is developing a complete version of this game that runs on
-Android. This version is already available for selected beta testers on Google
-Play. It is **also written in Haskell**. You can see their announcement
-[here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/) and
-[here](http://keera.co.uk/blog/?p=690),
-and followup on their progress on facebook (http://facebook.com/keerastudios)
-and twitter (http://twitter.com/KeeraStudios).
+Keera Studios has made a version of this game available on [Google Play for
+Android](https://play.google.com/store/apps/details?id=uk.co.keera.games.breakout.beta).
+It is **also written in Haskell**. You can see their announcement
+[here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/)
+and [here](http://keera.co.uk/blog/?p=690), and followup on their progress on
+facebook (http://facebook.com/keerastudios) and twitter
+(http://twitter.com/KeeraStudios).
 
 # Homework
 
