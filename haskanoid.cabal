@@ -55,9 +55,12 @@ Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
 
+Flag titan
+  Description: Demonstrate Titan features
+  Default: False
+
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
-  main-is: Main.hs
 
   if flag(wiimote)
     cpp-options: -Dwiimote
@@ -108,6 +111,12 @@ executable haskanoid
 
   if flag(kinect)
     build-depends: freenect, vector
+
+  if flag(titan)
+    main-is: Record.hs
+    build-depends: titan-yampa-recorder
+  else
+    main-is: Main.hs
 
 source-repository head
   type:     git
