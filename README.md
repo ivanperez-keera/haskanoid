@@ -1,4 +1,4 @@
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ivanperez-keera&url=https://github.com/ivanperez-keera/haskanoid&title=Haskanoid&language=&tags=github&category=software) 
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ivanperez-keera&url=https://github.com/ivanperez-keera/haskanoid&title=Haskanoid&language=&tags=github&category=software)
 
 This is a Haskell breakout game implemented using the Functional
 Reactive Programming library Yampa.
@@ -14,7 +14,17 @@ particular:
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
 
-![GitHub Logo](screenshots/desktop.png?raw=true)
+A slightly different version of this game, with SDL2, has been made available
+to play by [Keera Studios](https://facebook.com/keerastudios) for free on
+[Google Play for
+Android](https://play.google.com/store/apps/details?id=uk.co.keera.games.breakout.beta).
+There is a bug that makes the app not close or save the game when you exit it.
+I know how to solve it, I just haven't found the time to push that change.
+Please, report other bugs of that Android app here. You can follow the progress
+of the port for Android on [facebook](http://facebook.com/keerastudios) and
+[twitter](http://twitter.com/KeeraStudios).
+
+![Haskanoid on Android](screenshots/android.png?raw=true)
 
 We would like to call on Haskell programmers, game developers and anyone with
 an interest in Functional Reactive Programming and/or Game Programming to
