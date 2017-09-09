@@ -89,7 +89,10 @@ communicate with kinect devices.
 an introductory example of how to do sphere collisions in Yampa.
 
 * Magic Cookies (https://github.com/keera-studios/magic-cookies), a commercial
-FRP game written in Haskell using Yampa that's available on Google Play.
+  FRP game written in Haskell using Yampa that's available on
+[iTunes](https://itunes.apple.com/us/app/magic-cookies/id1244709871) and
+[Google
+Play](https://play.google.com/store/apps/details?id=uk.co.keera.games.magiccookies&hl=en).
 
 # Other links
 
