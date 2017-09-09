@@ -28,7 +28,7 @@ data Object = Object { objectName           :: ObjectName
                      , collisionEnergy      :: Double
                      , displacedOnCollision :: Bool       -- Theoretically, setting cE == 0 should suffice
                      }
- deriving (Show)
+ deriving (Read, Show)
 
 type Objects   = [Object]
 
@@ -37,10 +37,10 @@ type Objects   = [Object]
 -- TODO: Use a GADT to separate these properties in two types and guarantee a
 -- proper correspondence in 'Object'.
 data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D 
+                | Paddle  Size2D
                 | Block   Energy Size2D
                 | Side    Side
-  deriving (Show,Eq)
+  deriving (Read, Show,Eq)
 
 type Energy = Int
 
@@ -77,7 +77,7 @@ type Collisions = [Collision]
 
 -- | A collision is a list of objects that collided, plus their velocities as
 -- modified by the collision.
--- 
+--
 -- Take into account that the same object could take part in several
 -- simultaneous collitions, so these velocities should be added (per object).
 data Collision = Collision

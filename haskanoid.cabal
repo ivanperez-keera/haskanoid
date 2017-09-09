@@ -55,8 +55,13 @@ Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
 
-Flag titan
-  Description: Demonstrate Titan features
+Flag titandebug
+  Description: Enable debugging using Titan
+  Default: False
+
+
+Flag titanrecord
+  Description: Enable record-and-replay using Titan
   Default: False
 
 executable haskanoid
@@ -112,10 +117,13 @@ executable haskanoid
   if flag(kinect)
     build-depends: freenect, vector
 
-  if flag(titan)
+  if flag(titanrecord)
     main-is: Record.hs
     build-depends: titan-yampa-recorder
-  else
+  if flag(titandebug)
+    main-is: TitanMain.hs
+    build-depends: titan-yampa-debugger
+  if !flag(titanrecord) && !flag(titandebug)
     main-is: Main.hs
 
 source-repository head

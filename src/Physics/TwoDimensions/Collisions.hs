@@ -11,7 +11,7 @@ import Physics.TwoDimensions.Physics
 
 -- | Collision side of a rectangle
 data Side = TopSide | BottomSide | LeftSide | RightSide
-  deriving (Eq,Show)
+  deriving (Eq,Read,Show)
 
 -- | Opposite side during a collision.
 --

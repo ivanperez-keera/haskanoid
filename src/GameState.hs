@@ -23,6 +23,7 @@ data GameState = GameState
   { gameObjects :: Objects
   , gameInfo    :: GameInfo
   }
+ deriving (Read, Show)
 
 -- | Initial (default) game state.
 neutralGameState :: GameState
@@ -43,6 +44,7 @@ data GameInfo = GameInfo
   , gameLevel  :: Int
   , gamePoints :: Int
   }
+ deriving (Read, Show)
 
 -- | Initial (default) game info (no points, no lives, no level).
 neutralGameInfo :: GameInfo
@@ -63,4 +65,4 @@ data GameStatus = GamePlaying
                 | GameOver
                 | GameFinished
                 | GameStarted
- deriving Eq
+ deriving (Read, Show, Eq)
