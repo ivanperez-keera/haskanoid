@@ -1,4 +1,4 @@
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ivanperez-keera&url=https://github.com/ivanperez-keera/haskanoid&title=Haskanoid&language=&tags=github&category=software) 
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ivanperez-keera&url=https://github.com/ivanperez-keera/haskanoid&title=Haskanoid&language=&tags=github&category=software)
 
 This is a Haskell breakout game implemented using the Functional
 Reactive Programming library Yampa.
@@ -24,7 +24,7 @@ Please, report other bugs of that Android app here. You can follow the progress
 of the port for Android on [facebook](http://facebook.com/keerastudios) and
 [twitter](http://twitter.com/KeeraStudios).
 
-![GitHub Logo](screenshots/desktop.png?raw=true)
+![Haskanoid on Android](screenshots/android.png?raw=true)
 
 We would like to call on Haskell programmers, game developers and anyone with
 an interest in Functional Reactive Programming and/or Game Programming to
@@ -91,9 +91,9 @@ an introductory example of how to do sphere collisions in Yampa.
 * Magic Cookies (https://github.com/keera-studios/magic-cookies), a commercial
 FRP game written in Haskell using Yampa that's available on Google Play.
 
-<!-- 
+<!--
  # Other links
- 
+
  It is **also written in Haskell**. You can see their announcement
  [here](http://keera.co.uk/blog/2014/11/24/haskell-android-games-adventure-engine-beta-testing/) and
  [here](http://keera.co.uk/blog/?p=690),
