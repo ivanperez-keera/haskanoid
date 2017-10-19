@@ -69,7 +69,7 @@ those with:
 ```
 $ cabal unpack haskanoid     ## Or git clone this-repo
 $ cd haskanoid-*
-$ cabal init
+$ cabal sandbox init
 $ cabal install --only-dependencies
 $ cabal configure && cabal haddock --executables --internal
 ```
