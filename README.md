@@ -61,35 +61,35 @@ explanation.
  * MacOSX users (or anyone without a wiimote) might want to disable wiimote and kinect support. You can do so with the cabal flags wiimote and kinect, by running cabal install --flags="-kinect -wiimote".
  * For the use of the above installation instructions (with disabled wiimote and kinect support, see bullet point above) you need the following packages to run this game:
  
-  * [GHC](https://www.haskell.org/ghc/) 
-  * [command-line interface for cabal](https://github.com/haskell/cabal/tree/master/cabal-install)
-  * SDL
-  * SDL-mixer
-  * SDL-image
-  * SDL-ttf
+   * [GHC](https://www.haskell.org/ghc/) 
+   * [command-line interface for cabal](https://github.com/haskell/cabal/tree/master/cabal-install)
+   * SDL
+   * SDL-mixer
+   * SDL-image
+   * SDL-ttf
   
-  On debian/ubuntu, you can install them with:
+   On debian/ubuntu, you can install them with:
   
-  ```
-  $ sudo apt-get install ghc
-  $ sudo apt-get install cabal-install
-  $ sudo apt-get install libsdl1.2-dev 
-  $ sudo apt-get install libsdl-mixer1.2-dev
-  $ sudo apt-get install libsdl-image1.2-dev
-  $ sudo apt-get install libsdl-ttf2.0-dev
-  ```
+   ```
+   $ sudo apt-get install ghc
+   $ sudo apt-get install cabal-install
+   $ sudo apt-get install libsdl1.2-dev 
+   $ sudo apt-get install libsdl-mixer1.2-dev
+   $ sudo apt-get install libsdl-image1.2-dev
+   $ sudo apt-get install libsdl-ttf2.0-dev
+   ```
   
  * For the enabled wiimote and kinect support you need additional to the packages mentioned in the bullet point above the following packages:
  
-  * CWiid (wiimote)
-  * freenect (kinect)
+   * CWiid (wiimote)
+   * freenect (kinect)
   
-  On debian/ubuntu, you can install them with:
+   On debian/ubuntu, you can install them with:
 
-  ```
-  $ sudo apt-get install libcwiid-dev
-  $ sudo apt-get install freenect
-  ```
+   ```
+   $ sudo apt-get install libcwiid-dev
+   $ sudo apt-get install freenect
+   ```
 
 # Documentation
 
