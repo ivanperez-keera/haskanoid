@@ -38,16 +38,23 @@ details). Slides are linked from that website.
 
 # Installation
 
-The game will also be available on hackage. All the media resources are
-included with the distribution (see LICENCE for redistribution terms).  I
-personally recommend using sandboxes (either with cabal or with cabal-dev)*:
+The game is available on [hackage](https://hackage.haskell.org/package/SpaceInvaders). All the media resources are included with the distribution (see LICENCE for redistribution terms).  You can install it with*:
 
 ```
 $ cabal update
-$ cabal sandbox init                # skip if you are using cabal-dev
+$ cabal sandbox init
+$ cabal install haskanoid
+$ ./.cabal-sandbox/bin/haskanoid
+```
+
+If you want to explore the code and possibly make changes, do the following:
+
+```
+$ cabal update
+$ cabal sandbox init
 $ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
 $ cd haskanoid-*                    # Game resources are here
-$ cabal install                     # ...or cabal-dev install
+$ cabal install
 $ ./dist/build/haskanoid/haskanoid
 ```
 
