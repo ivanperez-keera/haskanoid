@@ -9,7 +9,7 @@ particular:
 
 * SDL 1.2 graphics and sound.
 
-* Multiple input devices (keyboard, mouse, Wiimote IR, Kinect).
+* Multiple input devices (keyboard, mouse, Wiimote infrared, Kinect).
 
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
