@@ -25,6 +25,7 @@ of the port for Android on [facebook](http://facebook.com/keerastudios) and
 [twitter](http://twitter.com/KeeraStudios).
 
 ![Haskanoid on Android](screenshots/android.gif?raw=true)
+![Haskanoid on Android](screenshots/android-lg.gif?raw=true)
 
 We would like to call on Haskell programmers, game developers and anyone with
 an interest in Functional Reactive Programming and/or Game Programming to
