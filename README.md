@@ -3,6 +3,8 @@
 This is a Haskell breakout game implemented using the Functional
 Reactive Programming library Yampa.
 
+![Haskanoid Video](screenshots/android.gif?raw=true)
+
 The game has been created for educational purposes, but tries to feature a
 substantial amount of the complexity often found in real arcade games. In
 particular:
@@ -24,7 +26,7 @@ Please, report other bugs of that Android app here. You can follow the progress
 of the port for Android on [facebook](http://facebook.com/keerastudios) and
 [twitter](http://twitter.com/KeeraStudios).
 
-![Haskanoid on Android](screenshots/android.gif?raw=true)
+![Haskanoid on Android](screenshots/android.png?raw=true)
 
 We would like to call on Haskell programmers, game developers and anyone with
 an interest in Functional Reactive Programming and/or Game Programming to
