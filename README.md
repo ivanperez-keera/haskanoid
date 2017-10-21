@@ -2,9 +2,9 @@
 
 This is a Haskell breakout game implemented using the Functional
 Reactive Programming library Yampa.
-
-![Haskanoid Video](screenshots/android.gif?raw=true)
-
+<p align="center">
+<img src="/ivanperez-keera/haskanoid/raw/master/screenshots/android.gif?raw=true" alt="Haskanoid Video" style="max-width:100%;">
+</p>
 The game has been created for educational purposes, but tries to feature a
 substantial amount of the complexity often found in real arcade games. In
 particular:
