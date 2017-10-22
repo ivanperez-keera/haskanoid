@@ -44,19 +44,19 @@ loadResources = runMaybeT $ do
   -- img <- lift $ fmap (Image levelBg) $ load levelBg
 
   ballImg <- liftIO $ getDataFileName "data/ball2.png"
-  ball <- lift $ (Image ballImg) <$> load ballImg
+  ball <- lift $ Image ballImg <$> load ballImg
 
   b1Img <- liftIO $ getDataFileName "data/block1.png"
-  b1 <- lift $ (Image b1Img) <$> load b1Img
+  b1 <- lift $ Image b1Img <$> load b1Img
 
   b2Img <- liftIO $ getDataFileName "data/block2.png"
-  b2 <- lift $ (Image b2Img) <$> load b2Img
+  b2 <- lift $ Image b2Img <$> load b2Img
 
   b3Img <- liftIO $ getDataFileName "data/block3.png"
-  b3 <- lift $ (Image b3Img) <$> load b3Img
+  b3 <- lift $ Image b3Img <$> load b3Img
 
   paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
-  paddle <- lift $ (Image paddleImg) <$> load paddleImg
+  paddle <- lift $ Image paddleImg <$> load paddleImg
 
   -- Start playing music
   -- when (isJust bgM) $ lift (playMusic (fromJust bgM))
@@ -69,7 +69,7 @@ loadResources = runMaybeT $ do
                                           mzero
 
   liftIO $ ResourceMgr <$>
-    newIORef (ResourceManager (GameStarted) (res))
+    newIORef (ResourceManager GameStarted res)
 
 initializeDisplay :: IO ()
 initializeDisplay = do
@@ -242,7 +242,7 @@ loadNewResources mgr state = do
       oldResources = resources manager
 
   newResources <- case newState of
-                    (GameLoading _) | (newState /= oldState)
+                    (GameLoading _) | newState /= oldState
                                     -> updateAllResources oldResources newState
                     _               -> return oldResources 
 
@@ -262,7 +262,7 @@ updateAllResources res (GameLoading n) = do
   let oldMusic   = bgMusic res
       oldMusicFP = maybe "" musicName oldMusic
 
-  newMusic <- if (oldMusicFP == newMusicFP)
+  newMusic <- if oldMusicFP == newMusicFP
               then return oldMusic
               else do -- Loading can fail, in which case we continue
                       -- with the old music

@@ -226,9 +226,9 @@ handleEvent c e =
     MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
     MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
     MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
-    KeyUp (Keysym { symKey = SDLK_p })       -> c { controllerPause = not (controllerPause c) }
-    KeyDown (Keysym { symKey = SDLK_SPACE }) -> c { controllerClick = True  }
-    KeyUp (Keysym { symKey = SDLK_SPACE })   -> c { controllerClick = False }
+    KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
+    KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
+    KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
     _                                        -> c
 
 
