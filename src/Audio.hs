@@ -37,7 +37,7 @@ initAudio = void $ do
 
 -- | Load a music file, returning a 'Music' if loaded successfully.
 loadMusic :: String -> IO (Maybe Music)
-loadMusic fp = fmap (fmap (Music fp)) $ SDL.Mixer.Music.tryLoadMUS fp
+loadMusic fp = fmap (Music fp) <$> SDL.Mixer.Music.tryLoadMUS fp
 
 -- | Play music in a loop at max volume.
 playMusic :: Music -> IO ()
@@ -55,7 +55,7 @@ musicPlaying = SDL.Mixer.Music.playingMusic
 
 -- | Load an audio file.
 loadAudio :: String -> IO (Maybe Audio)
-loadAudio fp = fmap (fmap (Audio fp)) $ SDL.Mixer.Samples.tryLoadWAV fp
+loadAudio fp = fmap (Audio fp) <$> SDL.Mixer.Samples.tryLoadWAV fp
 
 -- | Play an audio file for the given number of seconds.
 --

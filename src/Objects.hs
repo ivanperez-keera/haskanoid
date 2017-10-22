@@ -49,7 +49,7 @@ isBall (Ball _) = True
 isBall _        = False
 
 isBlock :: ObjectKind -> Bool
-isBlock (Block {}) = True
+isBlock Block {} = True
 isBlock _          = False
 
 isPaddle :: Object -> Bool
