@@ -379,7 +379,7 @@ followPaddle = arr $ \oi ->
   --
   -- This code allows for the paddle not to exist (Maybe), although that should
   -- never happen in practice.
-  let mbPaddlePos = fmap objectPos $ find isPaddle (knownObjects oi)
+  let mbPaddlePos = objectPos <$> find isPaddle (knownObjects oi)
       ballPos     = maybe (outOfScreen, outOfScreen)
                           ((paddleWidth/2, - ballHeight) ^+^)
                           mbPaddlePos
