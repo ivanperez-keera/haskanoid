@@ -17,7 +17,7 @@ particular:
 * Differentiated subsystems for physics/collisions, input,
   rendering/multimedia, logic, etc.
 
-A slightly different version using SDL2 has been made available by [Keera
+A version of this game using SDL2 has been made available by [Keera
 Studios](https://facebook.com/keerastudios) for free on [Google Play for
 Android](https://play.google.com/store/apps/details?id=uk.co.keera.games.breakout.beta).
 There is a bug that makes the app not close or save the game when you exit it.
