@@ -1,0 +1,11 @@
+resolver: lts-9.10
+
+packages:
+  - '.'
+
+extra-deps:
+- SDL-image-0.6.1.2
+- SDL-mixer-0.6.2.0
+- SDL-ttf-0.6.2.2
+
+flags: {}
