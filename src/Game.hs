@@ -414,9 +414,9 @@ bouncingBall p0 v0 =
        -- Calculate the future tentative position, and
        -- bounce if necessary.
        --
-	   -- The ballBounce needs the ball SF' input (which has knowledge of
-	   -- collisions), so we carry it parallely to the tentative new positions,
-	   -- and then use it to detect when it's time to bounce
+       -- The ballBounce needs the ball SF' input (which has knowledge of
+       -- collisions), so we carry it parallely to the tentative new positions,
+       -- and then use it to detect when it's time to bounce
 
        --      ==========================    ============================
        --     -==--------------------->==--->==-   ------------------->==
@@ -427,9 +427,9 @@ bouncingBall p0 v0 =
        --      ==========================    ============================
        progressAndBounce = (arr id &&& freeBall') >>> (arr snd &&& ballBounce)
 
-	   -- Position of the ball, starting from p0 with velicity v0, since the
-	   -- time of last switching (or being fired, whatever happened last)
-	   -- provided that no obstacles are encountered.
+       -- Position of the ball, starting from p0 with velicity v0, since the
+       -- time of last switching (or being fired, whatever happened last)
+       -- provided that no obstacles are encountered.
        freeBall' = freeBall p0 v0
 
 -- | Detect if the ball must bounce and, if so, take a snapshot of the object's

@@ -161,7 +161,7 @@ paintObject resources screen object =
                                      y' = y - round r
                                      sz = round (2*r)
                                  -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
-				 let bI = imgSurface $ ballImg resources
+                                 let bI = imgSurface $ ballImg resources
                                  t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
                                  setColorKey bI [SrcColorKey, RLEAccel] t 
                                  SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
