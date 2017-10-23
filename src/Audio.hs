@@ -16,6 +16,7 @@ module Audio
      stopMusic,
      musicPlaying) where
 
+import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Concurrent
 import qualified Graphics.UI.SDL.Mixer.General as SDL.Mixer

@@ -108,8 +108,8 @@ changedVelocity name cs =
         []          -> Nothing
         (_, v') : _ -> Just v'
 
-		-- IP: It should be something like the following, but that doesn't
-		-- work:
+        -- IP: It should be something like the following, but that doesn't
+        -- work:
         -- vs -> Just (foldl (^+^) (0,0) (map snd vs))
 
 -- | True if the velocity of the object has been changed by any collision.
