@@ -39,7 +39,7 @@
 module Game (wholeGame) where
 
 -- External imports
-import Control.Applicative (<$>)
+import Control.Applicative ((<$>))
 import Data.List
 import Data.Tuple.Utils
 import FRP.Yampa

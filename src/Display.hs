@@ -1,6 +1,6 @@
 module Display where
 
-import Control.Applicative (<$>)
+import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Monad.IfElse
 import Control.Monad.Trans.Class
