@@ -53,9 +53,9 @@ If you want to explore the code and possibly make changes, do the following:
 
 ```
 $ cabal update
-$ cabal sandbox init
 $ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
 $ cd haskanoid-*                    # Game resources are here
+$ cabal sandbox init
 $ cabal install
 $ ./dist/build/haskanoid/haskanoid
 ```
