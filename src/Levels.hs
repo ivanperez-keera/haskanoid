@@ -114,32 +114,15 @@ levels = [ -- Level 0
 -- % XXXXXXXX
 -- % XXXXXXXX
 blockPosS :: Int -> [Pos2D]
-blockPosS 0 = map (adjustHPos *** adjustVPos) allBlocks
+blockPosS 0 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a) => [(a,a)]
        allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1]]
 
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
        blockRows :: Num a => a
        blockRows = 4
 
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
 
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
-       
 
 -- Level 1
 --   %%%%%%%%
@@ -156,9 +139,6 @@ blockPosS 1 = map (adjustHPos *** adjustVPos) allBlocks
    allBlocks = [ (x,y) | x <- [0..7], y <- [0..5]
                        , (x + y > 2) && (x + y < 10)
                ]
-
-   adjustHPos :: Double -> Double
-   adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
 
    adjustVPos :: Double -> Double
    adjustVPos = ((blockHeight + blockSeparation) *)
@@ -189,37 +169,15 @@ blockPosS 2  = map (adjustHPos *** adjustVPos) allBlocks
 -- % X X X X
 -- %  X X X X
 -- % X X X X
-blockPosS 3 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 3 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1],
                     ((even x) && (odd y) || (odd x) && (even y))]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
        blockRows :: Num a => a
        blockRows = 4
 
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
-       
 
 -- Level 4
 --   %%%%%%%%
@@ -230,37 +188,15 @@ blockPosS 3 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- % X X X X
 -- %
 -- % XXXXXXXX
-blockPosS 4 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 4 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0,blockRows-1]] ++
                    [(x,y) | x <- [0..blockColumns-1], y <- [2], odd x] ++
                    [(x,y) | x <- [0..blockColumns-1], y <- [4], even x]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
        blockRows :: Num a => a
        blockRows = 7
-
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
 
 -- Level 5
 --   %%%%%%%%
@@ -276,30 +212,12 @@ blockPosS 5 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
                    [(1,2),(5,2)] ++
                    [(x,y) | x <- [0..6], y <- [3]]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
---       blockRows :: Num a => a
---       blockRows = 4
-
-       -- Fit as many as possible
---       blockColumns :: Num a => a
---       blockColumns =
---         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
---        where round' = fromIntegral . floor
 
        leftMargin :: Num a => a
        leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
          where round' = fromIntegral . floor
-       topMargin :: Num a => a
-       topMargin = 10
 
 -- Level 6
 --   %%%%%%%%
@@ -308,36 +226,15 @@ blockPosS 5 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- % X      X
 -- % X      X
 -- %  XXXXXX
-blockPosS 6 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 6 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [1..blockColumns-2], y <- [0,blockRows-1]] ++
                    [(x,y) | x <- [0,blockColumns-1],  y <- [1..blockRows-2]]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
        blockRows :: Num a => a
        blockRows = 5
 
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
 
 -- Level 7
 --   %%%%%%%%
@@ -347,39 +244,15 @@ blockPosS 6 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- %    XX 
 -- % X      X
 -- %  XXXXXX
-blockPosS 7 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 7 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [1..blockColumns-2], y <- [0,blockRows-1]] ++
                    [(x,y) | x <- [0,blockColumns-1],  y <- [1,blockRows-2]] ++
                    [(x,y) | x <- [3,4], y <- [2..4]]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
        blockRows :: Num a => a
        blockRows = 7
-
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
-
-
 
 -- Level 8
 --   %%%%%%%%
@@ -393,36 +266,14 @@ blockPosS 7 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
-blockPosS 8 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 8 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1], x /= 2, y /=2]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
 
        blockRows :: Num a => a
        blockRows = 9
-
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
-
 
 -- Level 9
 --   %%%%%%%%
@@ -441,30 +292,12 @@ blockPosS 9 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
                    [(x,y) | x <- [2,4], y <- [1,5]] ++
                    [(x,y) | x <- [1,5], y <- [2,4]]
                    
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
---       blockRows :: Num a => a
---       blockRows = 4
-
-       -- Fit as many as possible
---       blockColumns :: Num a => a
---       blockColumns =
---         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
---        where round' = fromIntegral . floor
 
        leftMargin :: Num a => a
        leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
          where round' = fromIntegral . floor
-       topMargin :: Num a => a
-       topMargin = 10
 
 
 -- Level 10
@@ -484,30 +317,15 @@ blockPosS 10 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
        allBlocks = [(x,y) | x <- [0..6], y <- [0..blockRows-1], odd x] ++
                    [(x,y) | x <- [0..6], y <- [4], even x]
 
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
 
        blockRows :: Num a => a
        blockRows = 9
 
-       -- Fit as many as possible
---       blockColumns :: Num a => a
---       blockColumns =
---         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
---        where round' = fromIntegral . floor
-
        leftMargin :: Num a => a
        leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
          where round' = fromIntegral . floor
-       topMargin :: Num a => a
-       topMargin = 10
 
 
 -- Level 11
@@ -519,39 +337,13 @@ blockPosS 10 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- % XXXXXX  
 -- % XXXX     
 -- % XX     
-blockPosS 11 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockPosS 11 = map adjustPos allBlocks
 
  where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
        allBlocks = [(x,y) | x <- [0..1], y <- [0,6]] ++
                    [(x,y) | x <- [0..3], y <- [1,5]] ++
                    [(x,y) | x <- [0..5], y <- [2,4]] ++
                    [(x,y) | x <- [0..7], y <- [3]]
-         
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
---       blockRows :: Num a => a
---       blockRows = 4
-
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
-       leftMargin :: Num a => a
-       leftMargin = 25
-
-       topMargin :: Num a => a
-       topMargin = 10
-
 
 -- Level 12
 --   %%%%%%%%
@@ -569,33 +361,48 @@ blockPosS 12 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
                    [(x,y) | x <- [2..5], y <- [1,2], even x] ++
                    [(1,4),(5,4),(0,5),(6,5)]
 
-
-       fI2 :: Integral a => (a,a) -> (Double, Double)
-       fI2 (x,y) = (fromIntegral x, fromIntegral y)
-       
-
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       adjustVPos :: Double -> Double
-       adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
 
        blockRows :: Num a => a
        blockRows = 9
 
-       -- Fit as many as possible
-       blockColumns :: Num a => a
-       blockColumns =
-         1 + round' ((gameWidth - blockWidth - 2 * leftMargin) / (blockWidth + blockSeparation))
-        where round' = fromIntegral . floor
-
        leftMargin :: Num a => a
        leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
          where round' = fromIntegral . floor
-       topMargin :: Num a => a
-       topMargin = 10
+
 
 blockPosS _ = error "No more levels"
+
+
+fI2 :: Integral a => (a,a) -> (Double, Double)
+fI2 (x,y) = (fromIntegral x, fromIntegral y)
+       
+         
+topMargin :: Num a => a
+topMargin = 10
+
+leftMargin :: Num a => a
+leftMargin = 25
+
+adjustVPos :: Double -> Double
+adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
+
+adjustHPos :: Double -> Double
+adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
+
+adjustPos :: Integral a => (a,a) -> (Double, Double)
+adjustPos = ((adjustHPos *** adjustVPos) . fI2)
+
+       -- Fit as many as possible
+blockColumns :: Num a => a
+blockColumns =
+    1 + round' ( (gameWidth - blockWidth - 2 * leftMargin)
+               / (blockWidth + blockSeparation)
+               )
+  where round' = fromIntegral . floor
+      
+
 
 -- * Testing constants
 --
