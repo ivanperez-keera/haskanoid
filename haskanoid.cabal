@@ -18,6 +18,8 @@ synopsis:            A breakout game written in Yampa using SDL
 -- A longer description of the package.
 description:         An arkanoid game featuring SDL graphics and sound, and
                      Wiimote & Kinect support, implemented using Yampa.
+                     .
+                     <<https://github.com/ivanperez-keera/haskanoid/blob/master/screenshots/android.gif?raw=true>>
 
 -- URL for the project homepage or repository.
 homepage:            http://github.com/ivanperez-keera/haskanoid
