@@ -1,5 +1,6 @@
 module Display where
 
+import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Monad.IfElse
 import Control.Monad.Trans.Class
@@ -19,57 +20,7 @@ import Resources hiding (audio)
 import Levels
 import Paths_haskanoid
 
--- | Ad-hoc resource loading
--- This function is ad-hoc in two senses: first, because it
--- has the paths to the files hard-coded inside. And second,
--- because it loads the specific resources that are needed,
--- not a general 
---
-loadResources :: IO (Maybe ResourceMgr)
-loadResources = runMaybeT $ do
-  -- Font initialization
-  ttfOk <- lift TTF.init
-  
-  gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
-  -- Load the fonts we need
-  font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
-  let myFont = fmap (Font gameFont) font
-
-  blockHit <- liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
-
-  -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
-  -- bgM <- liftIO $ loadMusic "data/level0.mp3"
-
-  -- let levelBg = "data/level0.png"
-  -- img <- lift $ fmap (Image levelBg) $ load levelBg
-
-  ballImg <- liftIO $ getDataFileName "data/ball2.png"
-  ball <- lift $ fmap (Image ballImg) $ load ballImg
-
-  b1Img <- liftIO $ getDataFileName "data/block1.png"
-  b1 <- lift $ fmap (Image b1Img) $ load b1Img
-
-  b2Img <- liftIO $ getDataFileName "data/block2.png"
-  b2 <- lift $ fmap (Image b2Img) $ load b2Img
-
-  b3Img <- liftIO $ getDataFileName "data/block3.png"
-  b3 <- lift $ fmap (Image b3Img) $ load b3Img
-
-  paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
-  paddle <- lift $ fmap (Image paddleImg) $ load paddleImg
-
-  -- Start playing music
-  -- when (isJust bgM) $ lift (playMusic (fromJust bgM))
-
-  -- Return Nothing or embed in Resources
-  res <- case (myFont, blockHit) of
-           (Just f, Just b) -> let 
-                               in return (Resources f b Nothing ball b1 b2 b3 paddle Nothing)
-           _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
-                                          mzero
-
-  liftIO $ fmap ResourceMgr $
-    newIORef (ResourceManager (GameStarted) (res))
+-- * Initialization
 
 initializeDisplay :: IO ()
 initializeDisplay = do
@@ -91,12 +42,16 @@ initGraphs = do
   -- Hide mouse
   SDL.showCursor False
 
+-- * Rendering and Sound
 
+-- | Loads new resources, renders the game state using SDL, and adjusts music. 
 render :: ResourceMgr -> GameState -> IO()
 render resourceManager shownState = do
   resources <- loadNewResources resourceManager shownState
   audio   resources shownState
   display resources shownState
+
+-- ** Audio
 
 audio :: Resources -> GameState -> IO()
 audio resources shownState = do
@@ -107,10 +62,13 @@ audio resources shownState = do
   -- Play object hits
   mapM_ (audioObject resources) $ gameObjects shownState
 
+audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
     (Block _ _) -> playFile (blockHitSnd resources) 3000
     _           -> return ()
+
+-- ** Painting
 
 display :: Resources -> GameState -> IO()
 display resources shownState = do 
@@ -148,6 +106,7 @@ display resources shownState = do
   -- Double buffering
   SDL.flip screen
 
+paintGeneral :: Surface -> Resources -> GameInfo -> IO ()
 paintGeneral screen resources over = void $ do
   -- Paint screen green
   let format = surfaceGetPixelFormat screen
@@ -155,12 +114,14 @@ paintGeneral screen resources over = void $ do
   fillRect screen Nothing bgColor
   paintGeneralHUD screen resources over
 
+paintGeneralMsg :: Surface -> Resources -> GameStatus -> IO ()
 paintGeneralMsg screen resources GamePlaying     = return ()
 paintGeneralMsg screen resources GamePaused      = paintGeneralMsg' screen resources "Paused"
 paintGeneralMsg screen resources (GameLoading n) = paintGeneralMsg' screen resources ("Level " ++ show n)
 paintGeneralMsg screen resources GameOver        = paintGeneralMsg' screen resources "GAME OVER!!!"
 paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resources "You won!!! Well done :)"
 
+paintGeneralMsg' :: Surface -> Resources -> String -> IO ()
 paintGeneralMsg' screen resources msg = void $ do
   let font = resFont resources
   message <- TTF.renderTextSolid (unFont font) msg (SDL.Color 128 128 128)
@@ -170,6 +131,7 @@ paintGeneralMsg' screen resources msg = void $ do
       h = SDL.surfaceGetHeight message
   SDL.blitSurface message Nothing screen $ Just (SDL.Rect x y w h)
 
+paintGeneralHUD :: Surface -> Resources -> GameInfo -> IO ()
 paintGeneralHUD screen resources over = void $ do
   let font = unFont $ resFont resources
   message1 <- TTF.renderTextSolid font ("Level: " ++ show (gameLevel over)) (SDL.Color 128 128 128)
@@ -186,8 +148,9 @@ paintGeneralHUD screen resources over = void $ do
       h2 = SDL.surfaceGetHeight message3
   SDL.blitSurface message3 Nothing screen $ Just (SDL.Rect (rightMargin - 10 - w2) 10 w2 h2)
 
-paintObject resources screen object = do
-  red <- mapRGB format 0xFF 0 0
+-- | Paints a game object on a surface.
+paintObject :: Resources -> Surface -> Object -> IO ()
+paintObject resources screen object =
   case objectKind object of
     (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
                                  t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
@@ -199,7 +162,7 @@ paintObject resources screen object = do
                                      y' = y - round r
                                      sz = round (2*r)
                                  -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
-				 let bI = imgSurface $ ballImg resources
+                                 let bI = imgSurface $ ballImg resources
                                  t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
                                  setColorKey bI [SrcColorKey, RLEAccel] t 
                                  SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
@@ -212,6 +175,8 @@ paintObject resources screen object = do
         blockImage 2 = block2Img resources
         blockImage n = block3Img resources
 
+-- * Resource management
+
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 
 data ResourceManager = ResourceManager
@@ -219,6 +184,7 @@ data ResourceManager = ResourceManager
   , resources       :: Resources
   }
 
+-- | Includes all the assets needed at the current time in the game.
 data Resources = Resources
   { resFont     :: Font
   , blockHitSnd :: Audio
@@ -234,6 +200,59 @@ data Resources = Resources
 data Image = Image { imgName  :: String, imgSurface :: Surface }
 data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 
+-- | Ad-hoc resource loading
+-- This function is ad-hoc in two senses: first, because it
+-- has the paths to the files hard-coded inside. And second,
+-- because it loads the specific resources that are needed,
+-- not a general 
+--
+loadResources :: IO (Maybe ResourceMgr)
+loadResources = runMaybeT $ do
+  -- Font initialization
+  ttfOk <- lift TTF.init
+  
+  gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
+  -- Load the fonts we need
+  font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
+  let myFont = fmap (Font gameFont) font
+
+  blockHit <- liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
+
+  -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
+  -- bgM <- liftIO $ loadMusic "data/level0.mp3"
+
+  -- let levelBg = "data/level0.png"
+  -- img <- lift $ fmap (Image levelBg) $ load levelBg
+
+  ballImg <- liftIO $ getDataFileName "data/ball2.png"
+  ball <- lift $ Image ballImg <$> load ballImg
+
+  b1Img <- liftIO $ getDataFileName "data/block1.png"
+  b1 <- lift $ Image b1Img <$> load b1Img
+
+  b2Img <- liftIO $ getDataFileName "data/block2.png"
+  b2 <- lift $ Image b2Img <$> load b2Img
+
+  b3Img <- liftIO $ getDataFileName "data/block3.png"
+  b3 <- lift $ Image b3Img <$> load b3Img
+
+  paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
+  paddle <- lift $ Image paddleImg <$> load paddleImg
+
+  -- Start playing music
+  -- when (isJust bgM) $ lift (playMusic (fromJust bgM))
+
+  -- Return Nothing or embed in Resources
+  res <- case (myFont, blockHit) of
+           (Just f, Just b) -> let 
+                               in return (Resources f b Nothing ball b1 b2 b3 paddle Nothing)
+           _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
+                                          mzero
+
+  liftIO $ ResourceMgr <$>
+    newIORef (ResourceManager GameStarted res)
+
+
 loadNewResources :: ResourceMgr ->  GameState -> IO Resources
 loadNewResources mgr state = do
   manager <- readIORef (unResMgr mgr)
@@ -242,7 +261,7 @@ loadNewResources mgr state = do
       oldResources = resources manager
 
   newResources <- case newState of
-                    (GameLoading _) | (newState /= oldState)
+                    (GameLoading _) | newState /= oldState
                                     -> updateAllResources oldResources newState
                     _               -> return oldResources 
 
@@ -262,7 +281,7 @@ updateAllResources res (GameLoading n) = do
   let oldMusic   = bgMusic res
       oldMusicFP = maybe "" musicName oldMusic
 
-  newMusic <- if (oldMusicFP == newMusicFP)
+  newMusic <- if oldMusicFP == newMusicFP
               then return oldMusic
               else do -- Loading can fail, in which case we continue
                       -- with the old music

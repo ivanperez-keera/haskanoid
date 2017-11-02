@@ -49,7 +49,7 @@ isBall (Ball _) = True
 isBall _        = False
 
 isBlock :: ObjectKind -> Bool
-isBlock (Block {}) = True
+isBlock Block {} = True
 isBlock _          = False
 
 isPaddle :: Object -> Bool
@@ -93,11 +93,13 @@ detectCollision obj1 obj2
   | overlap obj1 obj2 = Just (collisionResponseObj obj1 obj2)
   | otherwise         = Nothing
 
+overlap :: Object -> Object -> Bool
 overlap obj1 obj2 = overlapShape (objShape obj1) (objShape obj2)
 
 collisionSide :: Object -> Object -> Side
 collisionSide obj1 obj2 = shapeCollisionSide (objShape obj1) (objShape obj2)
 
+collisionResponseObj :: Object -> Object -> Collision
 collisionResponseObj o1 o2 =
   Collision $
     map objectToCollision [(o1, side, o2), (o2, side', o1)]

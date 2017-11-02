@@ -1,3 +1,4 @@
+import Control.Applicative ((<$>))
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
 
@@ -20,7 +21,7 @@ main = do
     reactimate (initGraphs >> senseInput controllerRef)
                (\_ -> do
                   -- Get clock and new input
-                  dtSecs <- fmap milisecsToSecs $ senseTimeRef timeRef
+                  dtSecs <- milisecsToSecs <$> senseTimeRef timeRef
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
