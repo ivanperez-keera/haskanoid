@@ -4,14 +4,14 @@
 --
 -- Each level has:
 --
---   - Logical properties (defined in 'blockPosS').
+--   - Logical properties (defined in 'blockDescS').
 --
 --   - Multimedia properties (a background and audio file).
 --
 -- Together they form 'levels'.
 module Levels where
 
-import Control.Arrow((***))
+import Control.Arrow ((***), first)
 import Data.List (nub)
 import Physics.TwoDimensions.Dimensions
 
@@ -21,9 +21,9 @@ import Resources
 -- * Levels
 -- ** Level specification
 data LevelSpec = LevelSpec
- { blockPoss  :: [Pos2D]       -- ^ Block positions
- , levelBg    :: ImageResource -- ^ Background image
- , levelMusic :: MusicResource -- ^ Background music
+ { blockCfgs  :: [(Pos2D, Int)] -- ^ Block positions and block lives
+ , levelBg    :: ImageResource  -- ^ Background image
+ , levelMusic :: MusicResource  -- ^ Background music
  }
 
 -- | Number of levels. Change this in the code to finish
@@ -34,84 +34,84 @@ numLevels = length levels
 -- * Concrete levels
 levels :: [LevelSpec]
 levels = [ -- Level 0
-           LevelSpec { blockPoss  = blockPosS 0
+           LevelSpec { blockCfgs  = blockDescS 0
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level0.mp3"
                      }
          ,
            -- Level 1
-           LevelSpec { blockPoss  = blockPosS 1
+           LevelSpec { blockCfgs  = blockDescS 1
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }
          ,
            -- Level 2
-           LevelSpec { blockPoss  = blockPosS 2
+           LevelSpec { blockCfgs  = blockDescS 2
                      , levelBg    = Resource "data/level2.png"
                      , levelMusic = Resource "data/level2.mp3"
                      }
          ,
            -- Level 3
-           LevelSpec { blockPoss  = blockPosS 3
+           LevelSpec { blockCfgs  = blockDescS 3
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level0.mp3"
                      }
          ,
            -- Level 4
-           LevelSpec { blockPoss  = blockPosS 4
+           LevelSpec { blockCfgs  = blockDescS 4
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }
          ,
            -- Level 5
-           LevelSpec { blockPoss  = blockPosS 5
+           LevelSpec { blockCfgs  = blockDescS 5
                      , levelBg    = Resource "data/level2.png"
                      , levelMusic = Resource "data/level2.mp3"
                      }
          ,
            -- Level 6
-           LevelSpec { blockPoss  = blockPosS 6
+           LevelSpec { blockCfgs  = blockDescS 6
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level0.mp3"
                      }
          ,
            -- Level 7
-           LevelSpec { blockPoss  = blockPosS 7
+           LevelSpec { blockCfgs  = blockDescS 7
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }
          ,
            -- Level 8
-           LevelSpec { blockPoss  = blockPosS 8
+           LevelSpec { blockCfgs  = blockDescS 8
                      , levelBg    = Resource "data/level2.png"
                      , levelMusic = Resource "data/level2.mp3"
                      }
          ,
            -- Level 9
-           LevelSpec { blockPoss  = blockPosS 9
+           LevelSpec { blockCfgs  = blockDescS 9
                      , levelBg    = Resource "data/level0.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }
          ,
            -- Level 10
-           LevelSpec { blockPoss  = blockPosS 10
+           LevelSpec { blockCfgs  = blockDescS 10
                      , levelBg    = Resource "data/level1.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }
          ,
            -- Level 11
-           LevelSpec { blockPoss  = blockPosS 11
+           LevelSpec { blockCfgs  = blockDescS 11
                      , levelBg    = Resource "data/level2.png"
                      , levelMusic = Resource "data/level2.mp3"
                      }
          ,
            -- Level 12
-           LevelSpec { blockPoss  = blockPosS 12
+           LevelSpec { blockCfgs  = blockDescS 12
                      , levelBg    = Resource "data/level0.png"
                      , levelMusic = Resource "data/level1.mp3"
                      }         ]
 
--- | Level block specification (positions)
+-- | Level block specification (positions,lives of block)
 
 -- Level 0
 --   %%%%%%%%
@@ -119,11 +119,13 @@ levels = [ -- Level 0
 -- % XXXXXXXX
 -- % XXXXXXXX
 -- % XXXXXXXX
-blockPosS :: Int -> [Pos2D]
-blockPosS 0 = map adjustPos allBlocks
+blockDescS :: Int -> [(Pos2D, Int)]
+blockDescS 0 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1]]
+ where allBlocks :: (Enum a, Num a) => [((a,a),Int)]
+       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [0..blockRows-1]
+                   ]
 
        blockRows :: Num a => a
        blockRows = 4
@@ -139,22 +141,25 @@ blockPosS 0 = map adjustPos allBlocks
 -- % XXXXX
 -- % XXXX
 --
-blockPosS 1 = map adjustPos allBlocks
+blockDescS 1 = map (first adjustPos) allBlocks
  where
-   allBlocks :: (Enum a, Num a, Eq a, Ord a) => [(a,a)]
-   allBlocks = [ (x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1]
-                       , (x + y > 2) && (x + y < 10)
+   allBlocks :: (Enum a, Num a, Eq a, Ord a) => [((a,a),Int)]
+   allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                     , y <- [0..blockRows-1]
+                                     , (x + y > 2) && (x + y < 10)
                ]
                
    blockRows :: Num a => a
    blockRows = 6
 
 -- Level 2
-blockPosS 2  = map adjustPos allBlocks
+blockDescS 2  = map (first adjustPos) allBlocks
  where
-   allBlocks :: (Enum a, Num a, Eq a) => [(a,a)]
-   allBlocks = [(x,y) | x <- [0..blockColumns - 1], y <- [0..blockRows-1]
-                      , x /= y && (blockColumns - 1 - x) /= y]
+   allBlocks :: (Enum a, Num a, Eq a) => [((a,a),Int)]
+   allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns - 1]
+                                     , y <- [0..blockRows-1]
+                                     , x /= y && (blockColumns - 1 - x) /= y
+               ]
 
    blockRows :: Num a => a
    blockRows = 4
@@ -166,11 +171,14 @@ blockPosS 2  = map adjustPos allBlocks
 -- % X X X X
 -- %  X X X X
 -- % X X X X
-blockPosS 3 = map adjustPos allBlocks
+blockDescS 3 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0..blockRows-1],
-                    ((even x) && (odd y) || (odd x) && (even y))]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [0..blockRows-1]
+                                         , ((even x) && (odd y) ||
+                                            (odd x) && (even y))
+                   ]
 
        blockRows :: Num a => a
        blockRows = 4
@@ -185,12 +193,15 @@ blockPosS 3 = map adjustPos allBlocks
 -- % X X X X
 -- %
 -- % XXXXXXXX
-blockPosS 4 = map adjustPos allBlocks
+blockDescS 4 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0,blockRows-1]] ++
-                   [(x,y) | x <- [0..blockColumns-1], y <- [2], odd x] ++
-                   [(x,y) | x <- [0..blockColumns-1], y <- [4], even x]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [0,blockRows-1]] ++
+                   [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [2], odd x] ++
+                   [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [4], even x]
 
        blockRows :: Num a => a
        blockRows = 7
@@ -201,14 +212,14 @@ blockPosS 4 = map adjustPos allBlocks
 -- %   X X
 -- %  X   X
 -- % XXXXXXX
-blockPosS 5 = map adjustPos allBlocks
+blockDescS 5 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
        allBlocks = nub $
-         [(3,0),(blockColumns-4,1)] ++
-         [(2,1),(blockColumns-3,1)] ++
-         [(1,2),(blockColumns-2,2)] ++
-         [(x,y) | x <- [0..blockColumns-1], y <- [3]]
+         [((3,0),maxBlockLife),((blockColumns-4,1),maxBlockLife)] ++
+         [((2,1),maxBlockLife),((blockColumns-3,1),maxBlockLife)] ++
+         [((1,2),maxBlockLife),((blockColumns-2,2),maxBlockLife)] ++
+         [((x,y),maxBlockLife) | x <- [0..blockColumns-1], y <- [3]]
 
 -- Level 6
 --   %%%%%%%%
@@ -217,11 +228,13 @@ blockPosS 5 = map adjustPos allBlocks
 -- % X      X
 -- % X      X
 -- %  XXXXXX
-blockPosS 6 = map adjustPos allBlocks
+blockDescS 6 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [1..blockColumns-2], y <- [0,blockRows-1]] ++
-                   [(x,y) | x <- [0,blockColumns-1],  y <- [1..blockRows-2]]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [1..blockColumns-2]
+                                         , y <- [0,blockRows-1]] ++
+                   [((x,y),maxBlockLife) | x <- [0,blockColumns-1]
+                                         ,  y <- [1..blockRows-2]]
 
        blockRows :: Num a => a
        blockRows = 5
@@ -235,12 +248,15 @@ blockPosS 6 = map adjustPos allBlocks
 -- %    XX 
 -- % X      X
 -- %  XXXXXX
-blockPosS 7 = map adjustPos allBlocks
+blockDescS 7 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [1..blockColumns-2], y <- [0,blockRows-1]] ++
-                   [(x,y) | x <- [0,blockColumns-1],  y <- [1,blockRows-2]] ++
-                   [(x,y) | x <- [3,4], y <- [2..4]]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [1..blockColumns-2]
+                                         , y <- [0,blockRows-1]] ++
+                   [((x,y),maxBlockLife) | x <- [0,blockColumns-1]
+                                         ,  y <- [1,blockRows-2]] ++
+                   [((x,y),maxBlockLife) | x <- [3,4]
+                                         , y <- [2..4]]
 
        blockRows :: Num a => a
        blockRows = 7
@@ -257,12 +273,13 @@ blockPosS 7 = map adjustPos allBlocks
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
-blockPosS 8 = map adjustPos allBlocks
+blockDescS 8 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1]
-                          , y <- [0..blockRows-1]
-                          , x /= 2, y /= 2 ]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [0..blockRows-1]
+                                         , x /= 2, y /= 2
+                   ]
 
        blockRows :: Num a => a
        blockRows = 9
@@ -276,13 +293,13 @@ blockPosS 8 = map adjustPos allBlocks
 -- %  X X X
 -- %   XXX
 -- %    X
-blockPosS 9 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
+blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [3], y <- [0..6]] ++
-                   [(x,y) | x <- [0..6], y <- [3]] ++
-                   [(x,y) | x <- [2,4], y <- [1,5]] ++
-                   [(x,y) | x <- [1,5], y <- [2,4]]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [3], y <- [0..6]] ++
+                   [((x,y),maxBlockLife) | x <- [0..6], y <- [3]] ++
+                   [((x,y),maxBlockLife) | x <- [2,4], y <- [1,5]] ++
+                   [((x,y),maxBlockLife) | x <- [1,5], y <- [2,4]]
                    
        adjustHPos :: Double -> Double
        adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
@@ -303,13 +320,14 @@ blockPosS 9 = map ((adjustHPos *** adjustVPos) . fI2) allBlocks
 -- %  X X X 
 -- %  X X X
 -- %  X X X 
-blockPosS 10 = map adjustPos allBlocks
+blockDescS 10 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1]
-                          , y <- [0..blockRows-1], odd x] ++
-                   [(x,y) | x <- [0..blockColumns-1], y <- [midRow], even x]
-
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [0..blockRows-1], odd x] ++
+                   [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                         , y <- [midRow], even x]
+  
        blockRows :: Num a => a
        blockRows = 9
 
@@ -327,11 +345,14 @@ blockPosS 10 = map adjustPos allBlocks
 -- % XXXXXX  
 -- % XXXX     
 -- % XX     
-blockPosS 11 = map adjustPos allBlocks
+blockDescS 11 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | y <- [0..blockRows-1]
-                          , x <- [0..(blockColumns-1) - 2 * abs (y - midRow)]]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | y <- [0..blockRows-1]
+                                         , x <- [0..(blockColumns-1)
+                                                 - (2 * abs (y - midRow))]
+                   ]
+                   
 
        blockRows :: Num a => a
        blockRows = 7
@@ -348,17 +369,23 @@ blockPosS 11 = map adjustPos allBlocks
 -- %  X   X
 -- % X     X
 
-blockPosS 12 = map adjustPos allBlocks
+blockDescS 12 = map (first adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [(a,a)]
-       allBlocks = [(x,y) | x <- [0..blockColumns-1], y <- [0]] ++
-                   [(x,y) | x <- [2, blockColumns-3], y <- [1,2]] ++
-                   [(1,4), (blockColumns-2,4), (0,5), (blockColumns-1,5)]
+ where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a),Int)]
+       allBlocks = [((x,y),maxBlockLife) | x <- [0..blockColumns-1]
+                                       , y <- [0]] ++
+                   [((x,y),maxBlockLife) | x <- [2, blockColumns-3]
+                                       , y <- [1,2]] ++
+                   [ ((1,4),maxBlockLife)
+                   , ((blockColumns-2,4),maxBlockLife)
+                   , ((0,5),maxBlockLife)
+                   , ((blockColumns-1,5),maxBlockLife)
+                   ]
 
        blockRows :: Num a => a
        blockRows = 9
 
-blockPosS _ = error "No more levels"
+blockDescS _ = error "No more levels"
 
 -- Dynamic positioning/level size
 
@@ -378,18 +405,6 @@ blockColumns =
                / (blockWidth + blockSeparation)
                )
   where round' = fromIntegral . floor
-
--- * Testing constants
---
--- These constans are used by the game, and can be mofidied on order to test
--- different levels.
---
--- TODO: should this be moved to the module Constants?
-
--- | Initial level. Change this in the code to start
--- from a different level.
-initialLevel :: Int
-initialLevel = 0
 
 -- * Constants
 

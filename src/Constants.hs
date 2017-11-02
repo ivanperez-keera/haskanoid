@@ -36,6 +36,10 @@ blockWidth   = 64
 blockHeight  = 32
 blockSeparation :: Double
 blockSeparation = 10
+maxBlockLife :: Int
+maxBlockLife = 3
+minBlockLife :: Int
+minBlockLife = 1
 
 initialBallVel :: Pos2D
 initialBallVel = (300, -300)
@@ -60,3 +64,10 @@ maxVNorm = 300
 -- 
 -- wonDelay :: Time
 -- wonDelay = 3
+
+-- * Debugging
+
+-- | Initial level. Change this in the code to start
+-- from a different level.
+initialLevel :: Int
+initialLevel = 0
