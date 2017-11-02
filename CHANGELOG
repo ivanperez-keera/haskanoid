@@ -1,4 +1,8 @@
 2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
+        * Version bump (0.1.5.4).
+        * Adds new levels.
+
+2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
         * Version bump (0.1.5.3).
         * Adds new levels.
         * Adds image to cabal description.
