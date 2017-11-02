@@ -1,3 +1,11 @@
+2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
+        * Version bump (0.1.5.3).
+        * Adds new levels.
+        * Adds image to cabal description.
+        * Adds image to README.
+        * Updates installation instructions.
+        * Other code improvements.
+
 2017-04-26 Ivan Perez <ivan.perez@keera.co.uk>:
         * Fixes Warning in cabal file.
         * Version bump (0.1.5.2).
