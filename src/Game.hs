@@ -49,12 +49,13 @@ import Data.Extra.Ord
 import Data.Extra.VectorSpace
 import Data.IdentityList
 import FRP.Extra.Yampa
+import Physics.CollisionEngine
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
+import Physics.TwoDimensions.PhysicalObjects(Collision(Collision))
 
 -- Internal imports
 import Constants
-import GameCollisions
 import GameState
 import Input
 import Levels

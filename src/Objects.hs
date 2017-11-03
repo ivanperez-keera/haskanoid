@@ -1,5 +1,10 @@
+{-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 -- | Game objects and collisions.
-module Objects where
+module Objects
+  ( module Objects )
+  where
 
 import FRP.Yampa.VectorSpace
 
@@ -7,6 +12,7 @@ import Data.Extra.Num
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Physics
+import qualified Physics.TwoDimensions.PhysicalObjects     as P
 
 import Constants
 
@@ -73,16 +79,8 @@ objShape obj = case objectKind obj of
        sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2*d, d)
 
 -- * Collisions
-type Collisions = [Collision]
-
--- | A collision is a list of objects that collided, plus their velocities as
--- modified by the collision.
--- 
--- Take into account that the same object could take part in several
--- simultaneous collitions, so these velocities should be added (per object).
-data Collision = Collision
-  { collisionData :: [(ObjectName, Vel2D)] } -- ObjectId x Velocity
- deriving Show
+type Collision  = P.Collision  ObjectName
+type Collisions = P.Collisions ObjectName
 
 -- | Detects a collision between one object and another regardless of
 -- everything else
@@ -101,7 +99,7 @@ collisionSide obj1 obj2 = shapeCollisionSide (objShape obj1) (objShape obj2)
 
 collisionResponseObj :: Object -> Object -> Collision
 collisionResponseObj o1 o2 =
-  Collision $
+  P.Collision $
     map objectToCollision [(o1, side, o2), (o2, side', o1)]
   where side  = collisionSide o1 o2
         side' = oppositeSide side
@@ -111,3 +109,14 @@ collisionResponseObj o1 o2 =
         correctVel (vx,vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
         correctVel (vx,vy) e LeftSide   = (ensureNeg (vx * (-e)),vy)
         correctVel (vx,vy) e RightSide  = (ensurePos (vx * (-e)),vy)
+
+instance P.PhysicalObject Object String Shape where
+  physObjectPos       = objectPos
+  physObjectVel       = objectVel
+  physObjectElas      = collisionEnergy
+  physObjectShape     = objShape
+  physObjectCollides  = canCauseCollisions
+  physObjectId x      = objectName x
+  physObjectUpdatePos = \o p -> o { objectPos = p }
+  physObjectUpdateVel = \o v -> o { objectVel = v }
+  physDetectCollision = detectCollision

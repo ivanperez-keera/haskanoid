@@ -12,7 +12,7 @@ import Graphics.UI.SDL       as SDL
 import qualified Graphics.UI.SDL.TTF as TTF
 import Graphics.UI.SDL.Image as Image
 
-import Audio
+import Game.Audio.SDL
 import Constants
 import GameState
 import Objects
