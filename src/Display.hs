@@ -11,12 +11,12 @@ import Data.Maybe
 import Graphics.UI.SDL       as SDL
 import qualified Graphics.UI.SDL.TTF as TTF
 import Graphics.UI.SDL.Image as Image
+import Game.AssetManager hiding (audio)
 
 import Game.Audio.SDL
 import Constants
 import GameState
 import Objects
-import Resources hiding (audio)
 import Levels
 import Paths_haskanoid
 

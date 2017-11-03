@@ -81,7 +81,6 @@ executable haskanoid
                  Levels
                  Objects
                  ObjectSF
-                 Resources
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
@@ -91,6 +90,7 @@ executable haskanoid
                        Yampa >= 0.9.6 && < 0.11,
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse,
+                       sage-assetmanager,
                        sage-backends-sdl1-audio,
                        sage-backends-sdl1-clock,
                        sage-data-extra,

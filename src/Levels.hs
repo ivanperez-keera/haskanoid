@@ -11,12 +11,12 @@
 -- Together they form 'levels'.
 module Levels where
 
-import Control.Arrow ((***), first)
-import Data.List (nub)
+import Control.Arrow                    ((***), first)
+import Data.List                        (nub)
+import Game.AssetManager
 import Physics.TwoDimensions.Dimensions
 
 import Constants
-import Resources
 
 -- * Levels
 -- ** Level specification
@@ -33,114 +33,26 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = [ -- Level 0
-           LevelSpec { blockCfgs  = blockDescS 0
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 1
-           LevelSpec { blockCfgs  = blockDescS 1
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 2
-           LevelSpec { blockCfgs  = blockDescS 2
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 3
-           LevelSpec { blockCfgs  = blockDescS 3
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 4
-           LevelSpec { blockCfgs  = blockDescS 4
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 5
-           LevelSpec { blockCfgs  = blockDescS 5
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 6
-           LevelSpec { blockCfgs  = blockDescS 6
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 7
-           LevelSpec { blockCfgs  = blockDescS 7
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 8
-           LevelSpec { blockCfgs  = blockDescS 8
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 9
-           LevelSpec { blockCfgs  = blockDescS 9
-                     , levelBg    = Resource "data/level0.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 10
-           LevelSpec { blockCfgs  = blockDescS 10
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 11
-           LevelSpec { blockCfgs  = blockDescS 11
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 12
-           LevelSpec { blockCfgs  = blockDescS 12
-                     , levelBg    = Resource "data/level0.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 13
-           LevelSpec { blockCfgs  = blockDescS 13
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 14
-           LevelSpec { blockCfgs  = blockDescS 14
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 15
-           LevelSpec { blockCfgs  = blockDescS 15
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 16
-           LevelSpec { blockCfgs  = blockDescS 16
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 17
-           LevelSpec { blockCfgs  = blockDescS 17
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ]
+levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m))
+  [ (blockDescS 0,  "data/level1.png", "data/level0.mp3")
+  , (blockDescS 1,  "data/level1.png", "data/level1.mp3")
+  , (blockDescS 2,  "data/level2.png", "data/level2.mp3")
+  , (blockDescS 3,  "data/level1.png", "data/level0.mp3")
+  , (blockDescS 4,  "data/level1.png", "data/level1.mp3")
+  , (blockDescS 5,  "data/level2.png", "data/level2.mp3")
+  , (blockDescS 6,  "data/level1.png", "data/level0.mp3")
+  , (blockDescS 7,  "data/level1.png", "data/level1.mp3")
+  , (blockDescS 8,  "data/level2.png", "data/level2.mp3")
+  , (blockDescS 9,  "data/level0.png", "data/level1.mp3")
+  , (blockDescS 10, "data/level1.png", "data/level1.mp3")
+  , (blockDescS 11, "data/level2.png", "data/level2.mp3")
+  , (blockDescS 12, "data/level0.png", "data/level1.mp3")
+  , (blockDescS 13, "data/level1.png", "data/level1.mp3")
+  , (blockDescS 14, "data/level2.png", "data/level2.mp3")
+  , (blockDescS 15, "data/level1.png", "data/level0.mp3")
+  , (blockDescS 16, "data/level1.png", "data/level1.mp3")
+  , (blockDescS 17, "data/level2.png", "data/level2.mp3")
+  ]
 
 -- | Level block specification (positions,lives of block)
 
@@ -158,10 +70,8 @@ blockDescS 0 = map (first adjustPos) allBlocks
                                           , y <- [0..blockRows - 1]
                    ]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 4
-
-
 
 -- Level 1
 --   %%%%%%%%
@@ -176,11 +86,11 @@ blockDescS 1 = map (first adjustPos) allBlocks
  where
    allBlocks :: [((Int, Int), Int)]
    allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                     , y <- [0..blockRows - 1]
-                                     , (x + y > 2) && (x + y < 10)
+                                      , y <- [0..blockRows - 1]
+                                      , (x + y > 2) && (x + y < 10)
                ]
                
-   blockRows :: Num a => a
+   blockRows :: Int
    blockRows = 6
 
 -- Level 2
@@ -192,7 +102,7 @@ blockDescS 2  = map (first adjustPos) allBlocks
                                       , x /= y && (blockColumns - 1 - x) /= y
                ]
 
-   blockRows :: Num a => a
+   blockRows :: Int
    blockRows = 4
                
 
@@ -211,9 +121,8 @@ blockDescS 3 = map (first adjustPos) allBlocks
                                             (odd x  && even y)
                    ]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 4
-
 
 -- Level 4
 --   %%%%%%%%
@@ -234,7 +143,7 @@ blockDescS 4 = map (first adjustPos) allBlocks
                    ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
                                              , y <- [4], even x]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 7
 
 -- Level 5
@@ -267,7 +176,7 @@ blockDescS 6 = map (first adjustPos) allBlocks
                    ++ [((x,y), maxBlockLife) | x <- [0, blockColumns - 1]
                                              , y <- [1..blockRows - 2]]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 5
 
 
@@ -289,7 +198,7 @@ blockDescS 7 = map (first adjustPos) allBlocks
                    ++ [((x,y), maxBlockLife) | x <- [3,4]
                                              , y <- [2..4]]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 7
 
 -- Level 8
@@ -312,7 +221,7 @@ blockDescS 8 = map (first adjustPos) allBlocks
                                           , x /= 2, y /= 2
                    ]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 9
 
 -- Level 9
@@ -356,18 +265,15 @@ blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
 blockDescS 10 = map (first adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1], odd x]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [midRow], even x]
+       allBlocks =  [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
+                                           , y <- [0..blockRows - 1]
+                                           , odd x || (y == midRow && even x)]
   
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 9
 
-       midRow :: Integral a => a
+       midRow :: Int
        midRow = blockRows `div` 2
-
-
 
 -- Level 11
 --   %%%%%%%%
@@ -385,12 +291,11 @@ blockDescS 11 = map (first adjustPos) allBlocks
                                           , x <- [0..(blockColumns-1)
                                                  - (2 * abs (y - midRow))]
                    ]
-                   
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 7
 
-       midRow :: Integral a => a
+       midRow :: Int
        midRow = blockRows `div` 2
 
 -- Level 12
@@ -417,7 +322,7 @@ blockDescS 12 = map (first adjustPos) allBlocks
 
 -- Level 13
 -- X == maxBlockLife
--- O == maxBlockLife - minBlockLife
+-- O == maxBlockLife - 1
 --   %%%%%%%%
 -- % XOXOXOXO
 -- % OXOXOXOX
@@ -433,12 +338,12 @@ blockDescS 13 = map (first adjustPos) allBlocks
                                                            else maxBlockLife - 1
                                        ]
                    
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 4
 
 -- Level 14
 -- X == maxBlockLife
--- O == maxBlockLife - minBlockLife
+-- O == maxBlockLife - 1
 -- Y == minBlockLife
 --   %%%%%%%%
 -- % YYYYYYYY
@@ -468,7 +373,7 @@ blockDescS 14 = map (first adjustPos) allBlocks
                                             || (x == blockColumns - 3)
                                             || (y == blockRows - 3)]
                    
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 5
 
 
@@ -498,12 +403,11 @@ blockDescS 15 = map (first adjustPos) allBlocks
                                                          + 1..blockColumns - 1]
                                                  , even x]
   
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 9
 
-       midRow :: Integral a => a
+       midRow :: Int
        midRow = blockRows `div` 2
-
 
 -- Level 16
 -- maxBlockLife == X
@@ -535,7 +439,7 @@ blockDescS 16 = map (first adjustPos) allBlocks
                                              , x /= midColumn - 1, x /= midColumn]
 
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 8
 
 -- Level 17
@@ -565,7 +469,7 @@ blockDescS 17 = map (first adjustPos) allBlocks
                    ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
                                              , y <- [0, blockRows - 1]
                                              , y == 0 || x /= midColumn]
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 9
 
 blockDescS _ = error "No more levels"
