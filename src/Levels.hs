@@ -233,23 +233,13 @@ blockDescS 8 = map (first adjustPos) allBlocks
 -- %  X X X
 -- %   XXX
 -- %    X
-blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
+blockDescS 9 = map (first adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [3], y <- [0..6]]
-                   ++ [((x,y), maxBlockLife) | x <- [0..6], y <- [3]]
-                   ++ [((x,y), maxBlockLife) | x <- [2,4], y <- [1,5]]
-                   ++ [((x,y), maxBlockLife) | x <- [1,5], y <- [2,4]]
-                   
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       leftMargin :: Double
-       leftMargin = round' $
-         (gameWidth - (blockWidth + blockSeparation) * 7) / 2
-         where
-           round' :: Double -> Double
-           round' x = fromIntegral (floor x :: Int)
+       allBlocks = [((x,y), maxBlockLife) | x <- midColumns, y <- [0..6]]
+                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns-1], y <- [3]]
+                   ++ [((x,y), maxBlockLife) | x <- [2,blockColumns-3], y <- [1,5]]
+                   ++ [((x,y), maxBlockLife) | x <- [1,blockColumns-2], y <- [2,4]]
 
 -- Level 10
 --   %%%%%%%%
@@ -427,7 +417,7 @@ blockDescS 16 = map (first adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int)]
        allBlocks = [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                              , y <- [midColumn - 1, midColumn]
+                                              , y <- midColumns
                                               , (even x && y == midColumn)
                                                 || (odd x && y == midColumn -1)]
                    ++ [((x,y), minBlockLife) | x <- [midColumn - 1, midColumn]
@@ -477,33 +467,37 @@ blockDescS _ = error "No more levels"
 -- Dynamic positioning/level size
 
 adjustPos :: (Int, Int) -> (Double, Double)
-adjustPos = (adjustHPos *** adjustVPos) . fI2
-
-adjustVPos :: Double -> Double
-adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
-adjustHPos :: Double -> Double
-adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
+adjustPos = (adjustHPos . fI) *** (adjustVPos . fI)
+  where
+    adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
+    adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
+    fI         = fromIntegral
 
 -- Fit as many as possible
 blockColumns :: Int
 blockColumns =
-    1 + floor ( (gameWidth - blockWidth - 2 * leftMargin)
+    1 + floor ( (gameWidth - blockWidth - 2 * minLeftMargin)
               / (blockWidth + blockSeparation)
               )
 
 midColumn :: Int
 midColumn = blockColumns `div` 2
 
+midColumns :: [Int]
+midColumns | odd blockColumns = [midColumn]
+           | otherwise        = [midColumn - 1, midColumn]
+
 -- * Constants
 
 topMargin :: Num a => a
 topMargin = 10
 
-leftMargin :: Num a => a
-leftMargin = 25
+minLeftMargin :: Num a => a
+minLeftMargin = 25
 
--- * Auxiliary functions
-
-fI2 :: (Int, Int) -> (Double, Double)
-fI2 (x,y) = (fromIntegral x, fromIntegral y)       
+leftMargin :: Double
+leftMargin = round' $
+  (gameWidth - blockWidth - (blockWidth + blockSeparation) * (fromIntegral blockColumns - 1)) / 2
+  where
+    round' :: Double -> Double
+    round' x = fromIntegral (floor x :: Int)
