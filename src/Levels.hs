@@ -179,7 +179,6 @@ blockDescS 6 = map (first adjustPos) allBlocks
        blockRows :: Int
        blockRows = 5
 
-
 -- Level 7
 --   %%%%%%%%
 -- %  XXXXXX
@@ -469,14 +468,14 @@ blockDescS _ = error "No more levels"
 adjustPos :: (Int, Int) -> (Double, Double)
 adjustPos = (adjustHPos . fI) *** (adjustVPos . fI)
   where
-    adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
+    adjustVPos = (gameAreaTopMargin +) . ((blockHeight + blockSeparation) *)
     adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
     fI         = fromIntegral
 
 -- Fit as many as possible
 blockColumns :: Int
 blockColumns =
-    1 + floor ( (gameWidth - blockWidth - 2 * minLeftMargin)
+    1 + floor ( (gameWidth - blockWidth - 2 * gameAreaMinLeftMargin)
               / (blockWidth + blockSeparation)
               )
 
@@ -487,17 +486,10 @@ midColumns :: [Int]
 midColumns | odd blockColumns = [midColumn]
            | otherwise        = [midColumn - 1, midColumn]
 
--- * Constants
-
-topMargin :: Num a => a
-topMargin = 10
-
-minLeftMargin :: Num a => a
-minLeftMargin = 25
-
 leftMargin :: Double
-leftMargin = round' $
-  (gameWidth - blockWidth - (blockWidth + blockSeparation) * (fromIntegral blockColumns - 1)) / 2
+leftMargin = round' $ (gameWidth - maxBlocksWidth) / 2
   where
     round' :: Double -> Double
     round' x = fromIntegral (floor x :: Int)
+    maxBlocksWidth =
+      blockWidth + (blockWidth + blockSeparation) * (fromIntegral blockColumns - 1)

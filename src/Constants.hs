@@ -3,23 +3,44 @@ module Constants where
 import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
 
+-- * Main screen proportion
 width :: Double
 width  = 640
+
 height :: Double
 height = 600
 
+-- * Game area
 gameTop    :: Double
 gameTop    = 100
+
 gameLeft   :: Double
 gameLeft   = 0
 
 gameWidth :: Double
 gameWidth = width
+
 gameHeight :: Double
 gameHeight = height - gameTop
 
+-- * Block area
+gameAreaTopMargin :: Num a => a
+gameAreaTopMargin = 10
+
+gameAreaMinLeftMargin :: Num a => a
+gameAreaMinLeftMargin = 25
+
+-- * Time \/ Delays
 loadingDelay :: DTime
 loadingDelay = 2 -- seconds
+      
+-- restartDelay :: Time
+-- restartDelay = 3
+-- 
+-- wonDelay :: Time
+-- wonDelay = 3
+
+-- * Object properties
 
 paddleWidth, paddleHeight :: Double
 paddleWidth  = 104
@@ -36,10 +57,17 @@ blockWidth   = 64
 blockHeight  = 32
 blockSeparation :: Double
 blockSeparation = 10
+
+-- * Lives
+
+stdLives :: Int
+stdLives = 3
 maxBlockLife :: Int
 maxBlockLife = 3
 minBlockLife :: Int
 minBlockLife = 1
+
+-- * Physics
 
 initialBallVel :: Pos2D
 initialBallVel = (300, -300)
@@ -47,23 +75,13 @@ initialBallVel = (300, -300)
 collisionErrorMargin :: Double
 collisionErrorMargin = 100
 
-stdLives :: Int
-stdLives = 3
-
--- Energy transmission between objects in collisions
+-- | Energy transmission between objects in collisions
 velTrans :: Double
 velTrans = 0.2
 
--- Max speed
+-- | Max speed
 maxVNorm :: Double
 maxVNorm = 300
-      
--- Delays
--- restartDelay :: Time
--- restartDelay = 3
--- 
--- wonDelay :: Time
--- wonDelay = 3
 
 -- * Debugging
 
