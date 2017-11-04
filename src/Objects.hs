@@ -2,9 +2,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 -- | Game objects and collisions.
-module Objects
-  ( module Objects )
-  where
+module Objects where
 
 import FRP.Yampa.VectorSpace
 
@@ -12,6 +10,7 @@ import Data.Extra.Num
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Physics
+import Physics.Shapes.BasicAABBCollisions
 import qualified Physics.TwoDimensions.PhysicalObjects     as P
 
 import Constants
@@ -81,34 +80,6 @@ objShape obj = case objectKind obj of
 -- * Collisions
 type Collision  = P.Collision  ObjectName
 type Collisions = P.Collisions ObjectName
-
--- | Detects a collision between one object and another regardless of
--- everything else
---
--- FIXME: should we use the last known positions? Or should velocities suffice?
-detectCollision :: Object -> Object -> Maybe Collision
-detectCollision obj1 obj2
-  | overlap obj1 obj2 = Just (collisionResponseObj obj1 obj2)
-  | otherwise         = Nothing
-
-overlap :: Object -> Object -> Bool
-overlap obj1 obj2 = overlapShape (objShape obj1) (objShape obj2)
-
-collisionSide :: Object -> Object -> Side
-collisionSide obj1 obj2 = shapeCollisionSide (objShape obj1) (objShape obj2)
-
-collisionResponseObj :: Object -> Object -> Collision
-collisionResponseObj o1 o2 =
-  P.Collision $
-    map objectToCollision [(o1, side, o2), (o2, side', o1)]
-  where side  = collisionSide o1 o2
-        side' = oppositeSide side
-        objectReacts      o             = collisionEnergy o > 0 || displacedOnCollision o
-        objectToCollision (o,s,o')      = (objectName o, correctVel (objectVel o ^+^ (velTrans *^ objectVel o')) (collisionEnergy o) s)
-        correctVel (vx,vy) e TopSide    = (vx, ensurePos (vy * (-e)))
-        correctVel (vx,vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
-        correctVel (vx,vy) e LeftSide   = (ensureNeg (vx * (-e)),vy)
-        correctVel (vx,vy) e RightSide  = (ensurePos (vx * (-e)),vy)
 
 instance P.PhysicalObject Object String Shape where
   physObjectPos       = objectPos
