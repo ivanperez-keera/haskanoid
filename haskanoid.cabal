@@ -45,7 +45,7 @@ category:            Game, Reactivity, FRP
 build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >=1.8
+cabal-version:       >=1.10
 
 data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
 
@@ -56,6 +56,15 @@ Flag wiimote
 Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
+
+Flag sdl
+  Description: Enable SDL multimedia
+  Default: True
+
+Flag ghcjs
+  Description: Enable compilation using GHCJS and HTML5 Canvas
+  Default: False
+
 
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
@@ -88,21 +97,32 @@ executable haskanoid
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.11,
-                       SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse,
                        sage-assetmanager,
-                       sage-backends-sdl1-audio,
-                       sage-backends-sdl1-clock,
                        sage-data-extra,
                        sage-data-identity-list,
                        sage-physics-2d-rectangles,
                        sage-yampa-extra
+
+  if flag(sdl)
+    cpp-options: -Dsdl
+    build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf,
+                   sage-backends-sdl1-audio,
+                   sage-backends-sdl1-clock
+
+  if flag(ghcjs)
+    cpp-options: -Dghcjs
+    other-extensions: JavaScriptFFI, CPP, OverloadedStrings
+    other-modules: GHCJSNow JsImports
+    build-depends: ghcjs-dom, ghcjs-base, linear, semigroups, time
 
   if flag(wiimote)
     build-depends: hcwiid
 
   if flag(kinect)
     build-depends: freenect, vector
+
+  default-language: Haskell2010
 
 source-repository head
   type:     git
