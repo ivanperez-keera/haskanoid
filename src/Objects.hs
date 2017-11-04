@@ -4,19 +4,19 @@
 -- | Game objects and collisions.
 module Objects where
 
-import FRP.Yampa.VectorSpace
-
-import Physics.TwoDimensions.Dimensions
-import Physics.TwoDimensions.Collisions
-import Physics.TwoDimensions.Physics
-import Physics.Shapes.BasicAABBCollisions
-import qualified Physics.TwoDimensions.PhysicalObjects     as P
+import           FRP.Yampa.VectorSpace
+import           Physics.TwoDimensions.Dimensions
+import           Physics.TwoDimensions.Collisions
+import           Physics.TwoDimensions.Physics
+import           Physics.Shapes.BasicAABBCollisions
+import qualified Physics.TwoDimensions.PhysicalObjects as P
 
 import Constants
 
 -- * Objects
 
-type ObjectName = String
+-- | Object collection.
+type Objects = [Object]
 
 -- | Objects have logical properties (ID, kind, dead, hit), shape properties
 -- (kind), physical properties (kind, pos, vel, acc) and collision properties
@@ -33,7 +33,8 @@ data Object = Object { objectName           :: ObjectName
                      }
  deriving (Show)
 
-type Objects   = [Object]
+-- | Type for object id.
+type ObjectName = String
 
 -- | The kind of object and any size properties.
 --
@@ -41,11 +42,15 @@ type Objects   = [Object]
 -- proper correspondence in 'Object'.
 data ObjectKind = Ball    Double -- radius?
                 | Paddle  Size2D 
-                | Block   Energy Size2D
+                | Block   BlockEnergy Size2D
                 | Side    Side
   deriving (Show,Eq)
 
-type Energy = Int
+-- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
+--   means "dead".
+type BlockEnergy = Int
+
+-- ** Distinguish objects by kind.
 
 isBlock :: Object -> Bool
 isBlock o = case objectKind o of
@@ -57,6 +62,9 @@ isPaddle o = case objectKind o of
   (Paddle _) -> True
   _          -> False
 
+-- * Physical properties
+
+-- | Physical object definition of an 'Object'. We use AABB for shapes.
 instance P.PhysicalObject Object String Shape where
   physObjectPos       = objectPos
   physObjectVel       = objectVel
@@ -68,21 +76,23 @@ instance P.PhysicalObject Object String Shape where
   physObjectUpdateVel = \o v -> o { objectVel = v }
   physDetectCollision = detectCollision
 
+-- | Collision shape of an object.
 objShape :: Object -> Shape
 objShape obj = case objectKind obj of
-  (Ball r)    -> Rectangle (p ^-^ (r,r)) (2*r, 2*r)
-  (Paddle s)  -> Rectangle p s
-  (Block _ s) -> Rectangle p s
-  (Side   s)  -> sideToShape p s
- where p = objectPos obj
+  Ball r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
+  Paddle sz       -> Rectangle pos sz
+  Block _ sz      -> Rectangle pos sz
+  Side TopSide    -> Rectangle (pos ^-^ (e, e)) (width' + 2*e, e)
+  Side LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,            height' + 2*e)
+  Side RightSide  -> Rectangle (pos ^-^ (0, e)) (e,            height' + 2*e)
+  Side BottomSide -> Rectangle (pos ^-^ (e, 0)) (width' + 2*e, e)
+
+ where pos = objectPos obj
+       e   = collisionErrorMargin
+
        width'  = gameWidth
        height' = gameHeight
-       d = collisionErrorMargin
-       sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2*d, d)
-       sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2*d)
-       sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2*d)
-       sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2*d, d)
 
--- * Collisions
+-- ** Collisions
 type Collision  = P.Collision  ObjectName
 type Collisions = P.Collisions ObjectName
