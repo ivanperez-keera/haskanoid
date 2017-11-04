@@ -17,9 +17,10 @@ import qualified Graphics.UI.SDL.TTF       as TTF
 
 import Constants
 import GameState
-import Objects
 import Levels
+import Objects
 import Paths_haskanoid
+import Resources
 
 -- * Initialization
 
@@ -184,19 +185,6 @@ newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 data ResourceManager = ResourceManager
   { lastKnownStatus :: GameStatus
   , resources       :: Resources
-  }
-
--- | Includes all the assets needed at the current time in the game.
-data Resources = Resources
-  { resFont     :: Font
-  , blockHitSnd :: Audio
-  , bgImage     :: Maybe Image
-  , ballImg     :: Image
-  , block1Img   :: Image
-  , block2Img   :: Image
-  , block3Img   :: Image
-  , paddleImg   :: Image
-  , bgMusic     :: Maybe Music
   }
 
 -- | Ad-hoc resource loading

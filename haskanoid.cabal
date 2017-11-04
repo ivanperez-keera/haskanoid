@@ -110,6 +110,7 @@ executable haskanoid
                    sage-backends-sdl1-clock,
                    sage-assetmanager-sdl1
     other-modules: Display
+                   Resources
 
   if flag(ghcjs)
     cpp-options: -Dghcjs
