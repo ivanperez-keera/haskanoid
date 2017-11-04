@@ -17,7 +17,7 @@ main = do
   controllerRef <- initializeInputDevices
   res           <- loadResources
 
-  awhen res $ \res' -> do
+  awhen res $ \res' ->
     reactimate (initGraphs >> senseInput controllerRef)
                (\_ -> do
                   -- Get clock and new input
