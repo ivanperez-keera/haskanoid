@@ -31,7 +31,6 @@ data Object = Object { objectName           :: ObjectName
                      , objectHit            :: Bool
                      , canCauseCollisions   :: Bool
                      , collisionEnergy      :: Double
-                     , displacedOnCollision :: Bool       -- Theoretically, setting cE == 0 should suffice
                      }
  deriving (Show)
 

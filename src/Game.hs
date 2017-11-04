@@ -397,7 +397,6 @@ followPaddle = arr $ \oi ->
                                , objectHit            = False
                                , canCauseCollisions   = False
                                , collisionEnergy      = 0
-                               , displacedOnCollision = False
                                }
 
 -- A bouncing ball moves freely until there is a collision, then bounces and
@@ -490,7 +489,6 @@ freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
                    , objectHit            = isHit
                    , canCauseCollisions   = True
                    , collisionEnergy      = 1
-                   , displacedOnCollision = True
                    }
   
   returnA -< livingObject obj
@@ -537,7 +535,6 @@ objPaddle = proc (ObjectInput ci cs os) -> do
                      , objectHit            = isHit
                      , canCauseCollisions   = True
                      , collisionEnergy      = 0
-                     , displacedOnCollision = False
                      }
 
 -- | Follow the controller's horizontal position, keeping a constant
@@ -597,7 +594,6 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
                       , objectHit            = isHit
                       , canCauseCollisions   = False
                       , collisionEnergy      = 0
-                      , displacedOnCollision = False
                       }
                dead
 
@@ -643,6 +639,5 @@ objWall name side pos = proc (ObjectInput ci cs os) -> do
                         , objectHit            = isHit
                         , canCauseCollisions   = False
                         , collisionEnergy      = 0
-                        , displacedOnCollision = False
                         }
                 noEvent
