@@ -8,8 +8,6 @@
 -- empty.
 module GameState where
 
--- import FRP.Yampa as Yampa
-
 import Objects
 
 -- | The running state is given by a bunch of 'Objects' and the current general
