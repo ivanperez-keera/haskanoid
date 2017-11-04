@@ -83,7 +83,7 @@ executable haskanoid
 
   -- Modules included in this executable, other than Main.
   other-modules: Constants
-                 Game
+                 GamePlay
                  GameState
                  Input
                  Levels
