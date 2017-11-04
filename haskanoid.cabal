@@ -114,7 +114,8 @@ executable haskanoid
     cpp-options: -Dghcjs
     other-extensions: JavaScriptFFI, CPP, OverloadedStrings
     other-modules: GHCJSNow JsImports
-    build-depends: ghcjs-dom, ghcjs-base, linear, semigroups, time
+    build-depends: ghcjs-dom, ghcjs-base, linear, semigroups,
+                   time, sage-backends-html-clock
 
   if flag(wiimote)
     build-depends: hcwiid
