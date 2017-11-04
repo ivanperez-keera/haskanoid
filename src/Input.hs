@@ -18,7 +18,7 @@
 -- updated version.
 --
 -- Limitations:
--- 
+--
 --    - Device failures are not handled.
 --
 --    - Falling back to the next available device when there's a problem.
@@ -61,7 +61,6 @@ import           GHCJS.Foreign
 import           GHCJS.Types
 import qualified JavaScript.Web.Canvas          as C
 import qualified JavaScript.Web.Canvas.Internal as C
-import           JsImports                      (now)
 
 
 import           Control.Applicative
@@ -153,7 +152,7 @@ initializeInputDevices = do
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
 -- if available, or the last one there was.
--- 
+--
 -- It is assumed that the sensing function is always
 -- callable, and that it knows how to update the
 -- Controller info if necessary.
@@ -224,10 +223,10 @@ senseWiimote wmdev controller = do
 
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
-  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight 
+  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight
   --     (x,y)   = controllerPos controller
   --     x'      = if isLeft then x - wiiXDiff else if isRight then x + wiiXDiff else x
-  --     x''     = inRange (0, gameWidth) x' 
+  --     x''     = inRange (0, gameWidth) x'
   --     pos'    = (x'', y)
   -- wiiXDiff :: Float
   -- wiiXDiff = 6
@@ -269,7 +268,7 @@ handleEvent c e =
   case e of
     MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
     MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
+    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False}
     KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
     KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
     KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
@@ -323,7 +322,7 @@ initializeCanvasSense dim = do
 
 ghcjsGetController ref co = do
   (px,py,c) <- readIORef ref
-  let c' = co { controllerPos = (px, py), controllerClick = c }  
+  let c' = co { controllerPos = (px, py), controllerClick = c }
   return c'
 
 getContext :: Element -> IO C.Context
@@ -386,7 +385,7 @@ updatePos lastPosRef newPos@(nx,ny) = do
   writeIORef lastPosRef (Just (mx, my))
   mx `seq` my `seq` return ()
 
-calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double) 
+calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double)
 calculateMousePos (width, height) payload =
   fmap g (findFirst payload)
   where g (px,py) = (mousex, mousey)

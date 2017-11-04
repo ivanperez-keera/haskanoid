@@ -2,7 +2,6 @@ module GHCJSNow where
 
 import Data.IORef
 import Data.Time.Clock.POSIX (getPOSIXTime)
--- import JsImports                     (now)
 
 initializeTimeRef :: IO (IORef Int)
 initializeTimeRef = do

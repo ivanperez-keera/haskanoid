@@ -27,7 +27,6 @@ import           GHCJS.Foreign
 import           GHCJS.Types
 import qualified JavaScript.Web.Canvas         as C
 import qualified JavaScript.Web.Canvas.Internal as C
-import           JsImports                     (now)
 
 
 import           Control.Applicative
@@ -51,7 +50,7 @@ import Paths_haskanoid
 -- This function is ad-hoc in two senses: first, because it
 -- has the paths to the files hard-coded inside. And second,
 -- because it loads the specific resources that are needed,
--- not a general 
+-- not a general
 --
 loadResources :: IO (Maybe ResourceMgr)
 loadResources = runMaybeT $ do
@@ -91,7 +90,7 @@ loadResources = runMaybeT $ do
 
   ---- Return Nothing or embed in Resources
   --res <- case (myFont, blockHit) of
-  --         (Just f, Just b) -> let 
+  --         (Just f, Just b) -> let
   --                             in return (Resources f b Nothing ball b1 b2 b3 paddle Nothing)
   --         _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
   --                                        mzero
@@ -113,7 +112,7 @@ initialHtml = "<canvas id=\"dia\" width=\"" ++ show (round width)
 
 initGraphs :: IO ()
 initGraphs = do
-  return () 
+  return ()
   -- -- Create window
   -- screen <- SDL.setVideoMode (round width) (round height) 32 [SWSurface]
   -- SDL.setCaption "Test" ""
@@ -138,7 +137,7 @@ audio resources shownState = do
   return ()
   -- Start bg music if necessary
   -- playing <- musicPlaying
-  -- unless playing $ awhen (bgMusic resources) playMusic 
+  -- unless playing $ awhen (bgMusic resources) playMusic
 
   -- -- Play object hits
   -- mapM_ (audioObject resources) $ gameObjects shownState
@@ -149,7 +148,7 @@ audio resources shownState = do
 --     _           -> return ()
 
 display :: Resources -> GameState -> IO()
-display resources shownState = synchronously $ do 
+display resources shownState = synchronously $ do
   -- Obtain surface
   Just doc <- currentDocument
   Just canvas <- getElementById doc "dia"
@@ -252,7 +251,7 @@ getContext = C.getContext . coerce
 --  newResources <- case newState of
 --                    (GameLoading _) | (newState /= oldState)
 --                                    -> updateAllResources oldResources newState
---                    _               -> return oldResources 
+--                    _               -> return oldResources
 --
 --  let manager' = ResourceManager { lastKnownStatus = newState
 --                                 , resources       = newResources
@@ -266,10 +265,10 @@ getContext = C.getContext . coerce
 --   -- Load new music
 --   let newMusicFP' = _resourceFP $ levelMusic $ levels !! n
 --   newMusicFP <- getDataFileName newMusicFP'
--- 
+--
 --   let oldMusic   = bgMusic res
 --       oldMusicFP = maybe "" musicName oldMusic
--- 
+--
 --   newMusic <- if (oldMusicFP == newMusicFP)
 --               then return oldMusic
 --               else do -- Loading can fail, in which case we continue
@@ -280,18 +279,18 @@ getContext = C.getContext . coerce
 --                                return oldMusic
 --                        else do stopMusic
 --                                return bgM
--- 
+--
 --   -- Load new background
 --   let newBgFP' = _resourceFP $ levelBg $ levels !! n
--- 
+--
 --   newBgFP <- getDataFileName newBgFP'
--- 
+--
 --   let oldBg   = bgImage res
 --       oldBgFP = maybe "" imgName oldBg
--- 
+--
 --   newBg <- if oldBgFP == newBgFP
 --              then return oldBg
 --              else do img' <- load newBgFP
 --                      return $ Just (Image newBgFP img')
--- 
+--
 --   return (res { bgImage = newBg, bgMusic = newMusic })
