@@ -82,16 +82,16 @@ objShape obj = case objectKind obj of
   Ball r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
   Paddle sz       -> Rectangle pos sz
   Block _ sz      -> Rectangle pos sz
-  Side TopSide    -> Rectangle (pos ^-^ (e, e)) (width' + 2*e, e)
-  Side LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,            height' + 2*e)
-  Side RightSide  -> Rectangle (pos ^-^ (0, e)) (e,            height' + 2*e)
-  Side BottomSide -> Rectangle (pos ^-^ (e, 0)) (width' + 2*e, e)
+  Side TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
+  Side LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
+  Side RightSide  -> Rectangle (pos ^-^ (0, e)) (e,           gameH + 2*e)
+  Side BottomSide -> Rectangle (pos ^-^ (e, 0)) (gameW + 2*e, e)
 
  where pos = objectPos obj
        e   = collisionErrorMargin
 
-       width'  = gameWidth
-       height' = gameHeight
+       gameW = gameWidth
+       gameH = gameHeight
 
 -- ** Collisions
 type Collision  = P.Collision  ObjectName
