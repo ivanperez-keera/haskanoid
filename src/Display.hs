@@ -1,19 +1,20 @@
 module Display where
 
-import Control.Applicative ((<$>))
-import Control.Monad
-import Control.Monad.IfElse
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Maybe
-import Control.Monad.IO.Class
-import Data.IORef
-import Data.Maybe
-import Graphics.UI.SDL       as SDL
-import qualified Graphics.UI.SDL.TTF as TTF
-import Graphics.UI.SDL.Image as Image
-import Game.AssetManager hiding (audio)
+import           Control.Applicative       ((<$>))
+import           Control.Monad
+import           Control.Monad.IfElse
+import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe
+import           Data.IORef
+import           Data.Maybe
+import           Game.AssetManager         hiding (audio)
+import           Game.AssetManager.SDL1
+import           Game.Audio.SDL
+import           Graphics.UI.SDL           as SDL
+import           Graphics.UI.SDL.Image     as Image
+import qualified Graphics.UI.SDL.TTF       as TTF
 
-import Game.Audio.SDL
 import Constants
 import GameState
 import Objects
@@ -197,9 +198,6 @@ data Resources = Resources
   , paddleImg   :: Image
   , bgMusic     :: Maybe Music
   }
-
-data Image = Image { imgName  :: String, imgSurface :: Surface }
-data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 
 -- | Ad-hoc resource loading
 -- This function is ad-hoc in two senses: first, because it

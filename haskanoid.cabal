@@ -83,7 +83,6 @@ executable haskanoid
 
   -- Modules included in this executable, other than Main.
   other-modules: Constants
-                 Display
                  Game
                  GameState
                  Input
@@ -108,12 +107,14 @@ executable haskanoid
     cpp-options: -Dsdl
     build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf,
                    sage-backends-sdl1-audio,
-                   sage-backends-sdl1-clock
+                   sage-backends-sdl1-clock,
+                   sage-assetmanager-sdl1,
+    other-modules: Display
 
   if flag(ghcjs)
     cpp-options: -Dghcjs
     other-extensions: JavaScriptFFI, CPP, OverloadedStrings
-    other-modules: GHCJSNow JsImports
+    other-modules: DisplayGHCJS
     build-depends: ghcjs-dom, ghcjs-base, linear, semigroups,
                    time, sage-backends-html-clock
 
