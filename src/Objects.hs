@@ -6,7 +6,6 @@ module Objects where
 
 import FRP.Yampa.VectorSpace
 
-import Data.Extra.Num
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Physics
@@ -48,18 +47,26 @@ data ObjectKind = Ball    Double -- radius?
 
 type Energy = Int
 
-isBall :: ObjectKind -> Bool
-isBall (Ball _) = True
-isBall _        = False
-
-isBlock :: ObjectKind -> Bool
-isBlock Block {} = True
-isBlock _          = False
+isBlock :: Object -> Bool
+isBlock o = case objectKind o of
+  (Block {}) -> True
+  _          -> False
 
 isPaddle :: Object -> Bool
 isPaddle o = case objectKind o of
   (Paddle _) -> True
   _          -> False
+
+instance P.PhysicalObject Object String Shape where
+  physObjectPos       = objectPos
+  physObjectVel       = objectVel
+  physObjectElas      = collisionEnergy
+  physObjectShape     = objShape
+  physObjectCollides  = canCauseCollisions
+  physObjectId x      = objectName x
+  physObjectUpdatePos = \o p -> o { objectPos = p }
+  physObjectUpdateVel = \o v -> o { objectVel = v }
+  physDetectCollision = detectCollision
 
 objShape :: Object -> Shape
 objShape obj = case objectKind obj of
@@ -79,14 +86,3 @@ objShape obj = case objectKind obj of
 -- * Collisions
 type Collision  = P.Collision  ObjectName
 type Collisions = P.Collisions ObjectName
-
-instance P.PhysicalObject Object String Shape where
-  physObjectPos       = objectPos
-  physObjectVel       = objectVel
-  physObjectElas      = collisionEnergy
-  physObjectShape     = objShape
-  physObjectCollides  = canCauseCollisions
-  physObjectId x      = objectName x
-  physObjectUpdatePos = \o p -> o { objectPos = p }
-  physObjectUpdateVel = \o v -> o { objectVel = v }
-  physDetectCollision = detectCollision

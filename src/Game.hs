@@ -174,7 +174,7 @@ gameWithLives numLives level pts = dSwitch
 -- | Detect if the level is completed (ie. if there are no more blocks).
 isLevelCompleted :: SF GameState (Event GameState)
 isLevelCompleted = proc s -> do
-  over <- edge -< not $ any isBlock (map objectKind (gameObjects s))
+  over <- edge -< not $ any isBlock (gameObjects s)
   let snapshot = over `tag` s
   returnA -< snapshot
 
