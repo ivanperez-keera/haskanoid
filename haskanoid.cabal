@@ -108,7 +108,7 @@ executable haskanoid
     build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf,
                    sage-backends-sdl1-audio,
                    sage-backends-sdl1-clock,
-                   sage-assetmanager-sdl1,
+                   sage-assetmanager-sdl1
     other-modules: Display
 
   if flag(ghcjs)
