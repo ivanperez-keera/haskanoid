@@ -44,7 +44,7 @@ initGraphs = do
 
 -- * Rendering and Sound
 
--- | Loads new resources, renders the game state using SDL, and adjusts music. 
+-- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> IO()
 render resourceManager shownState = do
   resources <- loadNewResources resourceManager shownState
@@ -57,7 +57,7 @@ audio :: Resources -> GameState -> IO()
 audio resources shownState = do
   -- Start bg music if necessary
   playing <- musicPlaying
-  unless playing $ awhen (bgMusic resources) playMusic 
+  unless playing $ awhen (bgMusic resources) playMusic
 
   -- Play object hits
   mapM_ (audioObject resources) $ gameObjects shownState
@@ -71,7 +71,7 @@ audioObject resources object = when (objectHit object) $
 -- ** Painting
 
 display :: Resources -> GameState -> IO()
-display resources shownState = do 
+display resources shownState = do
   -- Obtain surface
   screen <- getVideoSurface
 
@@ -108,10 +108,11 @@ display resources shownState = do
 
 paintGeneral :: Surface -> Resources -> GameInfo -> IO ()
 paintGeneral screen resources over = void $ do
-  -- Paint screen green
+  -- Paint background
   let format = surfaceGetPixelFormat screen
   bgColor <- mapRGB format 0x11 0x22 0x33
   fillRect screen Nothing bgColor
+  -- Paint HUD
   paintGeneralHUD screen resources over
 
 paintGeneralMsg :: Surface -> Resources -> GameStatus -> IO ()
@@ -153,8 +154,8 @@ paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
   case objectKind object of
     (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                 setColorKey bI [SrcColorKey, RLEAccel] t 
+                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0
+                                 setColorKey bI [SrcColorKey, RLEAccel] t
                                  SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
     (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
                                  SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
@@ -163,8 +164,8 @@ paintObject resources screen object =
                                      sz = round (2*r)
                                  -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
                                  let bI = imgSurface $ ballImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                 setColorKey bI [SrcColorKey, RLEAccel] t 
+                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0
+                                 setColorKey bI [SrcColorKey, RLEAccel] t
                                  SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
     _              -> return ()
   where format = surfaceGetPixelFormat screen
@@ -204,13 +205,13 @@ data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 -- This function is ad-hoc in two senses: first, because it
 -- has the paths to the files hard-coded inside. And second,
 -- because it loads the specific resources that are needed,
--- not a general 
+-- not a general
 --
 loadResources :: IO (Maybe ResourceMgr)
 loadResources = runMaybeT $ do
   -- Font initialization
   ttfOk <- lift TTF.init
-  
+
   gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
   -- Load the fonts we need
   font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
@@ -244,7 +245,7 @@ loadResources = runMaybeT $ do
 
   -- Return Nothing or embed in Resources
   res <- case (myFont, blockHit) of
-           (Just f, Just b) -> let 
+           (Just f, Just b) -> let
                                in return (Resources f b Nothing ball b1 b2 b3 paddle Nothing)
            _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
                                           mzero
@@ -263,7 +264,7 @@ loadNewResources mgr state = do
   newResources <- case newState of
                     (GameLoading _) | newState /= oldState
                                     -> updateAllResources oldResources newState
-                    _               -> return oldResources 
+                    _               -> return oldResources
 
   let manager' = ResourceManager { lastKnownStatus = newState
                                  , resources       = newResources
