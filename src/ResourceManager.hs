@@ -56,7 +56,11 @@ loadResources = runMaybeT $ do
   -- img <- lift $ fmap (Image levelBg) $ load levelBg
 
   ballImg <- liftIO $ getDataFileName "data/ball2.png"
-  ball <- lift $ Image ballImg <$> load ballImg
+
+  ball <- lift $ Image ballImg <$> do img <- load ballImg
+                                      t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
+                                      setColorKey img [SrcColorKey, RLEAccel] t
+                                      return img
 
   b1Img <- liftIO $ getDataFileName "data/block1.png"
   b1 <- lift $ Image b1Img <$> load b1Img
@@ -68,7 +72,10 @@ loadResources = runMaybeT $ do
   b3 <- lift $ Image b3Img <$> load b3Img
 
   paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
-  paddle <- lift $ Image paddleImg <$> load paddleImg
+  paddle <- lift $ Image paddleImg <$> do img <- load paddleImg
+                                          t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
+                                          setColorKey img [SrcColorKey, RLEAccel] t
+                                          return img
 
   -- Start playing music
   -- when (isJust bgM) $ lift (playMusic (fromJust bgM))

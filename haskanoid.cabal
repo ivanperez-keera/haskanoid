@@ -106,9 +106,10 @@ executable haskanoid
   if flag(sdl)
     cpp-options: -Dsdl
     build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf,
+                   sage-assetmanager-sdl1,
                    sage-backends-sdl1-audio,
                    sage-backends-sdl1-clock,
-                   sage-assetmanager-sdl1
+                   sage-backends-sdl1-drawing
     other-modules: Display
                    Resources
                    ResourceManager

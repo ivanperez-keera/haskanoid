@@ -7,10 +7,12 @@ module Display
 
 import Control.Monad
 import Control.Monad.IfElse
+import Data.Tuple.Extra
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
-import Graphics.UI.SDL        as SDL
-import Graphics.UI.SDL.TTF    as TTF
+import Graphics.UI.SDL              as SDL
+import Graphics.UI.Extra.SDLDrawing as SDL
+import Graphics.UI.SDL.TTF          as TTF
 
 import Constants
 import GameState
@@ -122,54 +124,47 @@ paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resou
 
 paintGeneralMsg' :: Surface -> Resources -> String -> IO ()
 paintGeneralMsg' screen resources msg = void $ do
-  let font = resFont resources
-  message <- TTF.renderTextSolid (unFont font) msg (SDL.Color 128 128 128)
-  let x = (SDL.surfaceGetWidth  screen - w) `div` 2
-      y = (SDL.surfaceGetHeight screen - h) `div` 2
-      w = SDL.surfaceGetWidth  message
-      h = SDL.surfaceGetHeight message
-  SDL.blitSurface message Nothing screen $ Just (SDL.Rect x y w h)
+  message <- printSolid resources msg
+  renderAlignCenter screen message
 
 paintGeneralHUD :: Surface -> Resources -> GameInfo -> IO ()
 paintGeneralHUD screen resources over = void $ do
-  let font = unFont $ resFont resources
-  message1 <- TTF.renderTextSolid font ("Level: " ++ show (gameLevel over)) (SDL.Color 128 128 128)
-  let w1 = SDL.surfaceGetWidth  message1
-      h1 = SDL.surfaceGetHeight message1
-  SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 w1 h1)
-  message2 <- TTF.renderTextSolid font ("Points: " ++ show (gamePoints over)) (SDL.Color 128 128 128)
-  let w2 = SDL.surfaceGetWidth  message2
-      h2 = SDL.surfaceGetHeight message2
-  SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h2 + 5) w2 h2)
-  message3 <- TTF.renderTextSolid font ("Lives: " ++ show (gameLives over)) (SDL.Color 128 128 128)
+
+  message1 <- printSolid resources ("Level: " ++ show (gameLevel over))
+  SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 (-1) (-1))
+
+  message2 <- printSolid resources ("Points: " ++ show (gamePoints over))
+  let h2 = SDL.surfaceGetHeight message2
+  SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h2 + 5) (-1) (-1))
+
+  message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
   let rightMargin = SDL.surfaceGetWidth screen
-      w2 = SDL.surfaceGetWidth  message3
-      h2 = SDL.surfaceGetHeight message3
-  SDL.blitSurface message3 Nothing screen $ Just (SDL.Rect (rightMargin - 10 - w2) 10 w2 h2)
+      w3          = SDL.surfaceGetWidth message3
+  SDL.blitSurface message3 Nothing screen $ Just (SDL.Rect (rightMargin - 10 - w3) 10 (-1) (-1))
+
+-- * Auxiliary drawing functions
+printSolid :: Resources -> String -> IO Surface
+printSolid resources msg = do
+  let font = unFont $ resFont resources
+  message <- TTF.renderTextSolid font msg (SDL.Color 128 128 128)
+  return message
 
 -- | Paints a game object on a surface.
 paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
   case objectKind object of
-    (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0
-                                 setColorKey bI [SrcColorKey, RLEAccel] t
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
-    (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
-    (Ball r)        -> void $ do let x' = x - round r
-                                     y' = y - round r
-                                     sz = round (2*r)
-                                 -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
-                                 let bI = imgSurface $ ballImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0
-                                 setColorKey bI [SrcColorKey, RLEAccel] t
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
-    _              -> return ()
-  where format = surfaceGetPixelFormat screen
-        p      = objectPos object
-        x      = round (fst p)
-        y      = round (snd p)
+    (Paddle _ ) -> void $ do let bI = imgSurface $ paddleImg resources
+                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+
+    (Block e _) -> void $ do let bI = imgSurface $ blockImage e
+                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+
+    (Ball r)    -> void $ do let (x', y') = (x - round r, y - round r)
+
+                             let bI = imgSurface $ ballImg resources
+                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
+    _           -> return ()
+  where (x, y) = both round (objectPos object)
         blockImage 3 = block1Img resources
         blockImage 2 = block2Img resources
         blockImage n = block3Img resources
