@@ -75,11 +75,7 @@ display resources shownState = do
   -- Obtain surface
   screen <- getVideoSurface
 
-  -- Paint screen green
-  let format = surfaceGetPixelFormat screen
-
   -- Paint background
-
   awhen (bgImage resources) $ \bg' -> void $ do
     let bg     = imgSurface bg'
     let rectBg = SDL.Rect 0 0 (-1) (-1)
