@@ -525,17 +525,17 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   --  let p = refPosPaddle ci
   --  v <- derivative -< p
 
-  returnA -< livingObject $
-               Object{ objectName           = name
-                     , objectKind           = Paddle (paddleWidth,paddleHeight)
-                     , objectPos            = p
-                     , objectVel            = (0,0)
-                     , objectAcc            = (0,0)
-                     , objectDead           = False
-                     , objectHit            = isHit
-                     , canCauseCollisions   = True
-                     , collisionEnergy      = 0
-                     }
+  returnA -< livingObject
+               Object { objectName           = name
+                      , objectKind           = Paddle (paddleWidth,paddleHeight)
+                      , objectPos            = p
+                      , objectVel            = (0,0)
+                      , objectAcc            = (0,0)
+                      , objectDead           = False
+                      , objectHit            = isHit
+                      , canCauseCollisions   = True
+                      , collisionEnergy      = 0
+                      }
 
 -- | Follow the controller's horizontal position, keeping a constant
 -- vertical position.
