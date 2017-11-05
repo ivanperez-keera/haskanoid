@@ -138,9 +138,7 @@ paintGeneralHUD screen resources over = void $ do
   SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h2 + 5) (-1) (-1))
 
   message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
-  let rightMargin = SDL.surfaceGetWidth screen
-      w3          = SDL.surfaceGetWidth message3
-  SDL.blitSurface message3 Nothing screen $ Just (SDL.Rect (rightMargin - 10 - w3) 10 (-1) (-1))
+  renderAlignRight screen message3 (10, 10)
 
 -- * Auxiliary drawing functions
 printSolid :: Resources -> String -> IO Surface
