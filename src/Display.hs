@@ -32,7 +32,7 @@ initializeDisplay = do
 initGraphs :: IO ()
 initGraphs = do
   -- Create window
-  screen <- SDL.setVideoMode (round width) (round height) 32 [SWSurface]
+  screen <- SDL.setVideoMode width height 32 [SWSurface]
   SDL.setCaption "Test" ""
 
   -- Important if we want the keyboard to work right (I don't know
@@ -82,7 +82,7 @@ display resources shownState = do
     SDL.blitSurface bg Nothing screen $ Just rectBg
 
   hud <- createRGBSurface [SWSurface]
-             (round width) (round gameTop)
+             width gameTop
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintInfo hud resources (gameInfo shownState)
   let rectHud = SDL.Rect 0 0 (-1) (-1)
@@ -92,11 +92,11 @@ display resources shownState = do
   -- The 32 is important because we are using Word32 for the masks
   -- FIXME: Should I use HWSurface and possibly other flags (alpha?)?
   surface <- createRGBSurface [SWSurface]
-             (round gameWidth) (round gameHeight)
+             gameWidth gameHeight
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintMessage surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
-  let rect = SDL.Rect (round gameLeft) (round gameTop) (-1) (-1)
+  let rect = SDL.Rect gameLeft gameTop (-1) (-1)
   SDL.blitSurface surface Nothing screen $ Just rect
 
   -- Double buffering

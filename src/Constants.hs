@@ -4,23 +4,23 @@ import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
 
 -- * Main screen proportion
-width :: Double
+width :: Num a => a
 width  = 640
 
-height :: Double
+height ::  Num a => a
 height = 600
 
 -- * Game area
-gameTop    :: Double
+gameTop    :: Num a => a
 gameTop    = 100
 
-gameLeft   :: Double
+gameLeft   :: Num a => a
 gameLeft   = 0
 
-gameWidth :: Double
+gameWidth :: Num a => a
 gameWidth = width
 
-gameHeight :: Double
+gameHeight :: Num a => a
 gameHeight = height - gameTop
 
 -- * Block area
