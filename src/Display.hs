@@ -93,7 +93,7 @@ display resources shownState = do
              gameWidth gameHeight
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintMessage surface resources (gameStatus (gameInfo shownState))
-  mapM_ (paintObject resources surface) $ gameObjects shownState
+  mapM_ (paintObject surface resources) $ gameObjects shownState
   SDL.blitSurface surface Nothing screen $ Just (SDL.Rect gameLeft gameTop (-1) (-1))
 
   -- Double buffering
@@ -130,8 +130,8 @@ paintMessage screen resources status =
     msg GameFinished    = Just "You won!!! Well done :)"
 
 -- | Paints a game object on a surface.
-paintObject :: Resources -> Surface -> Object -> IO ()
-paintObject resources screen object =
+paintObject :: Surface -> Resources -> Object -> IO ()
+paintObject screen resources object =
   case objectKind object of
     (Paddle _ ) -> void $ do let bI = imgSurface $ paddleImg resources
                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
