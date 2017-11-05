@@ -128,7 +128,6 @@ executable haskanoid
                    sage-temporary
     other-modules: DisplaySDL2
                    Resources
-                   ResourceManager
     extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2
 
   if flag(ghcjs)
