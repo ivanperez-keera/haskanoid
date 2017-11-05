@@ -20,6 +20,8 @@ import Objects
 import Resources
 import ResourceManager
 
+type RenderingCtx = ()
+
 -- * Initialization
 
 initializeDisplay :: IO ()
@@ -29,8 +31,8 @@ initializeDisplay = do
 
   initAudio
 
-initGraphs :: IO ()
-initGraphs = do
+initGraphs :: ResourceMgr -> IO ()
+initGraphs _mgr = do
   -- Create window
   screen <- SDL.setVideoMode width height 32 [SWSurface]
   SDL.setCaption "Test" ""
@@ -45,8 +47,8 @@ initGraphs = do
 -- * Rendering and Sound
 
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
-render :: ResourceMgr -> GameState -> IO()
-render resourceManager shownState = do
+render :: ResourceMgr -> GameState -> RenderingCtx -> IO()
+render resourceManager shownState () = do
   resources <- loadNewResources resourceManager shownState
   audio   resources shownState
   display resources shownState

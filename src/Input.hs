@@ -32,13 +32,15 @@ module Input where
 
 -- External imports
 import Data.IORef
-import Control.Monad
 import Control.Extra.Monad
 
 -- External imports (SDL)
 #ifdef sdl
 import Graphics.UI.SDL as SDL
 import Graphics.UI.Extra.SDL
+#elif sdl2
+import Graphics.UI.SDL as SDL
+import Game.Clock.SDL2
 #endif
 
 -- External imports (GHCJS)
@@ -84,6 +86,7 @@ import System.CWiid
 -- External imports (Kinect)
 #ifdef kinect
 import Control.Concurrent
+import Control.Monad
 import Data.Maybe (fromJust)
 import Data.Vector.Storable (Vector,(!))
 import Data.Word
@@ -92,7 +95,6 @@ import qualified Data.Vector.Storable as V
 #endif
 
 -- Internal imports
-
 
 import Constants
 
@@ -120,9 +122,9 @@ newtype ControllerRef =
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
 
-#ifdef sdl
+#if defined(sdl) || defined(sdl2)
   let baseDev = sdlGetController
-#elif ghcjs
+#elif defined(ghcjs)
   baseDev <- ghcjsController
 #endif
 
@@ -241,7 +243,7 @@ senseWiimote wmdev controller = do
 #endif
 
 -- * SDL API (mid-level)
-#ifdef sdl
+#if defined(sdl) || defined(sdl2)
 
 -- ** Initialization
 
@@ -261,7 +263,9 @@ sdlMouseKB = return (Just sdlGetController)
 sdlGetController :: Controller -> IO Controller
 sdlGetController info =
   foldLoopM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
+#endif
 
+#ifdef sdl
 -- | Handles one event only and returns the updated controller.
 handleEvent :: Controller -> SDL.Event -> Controller
 handleEvent c e =
@@ -269,13 +273,26 @@ handleEvent c e =
     MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
     MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
     MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False}
-    KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
+    KeyUp   Keysym { symKey = SDLK_p }       -> c { controllerPause = not (controllerPause c) }
     KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
-    KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
+    KeyUp   Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = False }
     _                                        -> c
 #endif
 
-
+#ifdef sdl2
+-- | Handles one event only and returns the updated controller.
+handleEvent :: Controller -> Maybe SDL.Event -> Controller
+handleEvent c Nothing  = c
+handleEvent c (Just e) =
+  case eventData e of
+    MouseMotion { mouseMotionPosition = Position x y }                         -> c { controllerPos        = (fromIntegral x, fromIntegral y)}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Released }      -> c { controllerClick      = False}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Pressed }       -> c { controllerClick      = True }
+    Keyboard { keySym = Keysym { keyScancode = P }, keyMovement = KeyUp   }    -> c { controllerPause      = not (controllerPause c) }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyDown } -> c { controllerClick      = True  }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyUp }   -> c { controllerClick      = False }
+    _                                                                          -> c
+#endif
 
 #ifdef ghcjs
 type GHCJSController = IORef (Double, Double, Bool)
@@ -420,6 +437,7 @@ avg ls = (sumx `div` l, sumy `div` l)
         (sumx, sumy) = foldr (\(_,x,y) (rx,ry) -> (x+rx,y+ry)) (0,0) ls
 
 -- Update a value, with a max cap
+-- TODO: Take from extra num? 
 adjust :: (Num a, Ord a) => a -> a -> a -> a
 adjust maxD old new
   | abs (old - new) < maxD = new

@@ -9,7 +9,14 @@ import Input
 #ifdef sdl
 import Display
 import Graphics.UI.Extra.SDL
-#elif ghcjs
+#endif
+
+#ifdef sdl2
+import DisplaySDL2
+import Game.Clock.SDL2
+#endif
+
+#ifdef ghcjs
 import Control.Concurrent
 import DisplayGHCJS
 import GHCJSNow
@@ -26,14 +33,15 @@ main = do
   controllerRef <- initializeInputDevices
   res           <- loadResources
 
-  awhen res $ \res' ->
-    reactimate (initGraphs >> senseInput controllerRef)
+  awhen res $ \res' -> do
+    renderingCtx <- initGraphs res'
+    reactimate (senseInput controllerRef)
                (\_ -> do
                   -- Get clock and new input
                   dtSecs <- milisecsToSecs <$> senseTimeRef timeRef
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ e -> render res' e >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
+               (\_ e -> render res' e renderingCtx >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
                wholeGame
  
