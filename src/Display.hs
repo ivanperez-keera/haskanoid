@@ -77,16 +77,14 @@ display resources shownState = do
 
   -- Paint background
   awhen (bgImage resources) $ \bg' -> void $ do
-    let bg     = imgSurface bg'
-    let rectBg = SDL.Rect 0 0 (-1) (-1)
-    SDL.blitSurface bg Nothing screen $ Just rectBg
+    let bg = imgSurface bg'
+    SDL.blitSurface bg Nothing screen $ Just (SDL.Rect 0 0 (-1) (-1))
 
   hud <- createRGBSurface [SWSurface]
              width gameTop
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintInfo hud resources (gameInfo shownState)
-  let rectHud = SDL.Rect 0 0 (-1) (-1)
-  SDL.blitSurface hud Nothing screen $ Just rectHud
+  SDL.blitSurface hud Nothing screen $ Just (SDL.Rect 0 0 (-1) (-1))
 
   -- The following line is BIG_ENDIAN specific
   -- The 32 is important because we are using Word32 for the masks
@@ -96,8 +94,7 @@ display resources shownState = do
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintMessage surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
-  let rect = SDL.Rect gameLeft gameTop (-1) (-1)
-  SDL.blitSurface surface Nothing screen $ Just rect
+  SDL.blitSurface surface Nothing screen $ Just (SDL.Rect gameLeft gameTop (-1) (-1))
 
   -- Double buffering
   SDL.flip screen
