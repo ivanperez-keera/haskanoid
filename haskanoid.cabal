@@ -111,6 +111,7 @@ executable haskanoid
                    sage-assetmanager-sdl1
     other-modules: Display
                    Resources
+                   ResourceManager
 
   if flag(ghcjs)
     cpp-options: -Dghcjs
