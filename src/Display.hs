@@ -82,14 +82,14 @@ display resources shownState = do
 
   awhen (bgImage resources) $ \bg' -> void $ do
     let bg     = imgSurface bg'
-    let rectBg = SDL.Rect 0 0 (round width) (round height)
+    let rectBg = SDL.Rect 0 0 (-1) (-1)
     SDL.blitSurface bg Nothing screen $ Just rectBg
 
   hud <- createRGBSurface [SWSurface]
              (round width) (round gameTop)
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintInfo hud resources (gameInfo shownState)
-  let rectHud = SDL.Rect 0 0 (round width) (round gameTop)
+  let rectHud = SDL.Rect 0 0 (-1) (-1)
   SDL.blitSurface hud Nothing screen $ Just rectHud
 
   -- The following line is BIG_ENDIAN specific
@@ -100,7 +100,7 @@ display resources shownState = do
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintMessage surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
-  let rect = SDL.Rect (round gameLeft) (round gameTop) (round gameWidth) (round gameHeight)
+  let rect = SDL.Rect (round gameLeft) (round gameTop) (-1) (-1)
   SDL.blitSurface surface Nothing screen $ Just rect
 
   -- Double buffering
