@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
 import Control.Applicative ((<$>))
+import Control.Exception
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
 
@@ -23,9 +24,12 @@ import GHCJSNow
 import System.Mem
 #endif
 
+catchAny :: IO a -> (SomeException -> IO a) -> IO a
+catchAny = Control.Exception.catch
+
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()
-main = do
+main = (`catchAny` print) $ do
 
   initializeDisplay
 
