@@ -64,20 +64,10 @@ initialHtml = "<canvas id=\"dia\" width=\"" ++ show (round width)
 initGraphs :: IO ()
 initGraphs = do
   return ()
-  -- -- Create window
-  -- screen <- SDL.setVideoMode (round width) (round height) 32 [SWSurface]
-  -- SDL.setCaption "Test" ""
-
-  -- -- Important if we want the keyboard to work right (I don't know
-  -- -- how to make it work otherwise)
-  -- SDL.enableUnicode True
-
-  -- -- Hide mouse
-  -- SDL.showCursor False
 
 -- * Rendering and Sound
 
--- | Loads new resources, renders the game state using SDL, and adjusts music.
+-- | Loads new resources, renders the game state, and adjusts music.
 render :: ResourceMgr -> GameState -> IO()
 render resourceManager shownState = do
   -- resources <- loadNewResources resourceManager shownState
