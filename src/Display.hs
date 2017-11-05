@@ -140,13 +140,6 @@ paintGeneralHUD screen resources over = void $ do
   message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
   renderAlignRight screen message3 (10, 10)
 
--- * Auxiliary drawing functions
-printSolid :: Resources -> String -> IO Surface
-printSolid resources msg = do
-  let font = unFont $ resFont resources
-  message <- TTF.renderTextSolid font msg (SDL.Color 128 128 128)
-  return message
-
 -- | Paints a game object on a surface.
 paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
@@ -166,3 +159,11 @@ paintObject resources screen object =
         blockImage 3 = block1Img resources
         blockImage 2 = block2Img resources
         blockImage n = block3Img resources
+
+-- * Auxiliary drawing functions
+
+printSolid :: Resources -> String -> IO Surface
+printSolid resources msg = do
+  let font = unFont $ resFont resources
+  message <- TTF.renderTextSolid font msg (SDL.Color 128 128 128)
+  return message
