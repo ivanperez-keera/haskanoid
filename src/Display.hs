@@ -88,7 +88,7 @@ display resources shownState = do
   hud <- createRGBSurface [SWSurface]
              (round width) (round gameTop)
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
-  paintGeneral hud resources (gameInfo shownState)
+  paintInfo hud resources (gameInfo shownState)
   let rectHud = SDL.Rect 0 0 (round width) (round gameTop)
   SDL.blitSurface hud Nothing screen $ Just rectHud
 
@@ -98,7 +98,7 @@ display resources shownState = do
   surface <- createRGBSurface [SWSurface]
              (round gameWidth) (round gameHeight)
              32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
-  paintGeneralMsg surface resources (gameStatus (gameInfo shownState))
+  paintMessage surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
   let rect = SDL.Rect (round gameLeft) (round gameTop) (round gameWidth) (round gameHeight)
   SDL.blitSurface surface Nothing screen $ Just rect
@@ -106,39 +106,35 @@ display resources shownState = do
   -- Double buffering
   SDL.flip screen
 
-paintGeneral :: Surface -> Resources -> GameInfo -> IO ()
-paintGeneral screen resources over = void $ do
-  -- Paint background
+paintInfo :: Surface -> Resources -> GameInfo -> IO ()
+paintInfo screen resources over = void $ do
+  -- Clear background
   let format = surfaceGetPixelFormat screen
   bgColor <- mapRGB format 0x11 0x22 0x33
   fillRect screen Nothing bgColor
+
   -- Paint HUD
-  paintGeneralHUD screen resources over
-
-paintGeneralMsg :: Surface -> Resources -> GameStatus -> IO ()
-paintGeneralMsg screen resources GamePlaying     = return ()
-paintGeneralMsg screen resources GamePaused      = paintGeneralMsg' screen resources "Paused"
-paintGeneralMsg screen resources (GameLoading n) = paintGeneralMsg' screen resources ("Level " ++ show n)
-paintGeneralMsg screen resources GameOver        = paintGeneralMsg' screen resources "GAME OVER!!!"
-paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resources "You won!!! Well done :)"
-
-paintGeneralMsg' :: Surface -> Resources -> String -> IO ()
-paintGeneralMsg' screen resources msg = void $ do
-  message <- printSolid resources msg
-  renderAlignCenter screen message
-
-paintGeneralHUD :: Surface -> Resources -> GameInfo -> IO ()
-paintGeneralHUD screen resources over = void $ do
-
   message1 <- printSolid resources ("Level: " ++ show (gameLevel over))
   SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 (-1) (-1))
-
+   
   message2 <- printSolid resources ("Points: " ++ show (gamePoints over))
   let h1 = SDL.surfaceGetHeight message1
   SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h1 + 5) (-1) (-1))
-
+   
   message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
   renderAlignRight screen message3 (10, 10)
+
+paintMessage :: Surface -> Resources -> GameStatus -> IO ()
+paintMessage screen resources status =
+    awhen (msg status) $ \msg' -> do
+      message <- printSolid resources msg'
+      renderAlignCenter screen message
+  where
+    msg GamePlaying     = Nothing
+    msg GamePaused      = Just "Paused"
+    msg (GameLoading n) = Just ("Level " ++ show n)
+    msg GameOver        = Just "GAME OVER!!!"
+    msg GameFinished    = Just "You won!!! Well done :)"
 
 -- | Paints a game object on a surface.
 paintObject :: Resources -> Surface -> Object -> IO ()
