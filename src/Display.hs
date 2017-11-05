@@ -134,8 +134,8 @@ paintGeneralHUD screen resources over = void $ do
   SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 (-1) (-1))
 
   message2 <- printSolid resources ("Points: " ++ show (gamePoints over))
-  let h2 = SDL.surfaceGetHeight message2
-  SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h2 + 5) (-1) (-1))
+  let h1 = SDL.surfaceGetHeight message1
+  SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h1 + 5) (-1) (-1))
 
   message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
   renderAlignRight screen message3 (10, 10)
