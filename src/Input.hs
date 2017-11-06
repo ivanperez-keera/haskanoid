@@ -32,12 +32,12 @@ module Input where
 
 -- External imports
 import Data.IORef
-import Control.Extra.Monad
+import Control.Monad.Extra
 
 -- External imports (SDL)
 #ifdef sdl
-import Graphics.UI.SDL as SDL
-import Graphics.UI.Extra.SDL
+import Graphics.UI.SDL       as SDL
+import Graphics.UI.SDL.Clock
 #elif sdl2
 import Graphics.UI.SDL as SDL
 import Game.Clock.SDL2

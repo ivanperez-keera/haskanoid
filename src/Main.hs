@@ -9,7 +9,7 @@ import Input
 
 #ifdef sdl
 import Display
-import Graphics.UI.Extra.SDL
+import Graphics.UI.SDL.Clock
 #endif
 
 #ifdef sdl2

@@ -10,9 +10,9 @@ import Control.Monad.IfElse
 import Data.Tuple.Extra
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
-import Graphics.UI.SDL              as SDL
-import Graphics.UI.Extra.SDLDrawing as SDL
-import Graphics.UI.SDL.TTF          as TTF
+import Graphics.UI.SDL        as SDL
+import Graphics.UI.SDL.Align  as SDL
+import Graphics.UI.SDL.TTF    as TTF
 
 import Constants
 import GameState
