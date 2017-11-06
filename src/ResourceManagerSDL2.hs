@@ -11,7 +11,6 @@ import qualified Game.AssetManager.SDL2     as Res
 import           Graphics.UI.SDL            as SDL
 import qualified Graphics.UI.SDL.TTF        as TTF
 
--- import Audio
 import Resources
 
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
@@ -30,10 +29,9 @@ loadResources = do
 
   -- Load the resources we need
   font     <- loadFont gameFontSpec
-
+  
   bgM      <- loadMusic   backgroundMusic
   blockHit <- loadSoundFX blockHitSFX
-
   img      <- loadImage initialBG
   ball     <- loadImage ballImage
   b1       <- loadImage block1Image
@@ -42,25 +40,25 @@ loadResources = do
   paddle   <- loadImage paddleImage
 
   -- FIXME: This sould not be here: start playing music
-  when (isJust bgM) $ do
-    playMusic (fromJust bgM)
+  when (isJust bgM) $ playMusic (fromJust bgM)
 
   -- Check that all resources have been loaded
 
   -- Return Nothing or embed in Resources
-  let res = do f   <- font
-               b   <- blockHit
-               i   <- img
-               bl  <- ball
-               bi1 <- b1
-               bi2 <- b2
-               bi3 <- b3
-               p   <- paddle
-               return (Resources f b img bl bi1 bi2 bi3 p bgM)
+  let res = Resources <$> font
+                      <*> blockHit
+                      <*> pure img
+                      <*> ball
+                      <*> b1
+                      <*> b2
+                      <*> b3
+                      <*> paddle
+                      <*> pure bgM
 
    -- Some resources did not load
   case res of
-    Nothing   -> do return Nothing
+    Nothing   -> do putStrLn "Something failed to load"
+                    return Nothing
     Just res' -> do newMgr <- newIORef (ResourceManager res')
                     return $ Just $ ResourceMgr newMgr
 
@@ -159,7 +157,7 @@ initialBG       :: ImageSpec
 initialBG       = ("data/level0.png", Nothing)
 
 ballImage       :: ImageSpec
-ballImage       = ("data/ball.png", Nothing)
+ballImage       = ("data/ball-alpha.png", Nothing)
 
 block1Image     :: ImageSpec
 block1Image     = ("data/block1.png", Nothing)
@@ -171,7 +169,7 @@ block3Image     :: ImageSpec
 block3Image     = ("data/block3.png", Nothing)
 
 paddleImage     :: ImageSpec
-paddleImage     = ("data/paddleBlu.png", Just (0, 255, 0))
+paddleImage     = ("data/paddleBluA.png", Nothing) -- Just (0, 255, 0))
 
 -- Fonts
 gameFontSpec    :: FontSpec
@@ -179,7 +177,7 @@ gameFontSpec    = ("data/lacuna.ttf", 32)
 
 -- Audio
 backgroundMusic :: MusicSpec
-backgroundMusic = "data/menu.mp3"
+backgroundMusic = "data/level0.mp3"
 
 blockHitSFX     :: SoundFXSpec
-blockHitSFX     = ("data/196106__aiwha__ding-copyrighted2.wav", 2000)
+blockHitSFX     = ("data/196106_aiwha_ding-cc-by.wav", 2000)

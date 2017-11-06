@@ -62,6 +62,20 @@ isPaddle o = case objectKind o of
   (Paddle _) -> True
   _          -> False
 
+-- Partial function!
+objectSize :: Object -> Size2D
+objectSize object = case objectKind object of
+  (Paddle sz)   -> sz
+  (Block _ sz)  -> sz
+  (Ball r)      -> let w = 2*r in (w, w)
+
+-- Partial function. Object has size.
+objectTopLevelCorner :: Object -> Pos2D
+objectTopLevelCorner object = case objectKind object of
+  (Paddle {}) -> objectPos object
+  (Block  {}) -> objectPos object
+  _other      -> objectPos object ^-^ (0.5 *^ (objectSize object))
+
 -- * Physical properties
 
 -- | Physical object definition of an 'Object'. We use AABB for shapes.
