@@ -12,6 +12,7 @@
 module ObjectSF where
 
 import FRP.Yampa
+import Physics.TwoDimensions.Dimensions
 
 import Objects
 import Input
@@ -48,12 +49,14 @@ data ObjectInput = ObjectInput
 data ObjectOutput = ObjectOutput
   { outputObject :: Object   -- ^ The object's state (position, shape, etc.).
   , harakiri     :: Event () -- ^ Whether the object has died (killed itself).
+  , births       :: Event PowerUp
   } 
 
+data PowerUp = Diamond Pos2D Size2D
 
 -- | Handy function to create an object that is currently alive.
 livingObject :: Object -> ObjectOutput
-livingObject o = ObjectOutput o noEvent
+livingObject o = ObjectOutput o noEvent noEvent
 
 -- | List of identifiable objects. Used to work with dynamic object
 -- collections.

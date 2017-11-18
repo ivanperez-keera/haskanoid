@@ -50,7 +50,7 @@ import FRP.Yampa.Extra
 import Physics.CollisionEngine
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
-import Physics.TwoDimensions.PhysicalObjects(Collision(Collision))
+import Physics.TwoDimensions.PhysicalObjects(Collision(..))
 
 -- Internal imports
 import Constants
@@ -299,13 +299,17 @@ gamePlay' objs = loopPre ([],[],0) $
          -- Turn every event carrying a function that transforms the
          -- object signal function list into one function that performs
          -- all the efects in sequence
-         foldl (mergeBy (.)) noEvent es
+         foldl (mergeBy (.)) noEvent (es ++ is)
 
          -- Turn every object that wants to kill itself into
          -- a function that removes it from the list
          where es :: [Event (IL ObjectSF -> IL ObjectSF)]
                es = [ harakiri oo `tag` deleteIL k
                     | (k,oo) <- assocsIL oos ]
+
+               is :: [Event (IL ObjectSF -> IL ObjectSF)]
+               is = [fmap (insertIL_ . createPowerUp) (births oo)
+                    | (k,oo) <- assocsIL oos]
 
        -- From the actual objects, detect which ones collide
        detectObjectCollisions :: SF (IL ObjectOutput) Collisions
@@ -320,7 +324,9 @@ gamePlay' objs = loopPre ([],[],0) $
                hasBall     = any ((=="ball").fst)
                countBlocks = length . filter (isPrefixOf "block" . fst)
 
-
+       -- Create powerup
+       createPowerUp :: PowerUp -> ObjectSF
+       createPowerUp (Diamond pos sz) = diamond pos sz
 
 -- * Game objects
 --
@@ -384,7 +390,7 @@ followPaddle = arr $ \oi ->
       ballPos     = maybe (outOfScreen, outOfScreen)
                           ((paddleWidth/2, - ballHeight) ^+^)
                           mbPaddlePos
-  in ObjectOutput (inertBallAt ballPos) noEvent
+  in ObjectOutput (inertBallAt ballPos) noEvent noEvent
   where outOfScreen = -10
         inertBallAt p = Object { objectName           = "ball"
                                , objectKind           = Ball ballWidth
@@ -582,6 +588,9 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
   dead <- edge -< isDead
   -- let isDead = False -- immortal blocks
 
+  -- If it's dead, does it create a 'powerup'?
+  let createDiamond = dead `tag` Diamond (x,y) (w,h)
+
   returnA -< ObjectOutput 
                 Object{ objectName           = name
                       , objectKind           = Block lives (w, h)
@@ -594,6 +603,55 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
                       , collisionEnergy      = 0
                       }
                dead
+               createDiamond
+
+-- *** Powerups
+diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+
+  let name = "diamondat" ++ show (x,y)
+
+  -- Has the diamond been hit?
+  let hits :: Collisions
+      hits = filter (any ((== name).fst) . collisionData) cs
+
+      paddleHits :: Collisions
+      paddleHits = filter (any ((== "paddle").fst) . collisionData) hits
+
+      bottomHits :: Collisions
+      bottomHits = filter (any ((== "bottomWall").fst) . collisionData) hits
+
+      isHit :: Bool
+      isHit = not (null $ concatMap collisionData paddleHits)
+              || not (null $ concatMap collisionData bottomHits)
+
+      -- Time to eliminate? (dead on collision with ball)
+  let isDead = isHit
+  dead <- edge -< isDead
+
+  -- Position (always falling)
+  p <- (p0 ^+^) ^<< integral -< v
+
+  returnA -< ObjectOutput
+               Object { objectName       = name
+                      , objectKind           = PDiamond (w', h')
+                      , objectPos            = p
+                      , objectVel            = v
+                      , objectAcc            = (0,0)
+                      , objectDead           = isDead
+                      , objectHit            = isHit
+                      , canCauseCollisions   = False
+                      , collisionEnergy      = 0
+                      }
+               dead
+               noEvent
+
+  where p0 = (x', y')
+        -- Calculate new position
+        x' = x + (w / 2) -- - (w' / 2)
+        y' = y + (h / 2) -- - (h' / 2)
+        w' = diamondWidth
+        h' = diamondHeight
+        v  = (0, 100)
 
 -- *** Walls
 
@@ -638,4 +696,5 @@ objWall name side pos = proc (ObjectInput ci cs os) -> do
                         , canCauseCollisions   = False
                         , collisionEnergy      = 0
                         }
+                noEvent
                 noEvent

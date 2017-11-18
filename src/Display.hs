@@ -135,17 +135,20 @@ paintMessage screen resources status =
 paintObject :: Surface -> Resources -> Object -> IO ()
 paintObject screen resources object =
   case objectKind object of
-    (Paddle _ ) -> void $ do let bI = imgSurface $ paddleImg resources
-                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    (Paddle _ )  -> void $ do let bI = imgSurface $ paddleImg resources
+                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    (Block e _) -> void $ do let bI = imgSurface $ blockImage e
-                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    (Block e _)  -> void $ do let bI = imgSurface $ blockImage e
+                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    (Ball r)    -> void $ do let (x', y') = (x - round r, y - round r)
+    (Ball r)     -> void $ do let (x', y') = (x - round r, y - round r)
+                              let bI = imgSurface $ ballImg resources
+                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
 
-                             let bI = imgSurface $ ballImg resources
-                             SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
-    _           -> return ()
+    (PDiamond _) -> void $ do let bI = imgSurface $ ballImg resources
+                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+
+    _                -> return ()
   where (x, y) = both round (objectPos object)
         blockImage 3 = block1Img resources
         blockImage 2 = block2Img resources

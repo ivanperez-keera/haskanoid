@@ -40,10 +40,11 @@ type ObjectName = String
 --
 -- TODO: Use a GADT to separate these properties in two types and guarantee a
 -- proper correspondence in 'Object'.
-data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D 
-                | Block   BlockEnergy Size2D
-                | Side    Side
+data ObjectKind = Ball     Double -- radius?
+                | Paddle   Size2D 
+                | Block    BlockEnergy Size2D
+                | Side     Side
+                | PDiamond Size2D -- A diamond (powerup) with a given size
   deriving (Show,Eq)
 
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
@@ -96,6 +97,7 @@ objShape obj = case objectKind obj of
   Ball r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
   Paddle sz       -> Rectangle pos sz
   Block _ sz      -> Rectangle pos sz
+  PDiamond sz     -> Rectangle pos sz
   Side TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
   Side LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
   Side RightSide  -> Rectangle (pos ^-^ (0, e)) (e,           gameH + 2*e)
