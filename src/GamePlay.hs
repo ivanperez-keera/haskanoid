@@ -220,7 +220,7 @@ gamePlay lives level pts =
 -- will fall in an infinite loop.  Therefore, this dswitch only switches for
 -- non-start events.
 composeGameState :: Int -> Int -> Int
-                 -> SF (ObjectOutputs, Event (), Int) GameState
+                 -> SF (ObjectOutputs, Int, Event (), Int) GameState
 composeGameState lives level pts = futureDSwitch
   (composeGameState' lives level pts)
   (\_ -> composeGameState (lives-1) level pts)
@@ -229,12 +229,13 @@ composeGameState lives level pts = futureDSwitch
 -- detect when a live is lost. When that happens, keep the last known game
 -- state.
 composeGameState' :: Int -> Int -> Int
-                  -> SF (ObjectOutputs, Event (), Int) (GameState, Event GameState)
-composeGameState' lives level pts = proc (oos,dead,points) -> do
+                  -> SF (ObjectOutputs, Int, Event (), Int) (GameState, Event GameState)
+composeGameState' lives level pts = proc (oos,lives', dead, points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
+  let lives'' = lives + lives'
   let general = GameState objects
-                          (GameInfo GamePlaying lives level (pts+points))
+                          (GameInfo GamePlaying lives'' level (pts+points))
 
   -- Detect death
   let lastGeneral = dead `tag` general
@@ -260,39 +261,34 @@ composeGameState' lives level pts = proc (oos,dead,points) -> do
 --
 --    - The last known points (added to the new ones in every loop iteration).
 --
-gamePlay' :: ObjectSFs -> SF Controller (ObjectOutputs, Event (), Int)
-gamePlay' objs = loopPre ([],[],0) $
-   -- Process physical movement and detect new collisions
-   ((adaptInput >>> processMovement >>> (arr elemsIL &&& detectObjectCollisions))
-   &&& arr (thd3.snd)) -- This last bit just carries the old points forward
+gamePlay' :: ObjectSFs -> SF Controller (ObjectOutputs, Int, Event (), Int)
+gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
-   -- Adds the old point count to the newly-made points
-   >>> (arr fst &&& arr (\((_,cs),o) -> o + countPoints cs))        
-                                                                    
-   -- Re-arrange output, selecting (objects+dead+points, objects+collisions+points)
-   >>> (composeOutput &&& arr (\((x,y),z) -> (x,y,z)))
+   let inputs = ObjectInput userInput cols (map outputObject objs)
+
+   outputs    <- processMovement objs   -< inputs
+   cols'      <- detectObjectCollisions -< outputs
+   hitBottom  <- collisionWithBottom    -< cols'
+   hitDiamond <- collisionDiamondPaddle -< cols'
+
+   let objs' = elemsIL outputs
+       pts'  = pts + countPoints cols'
+
+   let hitDiamondF :: Event (Int -> Int)
+       hitDiamondF = fmap (const (+1)) hitDiamond
+
+   lvs' <- accumHold 0 -< hitDiamondF
+
+   returnA -< ((objs', lvs', hitBottom, pts'), (objs', cols', pts'))
 
  where
 
-       -- Detect collisions between the ball and the bottom
-       -- which are the only ones that matter outside gamePlay'
-       composeOutput = proc ((x,y),z) -> do
-         y' <- collisionWithBottom -< y
-         returnA -< (x,y',z)
-
-       -- Just reorder the input
-       adaptInput :: SF (Controller, (ObjectOutputs, Collisions, Int)) ObjectInput
-       adaptInput = arr (\(gi,(os,cs,pts)) -> ObjectInput gi cs (map outputObject os))
-
        -- Parallely apply all object functions
-       processMovement :: SF ObjectInput (IL ObjectOutput)
-       processMovement = processMovement' objs
-
-       processMovement' :: ObjectSFs -> SF ObjectInput (IL ObjectOutput)
-       processMovement' objs = dpSwitchB 
-         objs                                   -- Signal functions
-         (noEvent --> arr suicidalSect)         -- When necessary, remove all elements that must be removed
-         (\sfs' f -> processMovement' (f sfs')) -- Move along! Move along! (with new state, aka. sfs)
+       processMovement :: ObjectSFs -> SF ObjectInput (IL ObjectOutput)
+       processMovement objs = dpSwitchB 
+         objs                                  -- Signal functions
+         (noEvent --> arr suicidalSect)        -- When necessary, remove all elements that must be removed
+         (\sfs' f -> processMovement (f sfs')) -- Move along! Move along! (with new state, aka. sfs)
 
        suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
        suicidalSect (_,oos) =
@@ -380,6 +376,27 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 -- the event only take place once per collision.
 collisionWithBottom :: SF Collisions (Event ())
 collisionWithBottom = inCollisionWith "ball" "bottomWall" ^>> edge
+
+-- | Fires an event when the diamond *enters in* a collision with the
+-- paddle.
+--
+-- NOTE: even if the overlap is not corrected, 'edge' makes
+-- the event only take place once per collision.
+collisionDiamondPaddle :: SF Collisions (Event ())
+collisionDiamondPaddle = proc cs -> do
+
+  -- Has the diamond been hit?
+  let hits :: Collisions
+      hits = filter (any (("diamond" `isPrefixOf` ).fst) . collisionData) cs
+
+      paddleHits :: Collisions
+      paddleHits = filter (any ((== "paddle").fst) . collisionData) hits
+
+      isHit :: Bool
+      isHit = not (null $ concatMap collisionData paddleHits)
+
+  dead <- edge -< isHit
+  returnA -< dead
 
 -- | Ball follows the paddle if there is one, and it's out of the screen
 -- otherwise). To avoid reacting to collisions, this ball is non-interactive.
