@@ -319,10 +319,13 @@ gamePlay' objs = loopPre ([],[],0) $
        countPoints :: Collisions -> Int
        countPoints = sum . map numPoints
          where numPoints (Collision cd)
-                  | hasBall cd = countBlocks cd
-                  | otherwise  = 0
-               hasBall     = any ((=="ball").fst)
-               countBlocks = length . filter (isPrefixOf "block" . fst)
+                  | hasBall cd    = countBlocks cd
+                  | hasPaddle cd  = 100 * countDiamonds cd
+                  | otherwise     = 0
+               hasBall       = any ((=="ball").fst)
+               countBlocks   = length . filter (isPrefixOf "block" . fst)
+               hasPaddle     = any ((=="paddle").fst)
+               countDiamonds = length . filter (isPrefixOf "diamond" . fst)
 
        -- Create powerup
        createPowerUp :: PowerUp -> ObjectSF
@@ -606,9 +609,10 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
                createDiamond
 
 -- *** Powerups
+diamond :: Pos2D -> Size2D -> ObjectSF
 diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
-  let name = "diamondat" ++ show (x,y)
+  let name = "diamond" ++ show (x,y)
 
   -- Has the diamond been hit?
   let hits :: Collisions
@@ -624,7 +628,7 @@ diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
       isHit = not (null $ concatMap collisionData paddleHits)
               || not (null $ concatMap collisionData bottomHits)
 
-      -- Time to eliminate? (dead on collision with ball)
+  -- Time to eliminate? (dead on collision with paddle)
   let isDead = isHit
   dead <- edge -< isDead
 
@@ -632,7 +636,7 @@ diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
   p <- (p0 ^+^) ^<< integral -< v
 
   returnA -< ObjectOutput
-               Object { objectName       = name
+               Object { objectName           = name
                       , objectKind           = PDiamond (w', h')
                       , objectPos            = p
                       , objectVel            = v
