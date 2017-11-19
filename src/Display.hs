@@ -145,7 +145,7 @@ paintObject screen resources object =
                               let bI = imgSurface $ ballImg resources
                               SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
 
-    (PDiamond _) -> void $ do let bI = imgSurface $ ballImg resources
+    (PDiamond _) -> void $ do let bI = imgSurface $ diamondImg resources
                               SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
     _                -> return ()
