@@ -3,7 +3,6 @@ module ResourceManagerSDL2 where
 import           Control.Monad
 import           Data.IORef
 import           Data.Maybe
-import           Data.Word
 import           Data.IORef.Extra
 import           Game.Audio.SDL2
 import           Game.AssetManager.SDL2     hiding (loadImage)
@@ -12,6 +11,7 @@ import           Graphics.UI.SDL            as SDL
 import qualified Graphics.UI.SDL.TTF        as TTF
 
 import Resources
+import ResourcesSDL2
 
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 
@@ -137,11 +137,6 @@ preloadResources mgr rdr = void $ do
 
 -- ** Resources
 
-type ImageSpec   = (FilePath, Maybe (Word8, Word8, Word8))
-type MusicSpec   = FilePath
-type SoundFXSpec = (FilePath, Int)
-type FontSpec    = (FilePath, Int)
-
 loadSoundFX :: SoundFXSpec -> IO (Maybe Audio)
 loadSoundFX (fp, dur) = loadAudio fp dur
 
@@ -152,37 +147,3 @@ loadImage (fp, mask)    = Just <$> tryLoadImage fp mask Nothing
 loadFont :: FontSpec -> IO (Maybe Font)
 loadFont (fp, lh) = Just . (\ttf -> Font fp ttf) <$> TTF.openFont fp lh
 
--- ** Game assets
-
--- Images
-initialBG       :: ImageSpec
-initialBG       = ("data/level0.png", Nothing)
-
-ballImage       :: ImageSpec
-ballImage       = ("data/ball-alpha.png", Nothing)
-
-block1Image     :: ImageSpec
-block1Image     = ("data/block1.png", Nothing)
-
-block2Image     :: ImageSpec
-block2Image     = ("data/block2.png", Nothing)
-
-block3Image     :: ImageSpec
-block3Image     = ("data/block3.png", Nothing)
-
-paddleImage     :: ImageSpec
-paddleImage     = ("data/paddleBluA.png", Nothing)
-
-diamondImage    :: ImageSpec
-diamondImage    = ("data/diamond-alpha.png", Nothing)
-
--- Fonts
-gameFontSpec    :: FontSpec
-gameFontSpec    = ("data/lacuna.ttf", 32)
-
--- Audio
-backgroundMusic :: MusicSpec
-backgroundMusic = "data/level0.mp3"
-
-blockHitSFX     :: SoundFXSpec
-blockHitSFX     = ("data/196106_aiwha_ding-cc-by.wav", 2000)
