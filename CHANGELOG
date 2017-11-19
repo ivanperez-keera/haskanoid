@@ -1,3 +1,10 @@
+2017-11-19 Christina Zeller <chriz@keera.co.uk>:
+        * Adds 100 points for every catched diamond.
+        * Adds proper image for diamonds (powerups).
+
+2017-11-18 Christina Zeller <chriz@keera.co.uk>:
+        * Adds basics for powerups in SDL1.
+
 2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
         * Version bump (0.1.5.4).
         * Adds new levels.

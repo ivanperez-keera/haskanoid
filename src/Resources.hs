@@ -20,5 +20,6 @@ data Resources = Resources
   , block2Img   :: Image
   , block3Img   :: Image
   , paddleImg   :: Image
+  , diamondImg  :: Image
   , bgMusic     :: Maybe Music
   }
