@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module DisplaySDL2
   ( initializeDisplay
   , RenderingCtx
@@ -8,17 +9,17 @@ module DisplaySDL2
   )
   where
 
-import Control.Arrow          ((***))
+import Control.Arrow             ((***))
 import Control.Monad
 import Control.Monad.IfElse
 import Data.IORef
 import Data.Maybe
 import FRP.Yampa.VectorSpace
-import Game.AssetManager.SDL2 hiding (loadImage)
+import Game.AssetManager.SDL2    hiding (loadImage)
 import Game.Audio.SDL2
-import Game.Render.SDL2       as Render
-import Graphics.UI.SDL        as SDL
-import Graphics.UI.SDL.TTF    as TTF
+import Game.Render.Renderer.SDL2 as Render
+import Graphics.UI.SDL           as SDL
+import Graphics.UI.SDL.TTF       as TTF
 
 import Constants
 import GameState
@@ -48,7 +49,6 @@ initGraphs mgr = do
 -- * Rendering and Sound
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState (renderer, window) = do
-  SDL.showWindow window
   -- resources <- loadNewResources resourceManager shownState renderer
   res <- resources <$> readIORef (unResMgr resourceManager)
   audio   res shownState
@@ -86,7 +86,7 @@ display resources shownState (rdr,window) = do
   let base = (gameLeft, gameTop)
 
   -- Paint overlay message, if any
-  paintMessage (0, 0)  rdr resources (gameStatus (gameInfo shownState))
+  paintMessage (0, 0) rdr resources (gameStatus (gameInfo shownState))
 
   -- Paint objects
   mapM_ (\o -> Render.render rdr (resources, o) base) (gameObjects shownState)
@@ -123,13 +123,14 @@ paintMessage base screen resources status = do
        statusMsg GameOver        = Just "GAME OVER!!!"
        statusMsg GameFinished    = Just "You won!!! Well done :)"
 
-instance Renderizable (Resources, Object) where
+instance Renderizable (Resources, Object) Renderer where
   renderTexture r  = renderTexture r . objectImage
   renderSize       = return . (round *** round) . objectSize . snd
   render screen (resources, object) base =
     case objectKind object of
       (Side {}) -> return ()
-      other     -> renderAlignLeft screen (resources, object) (x,y)
+      other     -> do tex <- renderTexture screen (resources, object)
+                      Render.render screen tex (x,y)
 
     where (x,y) = (round *** round) (objectTopLevelCorner object ^+^ base')
           base' = (fromIntegral *** fromIntegral) base
@@ -143,6 +144,7 @@ objectImage (resources, object) = case objectKind object of
                      2 -> block2Img resources
                      n -> block3Img resources
   (Ball {})     -> ballImg resources
+  (PDiamond{})  -> diamondImg resources
 
 -- * Auxiliary function
 printSolid :: Renderer -> Resources -> String -> IO (Texture, Surface)

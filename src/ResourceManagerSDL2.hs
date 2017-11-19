@@ -32,17 +32,16 @@ loadResources = do
   
   bgM      <- loadMusic   backgroundMusic
   blockHit <- loadSoundFX blockHitSFX
-  img      <- loadImage initialBG
-  ball     <- loadImage ballImage
-  b1       <- loadImage block1Image
-  b2       <- loadImage block2Image
-  b3       <- loadImage block3Image
-  paddle   <- loadImage paddleImage
+  img      <- loadImage   initialBG
+  ball     <- loadImage   ballImage
+  b1       <- loadImage   block1Image
+  b2       <- loadImage   block2Image
+  b3       <- loadImage   block3Image
+  paddle   <- loadImage   paddleImage
+  diamond  <- loadImage   diamondImage
 
   -- FIXME: This sould not be here: start playing music
   when (isJust bgM) $ playMusic (fromJust bgM)
-
-  -- Check that all resources have been loaded
 
   -- Return Nothing or embed in Resources
   let res = Resources <$> font
@@ -53,6 +52,7 @@ loadResources = do
                       <*> b2
                       <*> b3
                       <*> paddle
+                      <*> diamond
                       <*> pure bgM
 
    -- Some resources did not load
@@ -69,11 +69,12 @@ preloadResources mgr rdr = void $ do
     let res = resources mgr'
 
     bgImage'    <- maybe (return Nothing) ((Just <$>) . maybePreloadImage rdr) (bgImage res)
-    ballImg'    <- maybePreloadImage rdr (ballImg   res)
-    block1Img'  <- maybePreloadImage rdr (block1Img res)
-    block2Img'  <- maybePreloadImage rdr (block2Img res)
-    block3Img'  <- maybePreloadImage rdr (block3Img res)
-    paddleImg'  <- maybePreloadImage rdr (paddleImg res)
+    ballImg'    <- maybePreloadImage rdr (ballImg    res)
+    block1Img'  <- maybePreloadImage rdr (block1Img  res)
+    block2Img'  <- maybePreloadImage rdr (block2Img  res)
+    block3Img'  <- maybePreloadImage rdr (block3Img  res)
+    paddleImg'  <- maybePreloadImage rdr (paddleImg  res)
+    diamondImg' <- maybePreloadImage rdr (diamondImg res)
 
     let res' = res { bgImage    = bgImage'
                    , ballImg    = ballImg'
@@ -81,6 +82,7 @@ preloadResources mgr rdr = void $ do
                    , block2Img  = block2Img'
                    , block3Img  = block3Img'
                    , paddleImg  = paddleImg'
+                   , diamondImg = diamondImg'
                    }
     return (mgr' { resources = res' })
 
@@ -169,7 +171,10 @@ block3Image     :: ImageSpec
 block3Image     = ("data/block3.png", Nothing)
 
 paddleImage     :: ImageSpec
-paddleImage     = ("data/paddleBluA.png", Nothing) -- Just (0, 255, 0))
+paddleImage     = ("data/paddleBluA.png", Nothing)
+
+diamondImage    :: ImageSpec
+diamondImage    = ("data/diamond-alpha.png", Nothing)
 
 -- Fonts
 gameFontSpec    :: FontSpec

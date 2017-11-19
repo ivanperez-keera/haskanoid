@@ -125,7 +125,8 @@ executable haskanoid
                    sage-backends-sdl2-audio,
                    sage-backends-sdl2-clock,
                    sage-backends-sdl2-extra,
-                   sage-temporary
+                   sage-temporary,
+                   sage-temporary-sdl2
     other-modules: DisplaySDL2
                    Resources
                    ResourceManagerSDL2

@@ -39,8 +39,9 @@ import Control.Monad.Extra
 import Graphics.UI.SDL       as SDL
 import Graphics.UI.SDL.Clock
 #elif sdl2
-import Graphics.UI.SDL as SDL
 import Game.Clock.SDL2
+import Graphics.UI.SDL       as SDL
+import Graphics.UI.SDL.Extra (isEmptyEvent)
 #endif
 
 -- External imports (GHCJS)

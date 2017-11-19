@@ -32,7 +32,7 @@ import           GHCJS.DOM.Types               ( Element(..), IsDocument
 import           GHCJS.DOM.UIEvent             ( getPageX, getPageY )
 import           GHCJS.Foreign
 import           GHCJS.Types
-import qualified JavaScript.Web.Canvas         as C
+import qualified JavaScript.Web.Canvas          as C
 import qualified JavaScript.Web.Canvas.Internal as C
 
 import           Linear
@@ -154,6 +154,14 @@ paintObject (bx, by) resources screen object = do
                                  C.arc x y r 0 (2*pi) False screen
                                  C.fillStyle 240 168 48 1.0 screen
                                  C.fill screen
+    -- TODO: Check that the drawing is ok, possibly subsitute for a
+    -- proper diamond.
+    (PDiamond (w,h)) -> void $ do C.fillStyle 240 168 48 1.0 screen
+                                  C.fillRect x y w h screen
+                                  C.beginPath screen
+                                  C.arc x y r 0 (2*pi) False screen
+                                  C.fillStyle 220 108 21 1.0 screen
+                                  C.fill screen
     _               -> return ()
   where p = objectPos object
         x = bx + fst p

@@ -44,8 +44,8 @@ main = (`catchAny` print) $ do
                   -- Get clock and new input
                   dtSecs <- milisecsToSecs <$> senseTimeRef timeRef
                   mInput <- senseInput controllerRef
+                  print dtSecs
                   return (dtSecs, Just mInput)
                )
                (\_ e -> render res' e renderingCtx >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
                wholeGame
- 
