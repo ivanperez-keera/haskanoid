@@ -318,11 +318,11 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
                   | hasBall cd    = countBlocks cd
                   | hasPaddle cd  = 100 * countDiamonds cd
                   | otherwise     = 0
-               hasBall       = any ((=="ball").fst)
-               countBlocks   = length . filter (isPrefixOf "block" . fst)
-               hasPaddle     = any ((=="paddle").fst)
-               countDiamonds = length . filter (isPrefixOf "diamond" . fst)
-
+               hasBall       = any (collisionObjectName "ball")
+               countBlocks   = length . filter (collisionObjectKind Block)
+               hasPaddle     = any (collisionObjectName "paddle")
+               countDiamonds = length . filter (collisionObjectKind (PDiamond PointsUp)) 
+       
        -- Create powerup
        createPowerUp :: PowerUp -> ObjectSF
        createPowerUp (Diamond pos sz) = diamond pos sz
@@ -375,7 +375,7 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 -- NOTE: even if the overlap is not corrected, 'edge' makes
 -- the event only take place once per collision.
 collisionWithBottom :: SF Collisions (Event ())
-collisionWithBottom = inCollisionWith "ball" "bottomWall" ^>> edge
+collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> edge
 
 -- | Fires an event when the diamond *enters in* a collision with the
 -- paddle.
@@ -387,10 +387,10 @@ collisionDiamondPaddle = proc cs -> do
 
   -- Has the diamond been hit?
   let hits :: Collisions
-      hits = filter (any (("diamond" `isPrefixOf` ).fst) . collisionData) cs
+      hits = filter (any (("diamond" `isPrefixOf`) . fst . fst ) . collisionData) cs
 
       paddleHits :: Collisions
-      paddleHits = filter (any ((== "paddle").fst) . collisionData) hits
+      paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
 
       isHit :: Bool
       isHit = not (null $ concatMap collisionData paddleHits)
@@ -413,7 +413,8 @@ followPaddle = arr $ \oi ->
   in ObjectOutput (inertBallAt ballPos) noEvent noEvent
   where outOfScreen = -10
         inertBallAt p = Object { objectName           = "ball"
-                               , objectKind           = Ball ballWidth
+                               , objectKind           = Ball
+                               , objectProperties     = BallProps ballWidth
                                , objectPos            = p
                                , objectVel            = (0, 0)
                                , objectAcc            = (0, 0)
@@ -482,7 +483,7 @@ ballBounce' = proc (ObjectInput ci cs os, o) -> do
   -- HN 2014-09-07: With the present strategy, need to be able to
   -- detect an event directly after 
   -- ev <- edgeJust -< changedVelocity "ball" cs 
-  let ev = maybe noEvent Event (changedVelocity "ball" cs)
+  let ev = maybe noEvent Event (changedVelocity ("ball", Ball) cs)
   returnA -< fmap (\v -> (objectPos (outputObject o), v)) ev
 
 -- | Position of the ball, starting from p0 with velicity v0, since the time of
@@ -494,7 +495,8 @@ freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name = "ball"
-  let isHit = inCollision name cs
+  let kind = Ball
+  let isHit = inCollision (name, kind) cs
 
   -- Cap speed
   let v = limitNorm v0 maxVNorm
@@ -505,7 +507,8 @@ freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
   p <- (p0 ^+^) ^<< integral -< v
 
   let obj = Object { objectName           = name
-                   , objectKind           = Ball ballWidth
+                   , objectKind           = Ball 
+                   , objectProperties     = BallProps ballWidth
                    , objectPos            = p
                    , objectVel            = v0
                    , objectAcc            = (0, 0)
@@ -529,7 +532,8 @@ objPaddle = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name = "paddle"
-  let isHit = inCollision name cs
+  let kind = Paddle
+  let isHit = inCollision (name, kind) cs
 
   -- Try to get to the mouse position, but with a capped
   -- velocity.
@@ -551,7 +555,8 @@ objPaddle = proc (ObjectInput ci cs os) -> do
 
   returnA -< livingObject
                Object { objectName           = name
-                      , objectKind           = Paddle (paddleWidth,paddleHeight)
+                      , objectKind           = Paddle
+                      , objectProperties     = PaddleProps (paddleWidth,paddleHeight)
                       , objectPos            = p
                       , objectVel            = (0,0)
                       , objectAcc            = (0,0)
@@ -589,7 +594,8 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
-      isHit = inCollision name cs
+      kind  = Block
+      isHit = inCollision (name, kind) cs
   hit   <- edge -< isHit
 
   -- Must be hit initlives times to disappear
@@ -613,7 +619,8 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
 
   returnA -< ObjectOutput 
                 Object{ objectName           = name
-                      , objectKind           = Block lives (w, h)
+                      , objectKind           = Block
+                      , objectProperties     = BlockProps lives (w, h)
                       , objectPos            = (x,y)
                       , objectVel            = (0,0)
                       , objectAcc            = (0,0)
@@ -633,13 +640,13 @@ diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Has the diamond been hit?
   let hits :: Collisions
-      hits = filter (any ((== name).fst) . collisionData) cs
+      hits = filter (any (collisionObjectName name). collisionData) cs
 
       paddleHits :: Collisions
-      paddleHits = filter (any ((== "paddle").fst) . collisionData) hits
+      paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
 
       bottomHits :: Collisions
-      bottomHits = filter (any ((== "bottomWall").fst) . collisionData) hits
+      bottomHits = filter (any (collisionObjectName "bottomWall") . collisionData) hits
 
       isHit :: Bool
       isHit = not (null $ concatMap collisionData paddleHits)
@@ -654,7 +661,8 @@ diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   returnA -< ObjectOutput
                Object { objectName           = name
-                      , objectKind           = PDiamond (w', h')
+                      , objectKind           = PDiamond PointsUp
+                      , objectProperties     = PDiamondProps (w', h')
                       , objectPos            = p
                       , objectVel            = v
                       , objectAcc            = (0,0)
@@ -705,10 +713,11 @@ objSideBottom = objWall "bottomWall" BottomSide (0, gameHeight)
 -- position.
 objWall :: ObjectName -> Side -> Pos2D -> ObjectSF
 objWall name side pos = proc (ObjectInput ci cs os) -> do
-   let isHit = inCollision name cs
+   let isHit = inCollision (name, Side) cs
    returnA -< ObjectOutput
                  Object { objectName           = name
-                        , objectKind           = Side side
+                        , objectKind           = Side
+                        , objectProperties     = SideProps side 
                         , objectPos            = pos
                         , objectVel            = (0,0)
                         , objectAcc            = (0,0)

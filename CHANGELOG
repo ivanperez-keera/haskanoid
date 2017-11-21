@@ -1,3 +1,7 @@
+2017-11-21 Christina Zeller <chriz@keera.co.uk>:
+        * Splits objectKind into objectKind and objectProperties.
+        * Adds to type Collision and Collisions the ObjectKind.
+
 2017-11-19 Christina Zeller <chriz@keera.co.uk>:
         * Adds lives for every catched diamond.
         * Adds 100 points for every catched diamond.
@@ -27,6 +31,5 @@
         * Version bump (0.1.5.1).
 
 2015-06-23 Ivan Perez <ivan.perez@keera.co.uk>:
-
-	* Version bump (0.1.5).
+        * Version bump (0.1.5).
         * Bumps base upper bound (now compiles with GHC 7.10).
