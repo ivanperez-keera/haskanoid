@@ -266,18 +266,15 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
    let inputs = ObjectInput userInput cols (map outputObject objs)
 
-   outputs    <- processMovement objs   -< inputs
-   cols'      <- detectObjectCollisions -< outputs
-   hitBottom  <- collisionWithBottom    -< cols'
-   hitDiamond <- collisionDiamondPaddle -< cols'
+   outputs      <- processMovement objs     -< inputs
+   cols'        <- detectObjectCollisions   -< outputs
+   hitBottom    <- collisionWithBottom      -< cols'
+   hitLevelsUps <- collisionLevelsUpsPaddle -< cols'
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
 
-   let hitDiamondF :: Event (Int -> Int)
-       hitDiamondF = fmap (const (+1)) hitDiamond
-
-   lvs' <- accumHold 0 -< hitDiamondF
+   lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLevelsUps
 
    returnA -< ((objs', lvs', hitBottom, pts'), (objs', cols', pts'))
 
@@ -382,12 +379,12 @@ collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> ed
 --
 -- NOTE: even if the overlap is not corrected, 'edge' makes
 -- the event only take place once per collision.
-collisionDiamondPaddle :: SF Collisions (Event ())
-collisionDiamondPaddle = proc cs -> do
+collisionLevelsUpsPaddle :: SF Collisions Int 
+collisionLevelsUpsPaddle = proc cs -> do
 
   -- Has the diamond been hit?
   let hits :: Collisions
-      hits = filter (any (("diamond" `isPrefixOf`) . fst . fst ) . collisionData) cs
+      hits = filter (any (collisionObjectKind (PDiamond LevelsUp)) . collisionData) cs
 
       paddleHits :: Collisions
       paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
@@ -396,7 +393,7 @@ collisionDiamondPaddle = proc cs -> do
       isHit = not (null $ concatMap collisionData paddleHits)
 
   dead <- edge -< isHit
-  returnA -< dead
+  returnA -< length (concatMap collisionData paddleHits) 
 
 -- | Ball follows the paddle if there is one, and it's out of the screen
 -- otherwise). To avoid reacting to collisions, this ball is non-interactive.
