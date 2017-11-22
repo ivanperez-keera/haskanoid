@@ -65,16 +65,6 @@ type BlockEnergy = Int
 data PowerUpKind = PointsUp | LevelsUp
   deriving (Show,Eq)
 
--- ** Distinguish kinds of powerups.
-
-isPointsUp :: ObjectKind -> Bool
-isPointsUp (PDiamond PointsUp) = True
-isPointsUp _ = False
-
-isLevelsUp :: ObjectKind -> Bool
-isLevelsUp (PDiamond LevelsUp) = True
-isLevelsUp _ = False
-
 -- ** Distinguish objects by kind.
 
 isBlock :: Object -> Bool
