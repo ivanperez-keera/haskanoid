@@ -586,8 +586,8 @@ yPosPaddle = gameHeight - paddleMargin
 -- which means that two simulatenously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
-objBlock :: (Pos2D, Int, PowerUpKind) -> Size2D -> ObjectSF
-objBlock ((x,y), initlives, puk) (w,h) = proc (ObjectInput ci cs os) -> do
+objBlock :: (Pos2D, Int, Maybe PowerUpKind) -> Size2D -> ObjectSF
+objBlock ((x,y), initlives, (Just puk)) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
@@ -628,6 +628,43 @@ objBlock ((x,y), initlives, puk) (w,h) = proc (ObjectInput ci cs os) -> do
                       }
                dead
                createDiamond
+objBlock ((x,y), initlives, Nothing) (w,h) = proc (ObjectInput ci cs os) -> do
+
+  -- Detect collisions
+  let name  = "blockat" ++ show (x,y)
+      kind  = Block
+      isHit = inCollision (name, kind) cs
+  hit   <- edge -< isHit
+
+  -- Must be hit initlives times to disappear
+  --
+  -- If you want them to "recover" or self-heal with time,
+  -- use the following code in place of lives.
+  --
+  -- recover <- delayEvent 5.0 -< hit
+  -- lives <- accumHoldBy (+) 3 -< (hit `tag` (-1) `lMerge` recover `tag` 1) 
+  lives <- accumHoldBy (+) initlives -< (hit `tag` (-1)) 
+  -- 
+  -- let lives = 3 -- Always perfect
+
+  -- Dead if out of lives.
+  let isDead = lives <= 0
+  dead <- edge -< isDead
+  -- let isDead = False -- immortal blocks
+  returnA -< ObjectOutput 
+                Object{ objectName           = name
+                      , objectKind           = Block
+                      , objectProperties     = BlockProps lives (w, h)
+                      , objectPos            = (x,y)
+                      , objectVel            = (0,0)
+                      , objectAcc            = (0,0)
+                      , objectDead           = isDead
+                      , objectHit            = isHit
+                      , canCauseCollisions   = False
+                      , collisionEnergy      = 0
+                      }
+               dead
+               noEvent 
 
 -- *** Powerups
 diamond :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
