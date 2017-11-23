@@ -322,7 +322,7 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        
        -- Create powerup
        createPowerUp :: PowerUp -> ObjectSF
-       createPowerUp (Diamond pos sz) = diamond pos sz
+       createPowerUp (Diamond puk pos sz) = diamond puk pos sz
 
 -- * Game objects
 --
@@ -586,8 +586,8 @@ yPosPaddle = gameHeight - paddleMargin
 -- which means that two simulatenously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
-objBlock :: (Pos2D, Int) -> Size2D -> ObjectSF
-objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
+objBlock :: (Pos2D, Int, PowerUpKind) -> Size2D -> ObjectSF
+objBlock ((x,y), initlives, puk) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
@@ -612,7 +612,7 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
   -- let isDead = False -- immortal blocks
 
   -- If it's dead, does it create a 'powerup'?
-  let createDiamond = dead `tag` Diamond (x,y) (w,h)
+  let createDiamond = dead `tag` Diamond puk (x,y) (w,h)
 
   returnA -< ObjectOutput 
                 Object{ objectName           = name
@@ -630,8 +630,8 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
                createDiamond
 
 -- *** Powerups
-diamond :: Pos2D -> Size2D -> ObjectSF
-diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+diamond :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
+diamond puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   let name = "diamond" ++ show (x,y)
 
@@ -658,7 +658,7 @@ diamond (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   returnA -< ObjectOutput
                Object { objectName           = name
-                      , objectKind           = PDiamond PointsUp
+                      , objectKind           = PDiamond puk
                       , objectProperties     = PDiamondProps (w', h')
                       , objectPos            = p
                       , objectVel            = v

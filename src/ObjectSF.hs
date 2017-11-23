@@ -52,7 +52,7 @@ data ObjectOutput = ObjectOutput
   , births       :: Event PowerUp
   } 
 
-data PowerUp = Diamond Pos2D Size2D
+data PowerUp = Diamond PowerUpKind Pos2D Size2D
 
 -- | Handy function to create an object that is currently alive.
 livingObject :: Object -> ObjectOutput
