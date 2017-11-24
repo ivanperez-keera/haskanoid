@@ -49,10 +49,10 @@ data ObjectInput = ObjectInput
 data ObjectOutput = ObjectOutput
   { outputObject :: Object   -- ^ The object's state (position, shape, etc.).
   , harakiri     :: Event () -- ^ Whether the object has died (killed itself).
-  , births       :: Event PowerUp
+  , births       :: Event PowerUpDef
   } 
 
-data PowerUp = Diamond Pos2D Size2D
+data PowerUpDef = PowerUpDef PowerUpKind Pos2D Size2D
 
 -- | Handy function to create an object that is currently alive.
 livingObject :: Object -> ObjectOutput

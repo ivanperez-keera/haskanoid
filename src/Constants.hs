@@ -57,9 +57,12 @@ blockWidth   = 64
 blockHeight  = 32
 blockSeparation :: Double
 blockSeparation = 10
-diamondWidth, diamondHeight :: Double
-diamondWidth = 24
-diamondHeight = 24
+pointsUpWidth, pointsUpHeight :: Double
+pointsUpWidth = 30
+pointsUpHeight = 24
+livesUpWidth, livesUpHeight :: Double
+livesUpWidth = 30
+livesUpHeight = 27
 
 -- * Lives
 
