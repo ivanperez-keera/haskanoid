@@ -612,8 +612,13 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
   -- let isDead = False -- immortal blocks
 
   -- If it's dead, does it create a 'powerup'?
+
+  let pukWidthHeight :: PowerUpKind -> (Double, Double)
+      pukWidthHeight PointsUp = (diamondWidth, diamondHeight)
+      pukWidthHeight LevelsUp = (heartWidth, heartHeight)
+
   let createDiamondF :: Maybe PowerUpKind -> Event () -> Event PowerUp 
-      createDiamondF (Just puk) dead = dead `tag` Diamond puk (x,y) (w,h)
+      createDiamondF (Just puk) dead = dead `tag` Diamond puk (x,y) (pukWidthHeight puk)
       createDiamondF Nothing _       = noEvent
 
   let createDiamond = createDiamondF mpuk dead
