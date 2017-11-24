@@ -45,7 +45,7 @@ category:            Game, Reactivity, FRP
 build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >=1.8
+cabal-version:       >=1.10
 
 data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
 
@@ -56,6 +56,19 @@ Flag wiimote
 Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
+
+Flag sdl
+  Description: Enable SDL multimedia
+  Default: True
+
+Flag sdl2
+  Description: Enable SDL2 multimedia
+  Default: True
+
+Flag ghcjs
+  Description: Enable compilation using GHCJS and HTML5 Canvas
+  Default: False
+
 
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
@@ -73,28 +86,13 @@ executable haskanoid
   hs-source-dirs: src/
 
   -- Modules included in this executable, other than Main.
-  other-modules: Audio
-                 Constants
-                 Control.Extra.Monad
-                 Data.Extra.List
-                 Data.Extra.Num
-                 Data.Extra.Ord
-                 Data.Extra.VectorSpace
-                 Data.IdentityList
-                 Display
-                 FRP.Extra.Yampa
-                 Game
-                 GameCollisions
+  other-modules: Constants
+                 GamePlay
                  GameState
-                 Graphics.UI.Extra.SDL
                  Input
                  Levels
                  Objects
                  ObjectSF
-                 Physics.TwoDimensions.Collisions
-                 Physics.TwoDimensions.Dimensions
-                 Physics.TwoDimensions.Physics
-                 Resources
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
@@ -102,14 +100,51 @@ executable haskanoid
                        mtl,
                        MissingH,
                        Yampa >= 0.9.6 && < 0.11,
-                       SDL, SDL-image, SDL-mixer, SDL-ttf,
-                       IfElse
+                       IfElse,
+                       sage-assetmanager,
+                       sage-data-extra,
+                       sage-data-identity-list,
+                       sage-physics-2d-rectangles,
+                       sage-yampa-extra
+
+  if flag(sdl)
+    cpp-options: -Dsdl
+    build-depends: SDL, SDL-image, SDL-mixer, SDL-ttf,
+                   sage-assetmanager-sdl1,
+                   sage-backends-sdl1-audio,
+                   sage-backends-sdl1-clock,
+                   sage-backends-sdl1-drawing
+    other-modules: Display
+                   Resources
+                   ResourceManager
+
+  if flag(sdl2)
+    cpp-options: -Dsdl2
+    build-depends: SDL2 == 0.1.0, sdl2-image, sdl2-mixer, SDL2-ttf,
+                   sage-assetmanager-sdl2,
+                   sage-backends-sdl2-audio,
+                   sage-backends-sdl2-clock,
+                   sage-backends-sdl2-extra,
+                   sage-temporary
+    other-modules: DisplaySDL2
+                   Resources
+                   ResourceManagerSDL2
+    extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2
+
+  if flag(ghcjs)
+    cpp-options: -Dghcjs
+    other-extensions: JavaScriptFFI, CPP, OverloadedStrings
+    other-modules: DisplayGHCJS
+    build-depends: ghcjs-dom, ghcjs-base, linear, semigroups,
+                   time, sage-backends-html-clock
 
   if flag(wiimote)
     build-depends: hcwiid
 
   if flag(kinect)
     build-depends: freenect, vector
+
+  default-language: Haskell2010
 
 source-repository head
   type:     git

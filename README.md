@@ -93,6 +93,16 @@ explanation.
    $ sudo apt-get install freenect
    ```
 
+## Compilation of GHCJS branch
+
+This game works on browsers (sound and kinect/wiimote are not supported).  To
+compile it with GHCJS, you need to have GHCJS installed and compile haskanoid
+with the following line:
+
+```
+$ cabal install --ghcjs -fghcjs -f-sdl -f-kinect -f-wiimote
+```
+
 # Documentation
 
 To try and make things as clear as possible, the code includes a much haddock

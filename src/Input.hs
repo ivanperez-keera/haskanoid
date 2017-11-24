@@ -18,7 +18,7 @@
 -- updated version.
 --
 -- Limitations:
--- 
+--
 --    - Device failures are not handled.
 --
 --    - Falling back to the next available device when there's a problem.
@@ -32,8 +32,48 @@ module Input where
 
 -- External imports
 import Data.IORef
+import Control.Monad.Extra
+
+-- External imports (SDL)
+#ifdef sdl
+import Graphics.UI.SDL       as SDL
+import Graphics.UI.SDL.Clock
+#elif sdl2
 import Graphics.UI.SDL as SDL
-import Control.Monad
+import Game.Clock.SDL2
+#endif
+
+-- External imports (GHCJS)
+#ifdef ghcjs
+import           Data.Coerce
+import           GHCJS.DOM                      ( currentDocument
+                                                , currentWindow )
+import           GHCJS.DOM.Document             ( getBody
+                                                , getElementById )
+import           GHCJS.DOM.Element              ( getOffsetLeft
+                                                , getOffsetTop
+                                                , getInnerHTML )
+import           GHCJS.DOM.Element              ( setInnerHTML )
+import           GHCJS.DOM.EventTarget          ( addEventListener )
+import           GHCJS.DOM.EventTargetClosures  ( eventListenerNewSync )
+import           GHCJS.DOM.Types                ( Element(..), IsDocument
+                                                , MouseEvent, unElement )
+import           GHCJS.DOM.UIEvent              ( getPageX, getPageY )
+import           GHCJS.Foreign
+import           GHCJS.Types
+import qualified JavaScript.Web.Canvas          as C
+import qualified JavaScript.Web.Canvas.Internal as C
+
+
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Concurrent.MVar
+import           Control.Monad                  hiding (sequence_)
+import           Data.Foldable                  (minimumBy)
+import           Data.Ord
+import           Data.Semigroup
+import           Linear
+#endif
 
 -- External imports (Wiimote)
 #ifdef wiimote
@@ -46,6 +86,7 @@ import System.CWiid
 -- External imports (Kinect)
 #ifdef kinect
 import Control.Concurrent
+import Control.Monad
 import Data.Maybe (fromJust)
 import Data.Vector.Storable (Vector,(!))
 import Data.Word
@@ -54,8 +95,6 @@ import qualified Data.Vector.Storable as V
 #endif
 
 -- Internal imports
-import Control.Extra.Monad
-import Graphics.UI.Extra.SDL
 
 import Constants
 
@@ -82,7 +121,12 @@ newtype ControllerRef =
 -- not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
+
+#if defined(sdl) || defined(sdl2)
   let baseDev = sdlGetController
+#elif defined(ghcjs)
+  baseDev <- ghcjsController
+#endif
 
 -- Fall back to mouse/kb is no kinect is present
 #ifdef kinect
@@ -110,7 +154,7 @@ initializeInputDevices = do
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
 -- if available, or the last one there was.
--- 
+--
 -- It is assumed that the sensing function is always
 -- callable, and that it knows how to update the
 -- Controller info if necessary.
@@ -181,10 +225,10 @@ senseWiimote wmdev controller = do
 
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
-  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight 
+  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight
   --     (x,y)   = controllerPos controller
   --     x'      = if isLeft then x - wiiXDiff else if isRight then x + wiiXDiff else x
-  --     x''     = inRange (0, gameWidth) x' 
+  --     x''     = inRange (0, gameWidth) x'
   --     pos'    = (x'', y)
   -- wiiXDiff :: Float
   -- wiiXDiff = 6
@@ -199,6 +243,7 @@ senseWiimote wmdev controller = do
 #endif
 
 -- * SDL API (mid-level)
+#if defined(sdl) || defined(sdl2)
 
 -- ** Initialization
 
@@ -218,19 +263,88 @@ sdlMouseKB = return (Just sdlGetController)
 sdlGetController :: Controller -> IO Controller
 sdlGetController info =
   foldLoopM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
+#endif
 
+#ifdef sdl
 -- | Handles one event only and returns the updated controller.
 handleEvent :: Controller -> SDL.Event -> Controller
 handleEvent c e =
   case e of
     MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
     MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
-    KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
+    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False}
+    KeyUp   Keysym { symKey = SDLK_p }       -> c { controllerPause = not (controllerPause c) }
     KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
-    KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
+    KeyUp   Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = False }
     _                                        -> c
+#endif
 
+#ifdef sdl2
+-- | Handles one event only and returns the updated controller.
+handleEvent :: Controller -> Maybe SDL.Event -> Controller
+handleEvent c Nothing  = c
+handleEvent c (Just e) =
+  case eventData e of
+    MouseMotion { mouseMotionPosition = Position x y }                         -> c { controllerPos        = (fromIntegral x, fromIntegral y)}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Released }      -> c { controllerClick      = False}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Pressed }       -> c { controllerClick      = True }
+    Keyboard { keySym = Keysym { keyScancode = P }, keyMovement = KeyUp   }    -> c { controllerPause      = not (controllerPause c) }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyDown } -> c { controllerClick      = True  }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyUp }   -> c { controllerClick      = False }
+    _                                                                          -> c
+#endif
+
+#ifdef ghcjs
+type GHCJSController = IORef (Double, Double, Bool)
+
+ghcjsController :: IO (Controller -> IO Controller)
+ghcjsController = do
+  cvs <- initializeCanvasSense (width, height)
+  return $ ghcjsGetController cvs
+
+initializeCanvasSense :: (Double, Double) -> IO GHCJSController
+initializeCanvasSense dim = do
+  ref <- newIORef (0, 0, False)
+
+  Just doc    <- currentDocument
+  Just canvas <- getElementById doc "dia"
+  ctx         <- getContext canvas
+
+  listenerM   <- eventListenerNewSync (updateMove    dim ref canvas)
+  listenerC   <- eventListenerNewSync (updateClick   ref canvas)
+  listenerR   <- eventListenerNewSync (updateRelease ref canvas)
+  addEventListener canvas "mousemove" (Just listenerM) False
+  addEventListener canvas "mousedown" (Just listenerC) False
+  addEventListener canvas "mouseup"   (Just listenerR) False
+
+  return ref
+ where updateMove :: (Double, Double) -> GHCJSController -> Element -> MouseEvent -> IO ()
+       updateMove (w, h) ref canvas ev = do
+         x <- fromIntegral <$> getPageX ev
+         y <- fromIntegral <$> getPageY ev
+         x0 <- getOffsetLeft canvas
+         y0 <- getOffsetTop canvas
+         let x' = min (max 0 (x - x0)) w
+         let y' = min (max 0 (y - y0)) h
+         x' `seq` y' `seq` modifyIORef' ref (\(_,_,click) -> (x', y', click))
+         return ()
+
+       updateClick :: GHCJSController -> Element -> MouseEvent -> IO ()
+       updateClick ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, True))
+
+       updateRelease :: GHCJSController -> Element -> MouseEvent -> IO ()
+       updateRelease ref canvas _ =
+         modifyIORef' ref (\(x,y,_) -> (x, y, False))
+
+ghcjsGetController ref co = do
+  (px,py,c) <- readIORef ref
+  let c' = co { controllerPos = (px, py), controllerClick = c }
+  return c'
+
+getContext :: Element -> IO C.Context
+getContext = C.getContext . coerce
+#endif
 
 -- Kinect
 
@@ -288,7 +402,7 @@ updatePos lastPosRef newPos@(nx,ny) = do
   writeIORef lastPosRef (Just (mx, my))
   mx `seq` my `seq` return ()
 
-calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double) 
+calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double)
 calculateMousePos (width, height) payload =
   fmap g (findFirst payload)
   where g (px,py) = (mousex, mousey)
@@ -323,6 +437,7 @@ avg ls = (sumx `div` l, sumy `div` l)
         (sumx, sumy) = foldr (\(_,x,y) (rx,ry) -> (x+rx,y+ry)) (0,0) ls
 
 -- Update a value, with a max cap
+-- TODO: Take from extra num? 
 adjust :: (Num a, Ord a) => a -> a -> a -> a
 adjust maxD old new
   | abs (old - new) < maxD = new
