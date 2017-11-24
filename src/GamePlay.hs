@@ -269,12 +269,12 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
    outputs      <- processMovement objs     -< inputs
    cols'        <- detectObjectCollisions   -< outputs
    hitBottom    <- collisionWithBottom      -< cols'
-   hitLevelsUps <- collisionLevelsUpsPaddle -< cols'
+   hitLivesUps <- collisionLivesUpsPaddle -< cols'
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
 
-   lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLevelsUps
+   lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
    returnA -< ((objs', lvs', hitBottom, pts'), (objs', cols', pts'))
 
@@ -313,16 +313,16 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        countPoints = sum . map numPoints
          where numPoints (Collision cd)
                   | hasBall cd    = countBlocks cd
-                  | hasPaddle cd  = 100 * countDiamonds cd
+                  | hasPaddle cd  = 100 * countPointsUp cd
                   | otherwise     = 0
                hasBall       = any (collisionObjectName "ball")
                countBlocks   = length . filter (collisionObjectKind Block)
                hasPaddle     = any (collisionObjectName "paddle")
-               countDiamonds = length . filter (collisionObjectKind (PDiamond PointsUp)) 
+               countPointsUp = length . filter (collisionObjectKind (PowerUp PointsUp)) 
        
        -- Create powerup
-       createPowerUp :: PowerUp -> ObjectSF
-       createPowerUp (Diamond puk pos sz) = diamond puk pos sz
+       createPowerUp :: PowerUpDef -> ObjectSF
+       createPowerUp (PowerUpDef puk pos sz) = powerUp puk pos sz
 
 -- * Game objects
 --
@@ -374,17 +374,17 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 collisionWithBottom :: SF Collisions (Event ())
 collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> edge
 
--- | Fires an event when the diamond *enters in* a collision with the
+-- | Fires an event when a PowerUp LivesUp *enters in* a collision with the
 -- paddle.
 --
 -- NOTE: even if the overlap is not corrected, 'edge' makes
 -- the event only take place once per collision.
-collisionLevelsUpsPaddle :: SF Collisions Int 
-collisionLevelsUpsPaddle = proc cs -> do
+collisionLivesUpsPaddle :: SF Collisions Int 
+collisionLivesUpsPaddle = proc cs -> do
 
-  -- Has the diamond been hit?
+  -- Has the powerup been hit?
   let hits :: Collisions
-      hits = filter (any (collisionObjectKind (PDiamond LevelsUp)) . collisionData) cs
+      hits = filter (any (collisionObjectKind (PowerUp LivesUp)) . collisionData) cs
 
       paddleHits :: Collisions
       paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
@@ -614,14 +614,14 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
   -- If it's dead, does it create a 'powerup'?
 
   let pukWidthHeight :: PowerUpKind -> (Double, Double)
-      pukWidthHeight PointsUp = (diamondWidth, diamondHeight)
-      pukWidthHeight LevelsUp = (heartWidth, heartHeight)
+      pukWidthHeight PointsUp = (pointsUpWidth, pointsUpHeight)
+      pukWidthHeight LivesUp = (livesUpWidth, livesUpHeight)
 
-  let createDiamondF :: Maybe PowerUpKind -> Event () -> Event PowerUp 
-      createDiamondF (Just puk) dead = dead `tag` Diamond puk (x,y) (pukWidthHeight puk)
-      createDiamondF Nothing _       = noEvent
+  let createPowerUpF :: Maybe PowerUpKind -> Event () -> Event PowerUpDef 
+      createPowerUpF (Just puk) dead = dead `tag` PowerUpDef puk (x,y) (pukWidthHeight puk)
+      createPowerUpF Nothing _       = noEvent
 
-  let createDiamond = createDiamondF mpuk dead
+  let createPowerUp = createPowerUpF mpuk dead
 
   returnA -< ObjectOutput 
                 Object{ objectName           = name
@@ -636,15 +636,15 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
                       , collisionEnergy      = 0
                       }
                dead
-               createDiamond
+               createPowerUp
 
 -- *** Powerups
-diamond :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
-diamond puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+powerUp :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
+powerUp puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
-  let name = "diamond" ++ show (x,y)
+  let name = "powerup" ++ show (x,y)
 
-  -- Has the diamond been hit?
+  -- Has the powerup been hit?
   let hits :: Collisions
       hits = filter (any (collisionObjectName name). collisionData) cs
 
@@ -667,8 +667,8 @@ diamond puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   returnA -< ObjectOutput
                Object { objectName           = name
-                      , objectKind           = PDiamond puk
-                      , objectProperties     = PDiamondProps (w', h')
+                      , objectKind           = PowerUp puk
+                      , objectProperties     = PowerUpProps (w, h)
                       , objectPos            = p
                       , objectVel            = v
                       , objectAcc            = (0,0)
@@ -682,10 +682,8 @@ diamond puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
   where p0 = (x', y')
         -- Calculate new position
-        x' = x + (w / 2) -- - (w' / 2)
-        y' = y + (h / 2) -- - (h' / 2)
-        w' = diamondWidth
-        h' = diamondHeight
+        x' = x + (w / 2)
+        y' = y + (h / 2)
         v  = (0, 100)
 
 -- *** Walls

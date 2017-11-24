@@ -1,6 +1,7 @@
 2017-11-23 Christina Zeller <chriz@keera.co.uk>:
         * Removes code duplication in objBlock.
         * Adds heart image and uses different images for PowerUps.
+        * Code cleaning: change name of diamond to powerup
 
 2017-11-23 Christina Zeller <chriz@keera.co.uk>:
         * Changes the level definitions to select which block gives what.

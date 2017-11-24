@@ -45,7 +45,7 @@ data ObjectKind = Ball
                 | Paddle
                 | Block
                 | Side
-                | PDiamond PowerUpKind -- powerup
+                | PowerUp PowerUpKind -- powerup
   deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
@@ -53,8 +53,7 @@ data ObjectProperties  = BallProps     Double -- radius?
                        | PaddleProps   Size2D
                        | BlockProps    BlockEnergy Size2D
                        | SideProps     Side
-                         -- A diamond (powerup) with a given size
-                       | PDiamondProps Size2D
+                       | PowerUpProps Size2D -- A powerup with a given size
   deriving (Show,Eq)
 
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
@@ -62,7 +61,7 @@ data ObjectProperties  = BallProps     Double -- radius?
 type BlockEnergy = Int
 
 -- | The kind of powerup: Either points or levels are powered up.
-data PowerUpKind = PointsUp | LevelsUp
+data PowerUpKind = PointsUp | LivesUp
   deriving (Show,Eq)
 
 -- ** Distinguish objects by kind.
@@ -83,7 +82,7 @@ objectSize object = case objectProperties object of
   (PaddleProps sz)     -> sz
   (BlockProps _ sz)    -> sz
   (BallProps r)        -> let w = 2*r in (w, w)
-  (PDiamondProps sz)   -> sz
+  (PowerUpProps sz)   -> sz
 
 -- Partial function. Object has size.
 objectTopLevelCorner :: Object -> Pos2D
@@ -112,7 +111,7 @@ objShape obj = case objectProperties obj of
   BallProps r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
   PaddleProps sz       -> Rectangle pos sz
   BlockProps _ sz      -> Rectangle pos sz
-  PDiamondProps sz     -> Rectangle pos sz
+  PowerUpProps sz     -> Rectangle pos sz
   SideProps TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
   SideProps LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
   SideProps RightSide  -> Rectangle (pos ^-^ (0, e)) (e,           gameH + 2*e)

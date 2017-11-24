@@ -135,29 +135,29 @@ paintMessage screen resources status =
 paintObject :: Surface -> Resources -> Object -> IO ()
 paintObject screen resources object =
   case objectKind object of
-    Paddle              -> void $ do let bI = imgSurface $ paddleImg resources
-                                     SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    Paddle             -> void $ do let bI = imgSurface $ paddleImg resources
+                                    SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    Block               -> void $ do let (BlockProps e _) = objectProperties object
-                                     let bI = imgSurface $ blockImage e
-                                     SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
-    
-    Ball                -> void $ do let (BallProps r) = objectProperties object
-                                     let (x', y') = (x - round r, y - round r)
-                                     let bI = imgSurface $ ballImg resources
-                                     SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
+    Block              -> void $ do let (BlockProps e _) = objectProperties object
+                                    let bI = imgSurface $ blockImgF e resources
+                                    SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+   
+    Ball               -> void $ do let (BallProps r) = objectProperties object
+                                    let (x', y') = (x - round r, y - round r)
+                                    let bI = imgSurface $ ballImg resources
+                                    SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
 
-    (PDiamond PointsUp) -> void $ do let bI = imgSurface $ diamondImg resources
-                                     SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    (PowerUp PointsUp) -> void $ do let bI = imgSurface $ pointsUpImg resources
+                                    SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    (PDiamond LevelsUp) -> void $ do let bI = imgSurface $ heartImg resources
-                                     SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    (PowerUp LivesUp)  -> void $ do let bI = imgSurface $ livesUpImg resources
+                                    SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    _        -> return ()
+    _                  -> return ()
   where (x, y) = both round (objectPos object)
-        blockImage 3 = block1Img resources
-        blockImage 2 = block2Img resources
-        blockImage n = block3Img resources
+        blockImgF 3 = block1Img
+        blockImgF 2 = block2Img
+        blockImgF n = block3Img
 
 -- * Auxiliary drawing functions
 
