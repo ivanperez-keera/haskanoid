@@ -78,18 +78,23 @@ loadResources = runMaybeT $ do
                                           setColorKey img [SrcColorKey, RLEAccel] t
                                           return img
 
-  diamondImg <- liftIO $ getDataFileName "data/diamond.png"
+  diamondImg <- liftIO $ getDataFileName "data/diamond2.png"
   diamond <- lift $ Image diamondImg <$> do img <- load diamondImg
                                             t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
                                             setColorKey img [SrcColorKey, RLEAccel] t
                                             return img
+  heartImg <- liftIO $ getDataFileName "data/heart.png"
+  heart <- lift $ Image heartImg <$> do img <- load heartImg
+                                        t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
+                                        setColorKey img [SrcColorKey, RLEAccel] t
+                                        return img
   -- Start playing music
   -- when (isJust bgM) $ lift (playMusic (fromJust bgM))
 
   -- Return Nothing or embed in Resources
   res <- case (myFont, blockHit) of
            (Just f, Just b) -> let
-                               in return (Resources f b Nothing ball b1 b2 b3 paddle diamond Nothing)
+                               in return (Resources f b Nothing ball b1 b2 b3 paddle diamond heart Nothing)
            _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
                                           mzero
 

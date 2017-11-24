@@ -1,4 +1,8 @@
 2017-11-23 Christina Zeller <chriz@keera.co.uk>:
+        * Removes code duplication in objBlock.
+        * Adds heart image and uses different images for PowerUps.
+
+2017-11-23 Christina Zeller <chriz@keera.co.uk>:
         * Changes the level definitions to select which block gives what.
 
 2017-11-21 Christina Zeller <chriz@keera.co.uk>:
