@@ -23,8 +23,11 @@ block3Image     = ("data/block3.png", Nothing)
 paddleImage     :: ImageSpec
 paddleImage     = ("data/paddleBluA.png", Nothing)
 
-diamondImage    :: ImageSpec
-diamondImage    = ("data/diamond-alpha.png", Nothing)
+pointsUpImage    :: ImageSpec
+pointsUpImage    = ("data/diamond2-alpha.png", Nothing)
+
+livesUpImage    :: ImageSpec
+livesUpImage    = ("data/heart-alpha.png", Nothing)
 
 -- Fonts
 gameFontSpec    :: FontSpec

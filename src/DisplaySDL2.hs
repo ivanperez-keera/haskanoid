@@ -68,8 +68,8 @@ audio resources shownState = do
 audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
-    (Block _ _) -> playFile (blockHitSnd resources)
-    _           -> return ()
+    Block -> playFile (blockHitSnd resources)
+    _     -> return ()
 
 -- ** Visual rendering
 display :: Resources -> GameState -> RenderingCtx -> IO ()
@@ -138,13 +138,15 @@ instance Renderizable (Resources, Object) Renderer where
 -- Partial function. Object has image.
 objectImage :: (Resources, Object) -> Image
 objectImage (resources, object) = case objectKind object of
-  (Paddle {})   -> paddleImg resources
-  (Block e _)   -> case e of 
-                     3 -> block1Img resources
-                     2 -> block2Img resources
-                     n -> block3Img resources
-  (Ball {})     -> ballImg resources
-  (PDiamond{})  -> diamondImg resources
+  Paddle           -> paddleImg resources
+  Block            -> let (BlockProps e _) = objectProperties object 
+                      in case e of 
+                           3 -> block1Img resources
+                           2 -> block2Img resources
+                           n -> block3Img resources
+  Ball             -> ballImg resources
+  PowerUp PointsUp -> pointsUpImg resources
+  PowerUp LivesUp  -> livesUpImg  resources
 
 -- * Auxiliary function
 printSolid :: Renderer -> Resources -> String -> IO (Texture, Surface)

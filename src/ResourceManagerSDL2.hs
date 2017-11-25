@@ -38,7 +38,8 @@ loadResources = do
   b2       <- loadImage   block2Image
   b3       <- loadImage   block3Image
   paddle   <- loadImage   paddleImage
-  diamond  <- loadImage   diamondImage
+  pointsUp <- loadImage   pointsUpImage
+  livesUp  <- loadImage   livesUpImage
 
   -- FIXME: This sould not be here: start playing music
   when (isJust bgM) $ playMusic (fromJust bgM)
@@ -52,7 +53,8 @@ loadResources = do
                       <*> b2
                       <*> b3
                       <*> paddle
-                      <*> diamond
+                      <*> pointsUp
+                      <*> livesUp
                       <*> pure bgM
 
    -- Some resources did not load
@@ -68,21 +70,23 @@ preloadResources mgr rdr = void $ do
 
     let res = resources mgr'
 
-    bgImage'    <- maybe (return Nothing) ((Just <$>) . maybePreloadImage rdr) (bgImage res)
-    ballImg'    <- maybePreloadImage rdr (ballImg    res)
-    block1Img'  <- maybePreloadImage rdr (block1Img  res)
-    block2Img'  <- maybePreloadImage rdr (block2Img  res)
-    block3Img'  <- maybePreloadImage rdr (block3Img  res)
-    paddleImg'  <- maybePreloadImage rdr (paddleImg  res)
-    diamondImg' <- maybePreloadImage rdr (diamondImg res)
+    bgImage'     <- maybe (return Nothing) ((Just <$>) . maybePreloadImage rdr) (bgImage res)
+    ballImg'     <- maybePreloadImage rdr (ballImg    res)
+    block1Img'   <- maybePreloadImage rdr (block1Img  res)
+    block2Img'   <- maybePreloadImage rdr (block2Img  res)
+    block3Img'   <- maybePreloadImage rdr (block3Img  res)
+    paddleImg'   <- maybePreloadImage rdr (paddleImg  res)
+    pointsUpImg' <- maybePreloadImage rdr (pointsUpImg res)
+    livesUpImg'  <- maybePreloadImage rdr (livesUpImg res)
 
-    let res' = res { bgImage    = bgImage'
-                   , ballImg    = ballImg'
-                   , block1Img  = block1Img'
-                   , block2Img  = block2Img'
-                   , block3Img  = block3Img'
-                   , paddleImg  = paddleImg'
-                   , diamondImg = diamondImg'
+    let res' = res { bgImage     = bgImage'
+                   , ballImg     = ballImg'
+                   , block1Img   = block1Img'
+                   , block2Img   = block2Img'
+                   , block3Img   = block3Img'
+                   , paddleImg   = paddleImg'
+                   , pointsUpImg = pointsUpImg'
+                   , livesUpImg  = livesUpImg'
                    }
     return (mgr' { resources = res' })
 
