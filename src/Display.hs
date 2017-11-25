@@ -67,8 +67,8 @@ audio resources shownState = do
 audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
-    (Block _ _) -> playFile (blockHitSnd resources) 3000
-    _           -> return ()
+    (Block) -> playFile (blockHitSnd resources) 3000
+    _       -> return ()
 
 -- ** Painting
 
@@ -111,12 +111,12 @@ paintInfo screen resources over = void $ do
   -- Paint HUD
   message1 <- printSolid resources ("Level: " ++ show (gameLevel over))
   SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 (-1) (-1))
-   
+
   message2 <- printSolid resources ("Points: " ++ show (gamePoints over))
   let h1 = SDL.surfaceGetHeight message1
   SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h1 + 5) (-1) (-1))
-   
-  message3 <- printSolid resources ("Lives: " ++ show (gameLives over)) 
+
+  message3 <- printSolid resources ("Lives: " ++ show (gameLives over))
   renderAlignRight screen message3 (10, 10)
 
 paintMessage :: Surface -> Resources -> GameStatus -> IO ()
@@ -135,24 +135,25 @@ paintMessage screen resources status =
 paintObject :: Surface -> Resources -> Object -> IO ()
 paintObject screen resources object =
   case objectKind object of
-    (Paddle _ )  -> void $ do let bI = imgSurface $ paddleImg resources
-                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    Side -> return ()
+    _    -> void $ SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
 
-    (Block e _)  -> void $ do let bI = imgSurface $ blockImage e
-                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+  where
+    (x, y) = both round $ objectTopLevelCorner object
 
-    (Ball r)     -> void $ do let (x', y') = (x - round r, y - round r)
-                              let bI = imgSurface $ ballImg resources
-                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' (-1) (-1))
+    bI = imgSurface $ objectImg resources
 
-    (PDiamond _) -> void $ do let bI = imgSurface $ diamondImg resources
-                              SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (-1) (-1))
+    objectImg = case objectKind object of
+      Paddle           -> paddleImg
+      Block            -> let (BlockProps e _) = objectProperties object
+                          in blockImgF e
+      Ball             -> ballImg
+      PowerUp PointsUp -> pointsUpImg
+      PowerUp LivesUp  -> livesUpImg
 
-    _                -> return ()
-  where (x, y) = both round (objectPos object)
-        blockImage 3 = block1Img resources
-        blockImage 2 = block2Img resources
-        blockImage n = block3Img resources
+    blockImgF 3 = block1Img
+    blockImgF 2 = block2Img
+    blockImgF n = block3Img
 
 -- * Auxiliary drawing functions
 
