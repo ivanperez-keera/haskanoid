@@ -53,6 +53,9 @@ levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m))
   , (blockDescS 15, "data/level1.png", "data/level0.mp3")
   , (blockDescS 16, "data/level1.png", "data/level1.mp3")
   , (blockDescS 17, "data/level2.png", "data/level2.mp3")
+  , (blockDescS 18, "data/level1.png", "data/level0.mp3")
+  , (blockDescS 19, "data/level1.png", "data/level1.mp3")
+  , (blockDescS 20, "data/level2.png", "data/level2.mp3")
   ]
 
 -- | Level block specification (positions,lives of block, maybe powerup)
@@ -462,7 +465,102 @@ blockDescS 17 = map (first3 adjustPos) allBlocks
        blockRows :: Int
        blockRows = 9
 
+-- Level 18
+blockDescS 18 = map (first3 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe PowerUpKind)]
+       allBlocks = zip3 blocks lives powerUps
+         where
+           blocks   = blockPoss
+           blockn   = length blocks
+           lives    = blockLifeCycle blockn
+           powerUps = powerUpCycle lives
+ 
+       blockPoss ::[(Int,Int)]
+       blockPoss = [(x,y) | x <- [0..blockColumns - 1]
+                          , y <- [0..blockRows - 1]
+                   ]
+
+       -- example:
+       -- input: elements = 8
+       -- minBlockLife = 0
+       -- maxBlockLife = 3
+       -- creates [1,2,3,2,1,2,3,2]
+       blockLifeCycle :: Int -> [Int]
+       blockLifeCycle n = take n $ cycle oneCycle
+         where 
+           oneCycle = [minBlockLife..maxBlockLife] 
+                      ++ [(maxBlockLife - 1)..(minBlockLife + 1)]
+
+       powerUpCycle :: [Int] -> [Maybe PowerUpKind]
+       powerUpCycle [] = []
+       powerUpCycle (n:ns) | n == maxBlockLife = ((Just PointsUp) : powerUpCycle ns)
+                           | otherwise = (Nothing : powerUpCycle ns)
+
+       blockRows :: Int
+       blockRows = 5 
+
+
+-- Level 19
+-- adjusted Level 7
+--
+-- maxBlockLife == X
+-- minBlockLife == O
+--
+--   %%%%%%%%
+-- %  XXXXXX
+-- % X      X
+-- %    OO  
+-- %    OO 
+-- % X      X
+-- %  XXXXXX
+blockDescS 19 = map (first3 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe PowerUpKind)]
+       allBlocks = [((x,y), maxBlockLife, Nothing) | x <- [1..blockColumns - 2]
+                                                   , y <- [0, blockRows - 1]]
+                   ++ [((x,y), maxBlockLife, Nothing) | x <- [0, blockColumns - 1]
+                                                      ,  y <- [1, blockRows - 2]]
+                   ++ [((x,y), minBlockLife, powerUps x y) | x <- midColumns
+                                                           , y <- [2,3]]
+
+       powerUps :: Int -> Int -> Maybe PowerUpKind
+       powerUps x y | even x && odd y = (Just LivesUp)
+                    | odd x && even y = (Just LivesUp)
+                    | otherwise       = (Just PointsUp)
+
+
+       blockRows :: Int
+       blockRows = 6
+
+
+-- Level 20
+-- adjusted Level 10
+blockDescS 20 = map (first3 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe PowerUpKind)]
+       allBlocks =  [((x,y), blockLife y, powerUps x y) | x <- [0..blockColumns - 1]
+                                           , y <- [0..blockRows - 1]
+                                           , odd x || (y == midRow && even x)]
+
+       blockLife :: Int -> Int  
+       blockLife y | y == midRow = maxBlockLife - 1
+                   | otherwise   = maxBlockLife
+
+       powerUps :: Int -> Int -> Maybe PowerUpKind 
+       powerUps x y | y == midRow && even x = (Just PointsUp)
+                    | y == midRow && odd x  = (Just LivesUp)
+                    | otherwise             = Nothing
+
+       blockRows :: Int
+       blockRows = 9
+
+       midRow :: Int
+       midRow = blockRows `div` 2
+
+
 blockDescS _ = error "No more levels"
+
 
 -- Dynamic positioning/level size
 
