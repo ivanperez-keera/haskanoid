@@ -2,8 +2,9 @@
 {-# LANGUAGE FlexibleContexts            #-}
 {-# LANGUAGE FlexibleInstances           #-}
 {-# LANGUAGE MultiParamTypeClasses       #-}
-{-# LANGUAGE TypeSynonymInstances        #-}
 {-# LANGUAGE TypeFamilies                #-}
+{-# LANGUAGE TypeSynonymInstances        #-}
+{-# LANGUAGE UndecidableInstances        #-}
 module Display
   ( module Display
   , module ResourceManager
@@ -13,6 +14,7 @@ module Display
 import Control.Monad
 import Control.Monad.IfElse
 import Data.Tuple.Extra
+import Data.Word
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
 import Game.Render.Renderer   as Renderer
@@ -26,6 +28,7 @@ import Resources
 import ResourceManager
 
 type RenderingCtx = ()
+type RealRenderingCtx = Surface
 
 -- * Initialization
 
@@ -82,22 +85,22 @@ display resources shownState () = do
   screen <- getVideoSurface
   Renderer.render screen (resources, shownState) (0, 0)
 
-instance Renderizable (Resources, GameInfo) Surface where
+instance Renderizable (Resources, GameInfo) RealRenderingCtx where
 
- render screen (resources, over) (baseX, baseY) = do
+ render ctx (resources, over) (baseX, baseY) = do
    -- paintInfo :: Surface -> Resources -> GameInfo -> IO ()
-   -- paintInfo screen resources over = void $ do
-   -- clearScreen screen (0x11, 0x22, 0x33)
+   -- paintInfo ctx resources over = void $ do
+   -- clearScreen ctx (0x11, 0x22, 0x33)
 
    -- Paint HUD
    let message1 = (resources, "Level: " ++ show (gameLevel over))
    h1 <- renderHeight message1
 
-   renderAlignLeft  screen message1                                          (10, 10)
-   renderAlignLeft  screen (resources, "Points: " ++ show (gamePoints over)) (10, 10 + h1 + 5)
-   renderAlignRight screen (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
+   renderAlignLeft  ctx message1                                          (10, 10)
+   renderAlignLeft  ctx (resources, "Points: " ++ show (gamePoints over)) (10, 10 + h1 + 5)
+   renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
 
-instance Renderizable (Resources, GameStatus) Surface where
+instance Renderizable (Resources, GameStatus) RealRenderingCtx where
   renderTexture screen (resources, status) =
     renderTexture screen (resources, msg status)
     where 
@@ -116,29 +119,26 @@ instance Renderizable (Resources, GameStatus) Surface where
     txt <- renderTexture screen txt
     renderAlignCenter screen txt (0, 0)
 
-instance Renderizable (Resources, Object) Surface where
+instance Renderizable (Resources, Object) RealRenderingCtx where
   render screen (resources, object) (baseX, baseY) =
-      renderTexture screen (resources, object) >>= \x -> renderUnit screen x p'
+      renderTexture screen (resources, object) >>= \x -> Renderer.render screen x p'
     where
       p'     = (baseX + x, baseY + y)
       (x, y) = both round $ objectTopLevelCorner object
 
   renderTexture screen (resources, object) = 
-    case objectKind object of
-      Side -> return Nothing
-      _    -> return $ Just bI
+    renderTexture screen (resources, objectImg resources)
 
     where
 
-      bI = imgSurface $ objectImg resources
-
       objectImg = case objectKind object of
-        Paddle           -> paddleImg
+        Paddle           -> Just . paddleImg
         Block            -> let (BlockProps e _) = objectProperties object
-                            in blockImgF e
-        Ball             -> ballImg
-        PowerUp PointsUp -> pointsUpImg
-        PowerUp LivesUp  -> livesUpImg
+                            in Just . blockImgF e
+        Ball             -> Just . ballImg
+        PowerUp PointsUp -> Just . pointsUpImg
+        PowerUp LivesUp  -> Just . livesUpImg
+        Side             -> \_ -> Nothing 
 
       blockImgF 3 = block1Img
       blockImgF 2 = block2Img
@@ -151,11 +151,12 @@ instance Renderizable (Resources, Object) Surface where
 
 -- * Auxiliary drawing functions
 
-instance Renderizable (Resources, GameState) Surface where
+instance Renderizable (Resources, GameState) RealRenderingCtx where
   render screen (resources, shownState) (baseX, baseY) = do
 
     -- Render background
-    Renderer.render screen (imgSurface <$> bgImage resources) (0, 0)
+    -- Renderer.render screen (imgSurface <$> bgImage resources) (0, 0)
+    Renderer.render screen (resources, bgImage resources) (0, 0)
     Renderer.render screen (resources, gameInfo shownState) (0, 0)
     Renderer.render screen (resources, gameStatus (gameInfo shownState)) (gameLeft, gameTop)
     mapM_ (\obj -> Renderer.render screen (resources, obj) (gameLeft, gameTop)) $ gameObjects shownState
@@ -163,11 +164,47 @@ instance Renderizable (Resources, GameState) Surface where
     -- Double buffering
     SDL.flip screen
 
+-- * SDL Specific instances
+
 instance Renderizable x Surface => Renderizable (Maybe x) Surface where
   renderTexture surface Nothing  = return Nothing
   renderTexture surface (Just x) = renderTexture surface x
   renderSize Nothing  = return (0, 0)
   renderSize (Just x) = renderSize x
+
+instance Renderizable (res, a) Surface => Renderizable (res, Maybe a) Surface where
+
+  renderTexture _surface (res, Nothing) = return Nothing
+  renderTexture surface  (res, Just x)  = renderTexture surface (res, x)
+  renderSize (resources, Nothing) = return (0, 0)
+  renderSize (resources, Just x)  = renderSize (resources, x)
+
+instance Renderizable (Resources, Image) Surface where
+  renderTexture ctx (resources, img) = renderTexture ctx (imgSurface img)
+  renderSize (resources, img) = renderSize (imgSurface img)
+
+instance Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx
+         => Renderizable (Resources, String) ctx where
+
+  renderTexture surface (resources, msg) = do
+    let font = unFont $ resFont resources
+    renderTexture surface (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
+
+  renderSize (resources, msg) = do
+    screen <- getVideoSurface
+    msg    <- renderTexture screen (resources, msg)
+    renderingSize screen msg
+
+instance Renderizable (TTF.Font, String, (Word8, Word8, Word8)) Surface where
+
+  renderTexture _surface (font, msg, (r,g,b)) = do
+    message <- TTF.renderTextSolid font msg (SDL.Color r g b)
+    return (Just message)
+
+  renderSize (font, msg, color) = do
+    screen <- getVideoSurface
+    msg    <- renderTexture screen (font, msg, color)
+    renderingSize screen msg
 
 instance Renderizable Surface Surface where
 
@@ -176,25 +213,6 @@ instance Renderizable Surface Surface where
   renderSize surface = do
     screen <- getVideoSurface
     renderingSize screen (Just surface)
-
-instance Renderizable (Resources, String) Surface where
-
-  renderTexture _surface (resources, msg) = do
-    let font = unFont $ resFont resources
-    message <- TTF.renderTextSolid font msg (SDL.Color 128 128 128)
-    return (Just message)
-
-  renderSize (resources, msg) = do
-    screen <- getVideoSurface
-    msg    <- renderTexture screen (resources, msg)
-    renderingSize screen msg
-
-instance Renderizable (res, a) Surface => Renderizable (res, Maybe a) Surface where
-
-  renderTexture _surface (res, Nothing) = return Nothing
-  renderTexture surface  (res, Just x)  = renderTexture surface (res, x)
-  renderSize (resources, Nothing) = return (0, 0)
-  renderSize (resources, Just x)  = renderSize (resources, x)
 
 instance RenderingContext Surface where
   type RenderingUnit Surface = Maybe Surface
