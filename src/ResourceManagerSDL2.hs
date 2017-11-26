@@ -16,7 +16,7 @@ import ResourcesSDL2
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 
 data ResourceManager = ResourceManager
-  { resources       :: Resources
+  { resources :: Resources
   }
 
 -- | Ad-hoc resource loading
@@ -150,4 +150,3 @@ loadImage (fp, mask)    = Just <$> tryLoadImage fp mask Nothing
 
 loadFont :: FontSpec -> IO (Maybe Font)
 loadFont (fp, lh) = Just . (\ttf -> Font fp ttf) <$> TTF.openFont fp lh
-

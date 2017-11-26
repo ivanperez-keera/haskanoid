@@ -29,6 +29,8 @@ import ResourceManagerSDL2
 
 type RenderingCtx = (Renderer, Window)
 
+-- * Initialization
+
 initializeDisplay :: IO ()
 initializeDisplay = do
    -- Initialise SDL
@@ -47,14 +49,16 @@ initGraphs mgr = do
   return (renderer, window)
 
 -- * Rendering and Sound
+
+-- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
-render resourceManager shownState (renderer, window) = do
+render resourceManager shownState ctx = do
   -- resources <- loadNewResources resourceManager shownState renderer
   res <- resources <$> readIORef (unResMgr resourceManager)
   audio   res shownState
-  display res shownState (renderer, window)
+  display res shownState ctx
 
--- * Audio
+-- ** Audio
 
 audio :: Resources -> GameState -> IO ()
 audio resources shownState = do
@@ -73,7 +77,7 @@ audioObject resources object = when (objectHit object) $
 
 -- ** Visual rendering
 display :: Resources -> GameState -> RenderingCtx -> IO ()
-display resources shownState (rdr,window) = do 
+display resources shownState (rdr, window) = do 
   SDL.showWindow window
 
   setRenderDrawColor rdr 0xFF 0xFF 0 0
@@ -155,6 +159,3 @@ printSolid screen resources msg = do
   message <- TTF.renderTextSolid font msg fontColor
   txt     <- createTextureFromSurface screen message
   return (txt, message)
-
-fontColor :: SDL.Color
-fontColor = SDL.Color 228 228 228 255

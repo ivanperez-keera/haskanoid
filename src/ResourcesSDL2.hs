@@ -1,10 +1,10 @@
 module ResourcesSDL2 where
 
-import           Data.Word
+import Data.Word
 
--- ** Game assets
+-- * Game assets
 
--- Images
+-- ** Images
 initialBG       :: ImageSpec
 initialBG       = ("data/level0.png", Nothing)
 
@@ -29,11 +29,14 @@ pointsUpImage    = ("data/diamond2-alpha.png", Nothing)
 livesUpImage    :: ImageSpec
 livesUpImage    = ("data/heart-alpha.png", Nothing)
 
--- Fonts
+-- ** Fonts
 gameFontSpec    :: FontSpec
 gameFontSpec    = ("data/lacuna.ttf", 32)
 
--- Audio
+fontColor       :: ColorSpec
+fontColor       = (228, 228, 228, 255)
+
+-- ** Audio
 backgroundMusic :: MusicSpec
 backgroundMusic = "data/level0.mp3"
 
@@ -44,3 +47,4 @@ type ImageSpec   = (FilePath, Maybe (Word8, Word8, Word8))
 type MusicSpec   = FilePath
 type SoundFXSpec = (FilePath, Int)
 type FontSpec    = (FilePath, Int)
+type ColorSpec   = (Int, Int, Int, Int)

@@ -67,8 +67,8 @@ blockDescS :: Int -> [(Pos2D, Int, Maybe PowerUpKind)]
 blockDescS 0 = map (first3 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe PowerUpKind)]
-       allBlocks = [((x,y), maxBlockLife, Nothing) | x <- [0..blockColumns - 1]
-                                                    , y <- [0..blockRows - 1]
+       allBlocks = [((x,y), maxBlockLife, Just PointsUp) | x <- [0..blockColumns - 1]
+                                                         , y <- [0..blockRows - 1]
                    ]
 
        blockRows :: Int
