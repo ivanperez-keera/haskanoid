@@ -8,7 +8,7 @@ import GamePlay
 import Input
 
 #ifdef sdl
-import Display
+import DisplaySDL2
 import Graphics.UI.SDL.Clock
 #endif
 

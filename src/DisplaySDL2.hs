@@ -1,33 +1,42 @@
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# OPTIONS_GHC -fno-warn-orphans        #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+{-# LANGUAGE CPP                         #-}
+{-# LANGUAGE FlexibleContexts            #-}
+{-# LANGUAGE FlexibleInstances           #-}
+{-# LANGUAGE MultiParamTypeClasses       #-}
+{-# LANGUAGE TypeSynonymInstances        #-}
 module DisplaySDL2
-  ( initializeDisplay
-  , RenderingCtx
-  , initGraphs
-  , DisplaySDL2.render
-  , module ResourceManagerSDL2
+  ( module DisplaySDL2
+  , module ResourceManager
   )
   where
 
-import Control.Arrow             ((***))
+import Control.Arrow         ((***))
 import Control.Monad
-import Control.Monad.IfElse
-import Data.IORef
-import Data.Maybe
+import Control.Monad.IfElse  (awhen)
 import FRP.Yampa.VectorSpace
-import Game.AssetManager.SDL2    hiding (loadImage)
-import Game.Audio.SDL2
-import Game.Render.Renderer.SDL2 as Render
-import Graphics.UI.SDL           as SDL
-import Graphics.UI.SDL.TTF       as TTF
+import Game.Render.Renderer  as Render
+import Graphics.UI.SDL       as SDL
 
 import Constants
 import GameState
 import Objects
 import Resources
-import ResourceManagerSDL2
 
-type RenderingCtx = (Renderer, Window)
+#ifdef sdl
+import Game.AssetManager.SDL1
+import Game.Audio.SDL
+
+import RenderSDL1
+import ResourceManager as ResourceManager
+#elif sdl2
+import Data.IORef
+import Game.AssetManager.SDL2
+import Game.Audio.SDL2
+
+import RenderSDL2
+import ResourceManagerSDL2 as ResourceManager
+#endif
 
 -- * Initialization
 
@@ -39,6 +48,21 @@ initializeDisplay = do
   initAudio
 
 initGraphs :: ResourceMgr -> IO RenderingCtx
+#ifdef sdl
+initGraphs _mgr = do
+  -- Create window
+  screen <- SDL.setVideoMode width height 32 [SWSurface]
+  SDL.setCaption "Test" ""
+
+  -- Important if we want the keyboard to work right (I don't know
+  -- how to make it work otherwise)
+  SDL.enableUnicode True
+
+  -- Hide mouse
+  SDL.showCursor False
+
+#elif sdl2
+
 initGraphs mgr = do
   -- Create window
   (window,renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
@@ -47,24 +71,28 @@ initGraphs mgr = do
   preloadResources mgr renderer
 
   return (renderer, window)
+#endif
 
 -- * Rendering and Sound
 
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
-  -- resources <- loadNewResources resourceManager shownState renderer
+#ifdef sdl
+  res <- loadNewResources resourceManager shownState
+#elif sdl2
   res <- resources <$> readIORef (unResMgr resourceManager)
+#endif
   audio   res shownState
-  display res shownState ctx
+  display (res, shownState) ctx
 
 -- ** Audio
 
 audio :: Resources -> GameState -> IO ()
 audio resources shownState = do
   -- Start bg music if necessary
-  -- playing <- musicPlaying
-  -- unless playing $ awhen (bgMusic resources) playMusic
+  playing <- musicPlaying
+  unless playing $ awhen (bgMusic resources) playMusic
 
   -- Play object hits
   mapM_ (audioObject resources) $ gameObjects shownState
@@ -72,62 +100,61 @@ audio resources shownState = do
 audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
+#ifdef sdl
+    Block -> playFile (blockHitSnd resources) 3000
+#elif sdl2
     Block -> playFile (blockHitSnd resources)
+#endif
     _     -> return ()
 
 -- ** Visual rendering
-display :: Resources -> GameState -> RenderingCtx -> IO ()
-display resources shownState (rdr, window) = do 
-  SDL.showWindow window
+display :: Renderizable a RealRenderingCtx => a -> RenderingCtx -> IO ()
+display a = onRenderingCtx $ \ctx -> 
+  Render.render ctx a (0, 0)
 
-  setRenderDrawColor rdr 0xFF 0xFF 0 0
-  renderClear rdr
+instance Renderizable (Resources, GameState) RealRenderingCtx where
+  render screen (resources, shownState) (baseX, baseY) = do
 
-  paintBackground rdr resources
+    -- Render background
+    -- Render.render screen (imgSurface <$> bgImage resources) (0, 0)
+    Render.render screen (resources, bgImage resources) (0, 0)
+    Render.render screen (resources, gameInfo shownState) (0, 0)
+    Render.render screen (resources, gameStatus (gameInfo shownState)) (gameLeft, gameTop)
+    mapM_ (\obj -> Render.render screen (resources, obj) (gameLeft, gameTop)) $ gameObjects shownState
 
-  paintInfo rdr resources shownState
+instance Renderizable (Resources, GameInfo) RealRenderingCtx where
 
-  let base = (gameLeft, gameTop)
+ render ctx (resources, over) (baseX, baseY) = do
+   -- paintInfo :: Surface -> Resources -> GameInfo -> IO ()
+   -- paintInfo ctx resources over = void $ do
+   -- clearScreen ctx (0x11, 0x22, 0x33)
 
-  -- Paint overlay message, if any
-  paintMessage (0, 0) rdr resources (gameStatus (gameInfo shownState))
+   -- Paint HUD
+   let message1 = (resources, "Level: " ++ show (gameLevel over))
+   h1 <- renderHeight message1
 
-  -- Paint objects
-  mapM_ (\o -> Render.render rdr (resources, o) base) (gameObjects shownState)
+   renderAlignLeft  ctx message1                                          (10, 10)
+   renderAlignLeft  ctx (resources, "Points: " ++ show (gamePoints over)) (10, 10 + h1 + 5)
+   renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
 
-  -- Double buffering
-  SDL.renderPresent rdr
+instance Renderizable (Resources, GameStatus) RealRenderingCtx where
+  renderTexture screen (resources, status) =
+    renderTexture screen (resources, statusMsg status)
 
-paintBackground :: Renderer -> Resources -> IO ()
-paintBackground screen resources = do
-  when (isJust (bgImage resources)) $
-    renderAlignLeft screen (fromJust $ bgImage resources) (0,0)
+  renderSize (resources, status) =
+    renderSize (resources, statusMsg status)
 
+  render screen txt (x, y) = do
+    txt <- renderTexture screen txt
+    renderAlignCenter screen txt (x, y)
 
-paintInfo :: Renderer -> Resources -> GameState -> IO ()
-paintInfo screen resources state = void $ do
-  (txt, message) <- printSolid screen resources ("Level:  " ++ show (gameLevel  $ gameInfo state))
-  renderAlignLeft screen txt (10,10)
+statusMsg GamePlaying     = Nothing
+statusMsg GamePaused      = Just "Paused"
+statusMsg (GameLoading n) = Just ("Level " ++ show n)
+statusMsg GameOver        = Just "GAME OVER!!!"
+statusMsg GameFinished    = Just "You won!!! Well done :)"
 
-  (txt, message) <- printSolid screen resources ("Points: " ++ show (gamePoints $ gameInfo state))
-  renderAlignLeft screen txt (10,50)
-
-  (txt, message) <- printSolid screen resources ("Lives:  " ++ show (gameLives  $ gameInfo state))
-  renderAlignRight screen txt (10,10)
-
-paintMessage :: (Int, Int) -> Renderer -> Resources -> GameStatus -> IO ()
-paintMessage base screen resources status = do
-  awhen (statusMsg status) $ \msg -> do
-    (t,s) <- printSolid screen resources msg
-    renderAlignCenter screen t base
- where statusMsg :: GameStatus -> Maybe String
-       statusMsg GamePlaying     = Nothing
-       statusMsg GamePaused      = Just "Paused"
-       statusMsg (GameLoading n) = Just ("Level " ++ show n)
-       statusMsg GameOver        = Just "GAME OVER!!!"
-       statusMsg GameFinished    = Just "You won!!! Well done :)"
-
-instance Renderizable (Resources, Object) Renderer where
+instance Renderizable (Resources, Object) RealRenderingCtx where
   renderTexture r  = renderTexture r . objectImage
   renderSize       = return . (round *** round) . objectSize . snd
   render screen (resources, object) base =
@@ -151,11 +178,3 @@ objectImage (resources, object) = case objectKind object of
   Ball             -> ballImg resources
   PowerUp PointsUp -> pointsUpImg resources
   PowerUp LivesUp  -> livesUpImg  resources
-
--- * Auxiliary function
-printSolid :: Renderer -> Resources -> String -> IO (Texture, Surface)
-printSolid screen resources msg = do
-  let font = unFont $ resFont resources
-  message <- TTF.renderTextSolid font msg fontColor
-  txt     <- createTextureFromSurface screen message
-  return (txt, message)
