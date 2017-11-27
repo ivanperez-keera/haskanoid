@@ -135,6 +135,7 @@ instance Renderizable (Resources, GameStatus) RealRenderingCtx where
     txt <- renderTexture screen txt
     renderAlignCenter screen txt (x, y)
 
+statusMsg :: GameStatus -> Maybe String
 statusMsg GamePlaying     = Nothing
 statusMsg GamePaused      = Just "Paused"
 statusMsg (GameLoading n) = Just ("Level " ++ show n)
