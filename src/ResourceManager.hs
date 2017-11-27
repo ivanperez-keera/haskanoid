@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-module ResourceManagerSDL2 where
+module ResourceManager where
 
 import           Control.Applicative    ((<$>))
 import           Control.Monad
@@ -12,7 +12,7 @@ import GameState
 import Levels
 import Paths_haskanoid
 import Resources
-import ResourcesSDL2
+import ResourceSpecs
 
 #ifdef sdl
 import           Game.AssetManager.SDL1 hiding (loadImage)

@@ -22,20 +22,19 @@ import Constants
 import GameState
 import Objects
 import Resources
+import ResourceManager as ResourceManager
 
 #ifdef sdl
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
 
 import RenderSDL1
-import ResourceManagerSDL2 as ResourceManager
 #elif sdl2
 import Data.IORef
 import Game.AssetManager.SDL2
 import Game.Audio.SDL2
 
 import RenderSDL2
-import ResourceManagerSDL2 as ResourceManager
 #endif
 
 -- * Initialization

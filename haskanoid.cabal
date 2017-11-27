@@ -117,8 +117,8 @@ executable haskanoid
                    sage-temporary
     other-modules: Display
                    Resources
-                   ResourceManagerSDL2
-                   ResourcesSDL2
+                   ResourceManager
+                   ResourceSpecs
 
   if flag(sdl2)
     cpp-options: -Dsdl2
@@ -131,8 +131,8 @@ executable haskanoid
                    sage-temporary-sdl2
     other-modules: Display
                    Resources
-                   ResourceManagerSDL2
-                   ResourcesSDL2
+                   ResourceManager
+                   ResourceSpecs
     extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2
 
   if flag(ghcjs)

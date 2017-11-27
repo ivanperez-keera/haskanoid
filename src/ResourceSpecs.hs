@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-module ResourcesSDL2 where
+module ResourceSpecs where
 
 -- * Game assets
 import Resources
