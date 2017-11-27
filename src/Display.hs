@@ -116,20 +116,16 @@ instance Renderizable (Resources, GameState) RealRenderingCtx where
   render screen (resources, shownState) (baseX, baseY) = do
 
     -- Render background
-    -- Render.render screen (imgSurface <$> bgImage resources) (0, 0)
     Render.render screen (resources, bgImage resources) (0, 0)
+
     Render.render screen (resources, gameInfo shownState) (0, 0)
     Render.render screen (resources, gameStatus (gameInfo shownState)) (gameLeft, gameTop)
     mapM_ (\obj -> Render.render screen (resources, obj) (gameLeft, gameTop)) $ gameObjects shownState
 
 instance Renderizable (Resources, GameInfo) RealRenderingCtx where
 
+ -- Paint HUD
  render ctx (resources, over) (baseX, baseY) = do
-   -- paintInfo :: Surface -> Resources -> GameInfo -> IO ()
-   -- paintInfo ctx resources over = void $ do
-   -- clearScreen ctx (0x11, 0x22, 0x33)
-
-   -- Paint HUD
    let message1 = (resources, "Level: " ++ show (gameLevel over))
    h1 <- renderHeight message1
 
