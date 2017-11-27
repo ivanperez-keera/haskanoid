@@ -1,4 +1,5 @@
-module ResourceManager where
+{-# LANGUAGE CPP #-}
+module ResourceManagerSDL2 where
 
 import           Control.Applicative    ((<$>))
 import           Control.Monad
@@ -13,9 +14,17 @@ import Paths_haskanoid
 import Resources
 import ResourcesSDL2
 
+#ifdef sdl
 import           Game.AssetManager.SDL1 hiding (loadImage)
 import qualified Game.AssetManager.SDL1 as Res
 import           Game.Audio.SDL
+#elif sdl2
+import           Data.IORef.Extra
+import           Game.AssetManager.SDL2 hiding (loadImage)
+import qualified Game.AssetManager.SDL2 as Res
+import           Game.Audio.SDL2
+import           Graphics.UI.SDL        as SDL
+#endif
 
 -- * Resource management
 
@@ -69,6 +78,34 @@ loadResources = do
                     return Nothing
     Just res' -> (Just . ResourceMgr)
                     <$> newIORef (ResourceManager GameStarted res')
+
+#ifdef sdl2
+preloadResources :: ResourceMgr -> Renderer -> IO ()
+preloadResources mgr rdr = void $ do
+  modifyIORefM (unResMgr mgr) $ \mgr' -> do
+
+    let res = resources mgr'
+
+    bgImage'     <- maybe (return Nothing) ((Just <$>) . maybePreloadImage rdr) (bgImage res)
+    ballImg'     <- maybePreloadImage rdr (ballImg    res)
+    block1Img'   <- maybePreloadImage rdr (block1Img  res)
+    block2Img'   <- maybePreloadImage rdr (block2Img  res)
+    block3Img'   <- maybePreloadImage rdr (block3Img  res)
+    paddleImg'   <- maybePreloadImage rdr (paddleImg  res)
+    pointsUpImg' <- maybePreloadImage rdr (pointsUpImg res)
+    livesUpImg'  <- maybePreloadImage rdr (livesUpImg res)
+
+    let res' = res { bgImage     = bgImage'
+                   , ballImg     = ballImg'
+                   , block1Img   = block1Img'
+                   , block2Img   = block2Img'
+                   , block3Img   = block3Img'
+                   , paddleImg   = paddleImg'
+                   , pointsUpImg = pointsUpImg'
+                   , livesUpImg  = livesUpImg'
+                   }
+    return (mgr' { resources = res' })
+#endif
 
 loadNewResources :: ResourceMgr ->  GameState -> IO Resources
 loadNewResources mgr state = do
@@ -130,7 +167,11 @@ loadSoundFX (fp, dur) = loadAudio fp dur
 
 loadImage :: ImageSpec -> IO (Maybe Image)
 loadImage (fp, Nothing) = Just <$> Res.loadImage fp
+#ifdef sdl
 loadImage (fp, mask)    = Just <$> tryLoadImage fp mask
+#elif sdl2
+loadImage (fp, mask)    = Just <$> tryLoadImage fp mask Nothing
+#endif
 
 loadFont :: FontSpec -> IO (Maybe Font)
 loadFont (fp, lh) = Just . (\ttf -> Font fp ttf) <$> TTF.openFont fp lh
