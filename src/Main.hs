@@ -1,8 +1,8 @@
 {-# LANGUAGE CPP #-}
-import Control.Applicative ((<$>))
+import Control.Applicative  ((<$>))
 import Control.Exception
 import Control.Monad.IfElse
-import FRP.Yampa as Yampa
+import FRP.Yampa            as Yampa
 
 import GamePlay
 import Input
