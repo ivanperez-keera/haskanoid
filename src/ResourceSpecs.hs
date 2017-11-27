@@ -1,8 +1,9 @@
 {-# LANGUAGE CPP #-}
 module ResourceSpecs where
 
--- * Game assets
 import Resources
+
+-- * Game assets
 
 -- ** Images
 initialBG       :: ImageSpec
@@ -45,16 +46,17 @@ livesUpImage    = ("data/heart.png", Just (0, 255, 0))
 livesUpImage    = ("data/heart-alpha.png", Nothing)
 #endif
 
--- ** Fonts
-gameFontSpec    :: FontSpec
-gameFontSpec    = ("data/lacuna.ttf", 32)
-
-fontColor       :: ColorSpec
-fontColor       = (228, 228, 228, 255)
-
 -- ** Audio
 backgroundMusic :: MusicSpec
 backgroundMusic = "data/level0.mp3"
 
 blockHitSFX     :: SoundFXSpec
 blockHitSFX     = ("data/196106_aiwha_ding-cc-by.wav", 2000)
+
+-- ** Fonts
+gameFontSpec    :: FontSpec
+gameFontSpec    = ("data/lacuna.ttf", 32)
+
+-- ** Colors
+fontColor       :: ColorSpec
+fontColor       = (228, 228, 228, 255)
