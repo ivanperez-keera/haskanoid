@@ -115,7 +115,7 @@ executable haskanoid
                    sage-backends-sdl1-clock,
                    sage-backends-sdl1-drawing,
                    sage-temporary
-    other-modules: DisplaySDL2
+    other-modules: Display
                    Resources
                    ResourceManager
 
@@ -128,7 +128,7 @@ executable haskanoid
                    sage-backends-sdl2-extra,
                    sage-temporary,
                    sage-temporary-sdl2
-    other-modules: DisplaySDL2
+    other-modules: Display
                    Resources
                    ResourceManagerSDL2
                    ResourcesSDL2

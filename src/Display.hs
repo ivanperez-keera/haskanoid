@@ -23,12 +23,20 @@ import GameState
 import Objects
 import Resources
 
-
+#ifdef sdl
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
 
 import RenderSDL1
-import ResourceManager
+import ResourceManager as ResourceManager
+#elif sdl2
+import Data.IORef
+import Game.AssetManager.SDL2
+import Game.Audio.SDL2
+
+import RenderSDL2
+import ResourceManagerSDL2 as ResourceManager
+#endif
 
 -- * Initialization
 
@@ -40,6 +48,7 @@ initializeDisplay = do
   initAudio
 
 initGraphs :: ResourceMgr -> IO RenderingCtx
+#ifdef sdl
 initGraphs _mgr = do
   -- Create window
   screen <- SDL.setVideoMode width height 32 [SWSurface]
@@ -52,12 +61,28 @@ initGraphs _mgr = do
   -- Hide mouse
   SDL.showCursor False
 
+#elif sdl2
+
+initGraphs mgr = do
+  -- Create window
+  (window,renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
+  renderSetLogicalSize renderer width height
+
+  preloadResources mgr renderer
+
+  return (renderer, window)
+#endif
+
 -- * Rendering and Sound
 
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
+#ifdef sdl
   res <- loadNewResources resourceManager shownState
+#elif sdl2
+  res <- resources <$> readIORef (unResMgr resourceManager)
+#endif
   audio   res shownState
   display (res, shownState) ctx
 
@@ -75,7 +100,11 @@ audio resources shownState = do
 audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
+#ifdef sdl
     Block -> playFile (blockHitSnd resources) 3000
+#elif sdl2
+    Block -> playFile (blockHitSnd resources)
+#endif
     _     -> return ()
 
 -- ** Visual rendering
