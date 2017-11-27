@@ -18,10 +18,10 @@ import Game.Clock.SDL2
 #endif
 
 #ifdef ghcjs
-import Control.Concurrent
 import DisplayGHCJS
 import GHCJSNow
-import System.Mem
+-- import Control.Concurrent
+-- import System.Mem
 #endif
 
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
