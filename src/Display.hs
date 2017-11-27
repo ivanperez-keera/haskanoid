@@ -100,11 +100,7 @@ audio resources shownState = do
 audioObject :: Resources -> Object -> IO ()
 audioObject resources object = when (objectHit object) $
   case objectKind object of
-#ifdef sdl
-    Block -> playFile (blockHitSnd resources) 3000
-#elif sdl2
     Block -> playFile (blockHitSnd resources)
-#endif
     _     -> return ()
 
 -- ** Visual rendering

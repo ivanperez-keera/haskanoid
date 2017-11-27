@@ -10,6 +10,13 @@ import qualified Game.AssetManager.SDL2     as Res
 import           Graphics.UI.SDL            as SDL
 import qualified Graphics.UI.SDL.TTF        as TTF
 
+import Constants
+import GameState
+import Levels
+import Objects
+import Paths_haskanoid
+import Resources
+
 import Resources
 import ResourcesSDL2
 
@@ -90,8 +97,8 @@ preloadResources mgr rdr = void $ do
                    }
     return (mgr' { resources = res' })
 
--- loadNewResources (GamePlaying (prefs, state)) = do
---   mgr     <- unResMgr <$> getResourceManagerDM
+-- loadNewResources :: ResourceMgr ->  GameState -> IO Resources
+-- loadNewResources msg (GamePlaying (prefs, state)) = do
 --   manager <- lift $ readIORef mgr
 --   let oldState     = lastKnownStatus manager
 --       newState     = gameStatus (gameInfo state)

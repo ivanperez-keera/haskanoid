@@ -1,6 +1,8 @@
 {-# LANGUAGE CPP #-}
 module Resources where
 
+import Data.Word
+
 #ifdef sdl
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
@@ -24,3 +26,9 @@ data Resources = Resources
   , livesUpImg  :: Image
   , bgMusic     :: Maybe Music
   }
+
+type ImageSpec   = (FilePath, Maybe (Word8, Word8, Word8))
+type MusicSpec   = FilePath
+type SoundFXSpec = (FilePath, Int)
+type FontSpec    = (FilePath, Int)
+type ColorSpec   = (Int, Int, Int, Int)

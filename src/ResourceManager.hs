@@ -10,6 +10,7 @@ import           Data.IORef
 import           Data.Maybe
 import           Game.AssetManager         hiding (audio)
 import           Game.AssetManager.SDL1
+import qualified Game.AssetManager.SDL1    as Res
 import           Game.Audio.SDL
 import           Graphics.UI.SDL           as SDL
 import           Graphics.UI.SDL.Image     as Image
@@ -47,7 +48,7 @@ loadResources = runMaybeT $ do
   font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
   let myFont = fmap (Font gameFont) font
 
-  blockHit <- liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
+  blockHit <- liftIO $ (`loadAudio` 3000) =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
 
   -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
   -- bgM <- liftIO $ loadMusic "data/level0.mp3"
@@ -155,3 +156,13 @@ updateAllResources res (GameLoading n) = do
                      return $ Just (Image newBgFP img')
 
   return (res { bgImage = newBg, bgMusic = newMusic })
+
+loadSoundFX :: SoundFXSpec -> IO (Maybe Audio)
+loadSoundFX (fp, dur) = loadAudio fp dur
+
+loadImage :: ImageSpec -> IO (Maybe Image)
+loadImage (fp, Nothing) = Just <$> Res.loadImage fp
+loadImage (fp, mask)    = Just <$> tryLoadImage fp mask
+
+loadFont :: FontSpec -> IO (Maybe Font)
+loadFont (fp, lh) = Just . (\ttf -> Font fp ttf) <$> TTF.openFont fp lh

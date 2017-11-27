@@ -1,7 +1,5 @@
 module ResourcesSDL2 where
 
-import Data.Word
-
 -- * Game assets
 
 -- ** Images
@@ -42,9 +40,3 @@ backgroundMusic = "data/level0.mp3"
 
 blockHitSFX     :: SoundFXSpec
 blockHitSFX     = ("data/196106_aiwha_ding-cc-by.wav", 2000)
-
-type ImageSpec   = (FilePath, Maybe (Word8, Word8, Word8))
-type MusicSpec   = FilePath
-type SoundFXSpec = (FilePath, Int)
-type FontSpec    = (FilePath, Int)
-type ColorSpec   = (Int, Int, Int, Int)
