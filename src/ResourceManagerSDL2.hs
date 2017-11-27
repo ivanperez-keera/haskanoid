@@ -1,29 +1,38 @@
+{-# LANGUAGE CPP #-}
 module ResourceManagerSDL2 where
 
+import           Control.Applicative    ((<$>))
 import           Control.Monad
 import           Data.IORef
 import           Data.Maybe
-import           Data.IORef.Extra
-import           Game.Audio.SDL2
-import           Game.AssetManager.SDL2     hiding (loadImage)
-import qualified Game.AssetManager.SDL2     as Res
-import           Graphics.UI.SDL            as SDL
-import qualified Graphics.UI.SDL.TTF        as TTF
+import           Game.AssetManager      hiding (audio)
+import qualified Graphics.UI.SDL.TTF    as TTF
 
-import Constants
 import GameState
 import Levels
-import Objects
 import Paths_haskanoid
 import Resources
-
-import Resources
 import ResourcesSDL2
+
+#ifdef sdl
+import           Game.AssetManager.SDL1 hiding (loadImage)
+import qualified Game.AssetManager.SDL1 as Res
+import           Game.Audio.SDL
+#elif sdl2
+import           Data.IORef.Extra
+import           Game.AssetManager.SDL2 hiding (loadImage)
+import qualified Game.AssetManager.SDL2 as Res
+import           Game.Audio.SDL2
+import           Graphics.UI.SDL        as SDL
+#endif
+
+-- * Resource management
 
 newtype ResourceMgr = ResourceMgr { unResMgr :: IORef ResourceManager }
 
 data ResourceManager = ResourceManager
-  { resources :: Resources
+  { lastKnownStatus :: GameStatus
+  , resources       :: Resources
   }
 
 -- | Ad-hoc resource loading
@@ -35,18 +44,17 @@ loadResources = do
   initAudio
 
   -- Load the resources we need
-  font     <- loadFont gameFontSpec
-  
-  bgM      <- loadMusic   backgroundMusic
-  blockHit <- loadSoundFX blockHitSFX
-  img      <- loadImage   initialBG
-  ball     <- loadImage   ballImage
-  b1       <- loadImage   block1Image
-  b2       <- loadImage   block2Image
-  b3       <- loadImage   block3Image
-  paddle   <- loadImage   paddleImage
-  pointsUp <- loadImage   pointsUpImage
-  livesUp  <- loadImage   livesUpImage
+  font     <- loadFont    =<< localizeResource gameFontSpec
+  bgM      <- loadMusic   =<< fst <$> localizeResource (backgroundMusic, ())
+  blockHit <- loadSoundFX =<< localizeResource blockHitSFX
+  img      <- loadImage   =<< localizeResource initialBG
+  ball     <- loadImage   =<< localizeResource ballImage
+  b1       <- loadImage   =<< localizeResource block1Image
+  b2       <- loadImage   =<< localizeResource block2Image
+  b3       <- loadImage   =<< localizeResource block3Image
+  paddle   <- loadImage   =<< localizeResource paddleImage
+  pointsUp <- loadImage   =<< localizeResource pointsUpImage
+  livesUp  <- loadImage   =<< localizeResource livesUpImage
 
   -- FIXME: This sould not be here: start playing music
   when (isJust bgM) $ playMusic (fromJust bgM)
@@ -68,9 +76,10 @@ loadResources = do
   case res of
     Nothing   -> do putStrLn "Something failed to load"
                     return Nothing
-    Just res' -> do newMgr <- newIORef (ResourceManager res')
-                    return $ Just $ ResourceMgr newMgr
+    Just res' -> (Just . ResourceMgr)
+                    <$> newIORef (ResourceManager GameStarted res')
 
+#ifdef sdl2
 preloadResources :: ResourceMgr -> Renderer -> IO ()
 preloadResources mgr rdr = void $ do
   modifyIORefM (unResMgr mgr) $ \mgr' -> do
@@ -96,55 +105,60 @@ preloadResources mgr rdr = void $ do
                    , livesUpImg  = livesUpImg'
                    }
     return (mgr' { resources = res' })
+#endif
 
--- loadNewResources :: ResourceMgr ->  GameState -> IO Resources
--- loadNewResources msg (GamePlaying (prefs, state)) = do
---   manager <- lift $ readIORef mgr
---   let oldState     = lastKnownStatus manager
---       newState     = gameStatus (gameInfo state)
---       oldResources = resources manager
--- 
---   newResources <- case newState of
---                     GameLoading n | newState /= oldState
---                                   -> updateAllResources oldResources newState
---                     _             -> return oldResources
--- 
---   let manager' = ResourceManager { lastKnownStatus = newState
---                                  , resources       = newResources
---                                  }
--- 
---   lift $ writeIORef mgr manager'
--- 
---   return newResources
--- 
--- updateAllResources :: Resources -> GameStatus -> DisplayMonad Resources
--- updateAllResources res (GameLoading n) = do
--- 
---   let newBgFP    = _resourceFP $ levelBg    $ levels !! n
---   let newMusicFP = _resourceFP $ levelMusic $ levels !! n
--- 
---   -- Load the next background music, if available and necessary
---   let oldMusic = bgMusic $ gameRes res
---   newMusic <- lift $
---                 if musicName oldMusic == newMusicFP
---                    then return oldMusic
---                    else do bgM <- loadMusic newMusicFP
---                            case bgM of
---                              Nothing -> do return oldMusic
---                              Just m  -> do stopMusic
---                                            playMusic m
---                                            return m
--- 
---   -- Load the next background image, if available and necessary
---   let oldBg = bgImage $ gameRes res
---   newBg <- if imgName oldBg == newBgFP
---              then return oldBg
---              else (lift . tryLoadImage newBgFP Nothing . Just) =<< getRendererDM
--- 
---   let gameRes' = (gameRes res) { bgMusic = newMusic, bgImage = newBg }
---       res'     = res { gameRes = gameRes'}
--- 
---   return res'
+loadNewResources :: ResourceMgr ->  GameState -> IO Resources
+loadNewResources mgr state = do
+  manager <- readIORef (unResMgr mgr)
+  let oldState = lastKnownStatus manager
+      newState = gameStatus (gameInfo state)
+      oldResources = resources manager
+
+  newResources <- case newState of
+                    (GameLoading _) | newState /= oldState
+                                    -> updateAllResources oldResources newState
+                    _               -> return oldResources
+
+  let manager' = ResourceManager { lastKnownStatus = newState
+                                 , resources       = newResources
+                                 }
+
+  writeIORef (unResMgr mgr) manager'
+  return newResources
+
+updateAllResources :: Resources -> GameStatus -> IO Resources
+updateAllResources res (GameLoading n) = do
+  -- Load new music
+  let newMusicFP' = _resourceFP $ levelMusic $ levels !! n
+  newMusicFP <- fst <$> localizeResource (newMusicFP', ())
+
+  let oldMusic   = bgMusic res
+      oldMusicFP = maybe "" musicName oldMusic
+  newMusic <- if oldMusicFP == newMusicFP
+              then return oldMusic
+              else do -- Loading can fail, in which case we continue
+                      -- with the old music
+                      bgM <- loadMusic newMusicFP
+                      if isNothing bgM
+                       then do putStrLn $ "Could not load resource " ++ newMusicFP
+                               return oldMusic
+                       else do stopMusic
+                               playMusic (fromJust bgM)
+                               return bgM
+
+  -- Load new background
+  let newBgFP' = _resourceFP $ levelBg $ levels !! n
+  newBgFP <- fst <$> localizeResource (newBgFP', Nothing)
+
+  -- Load the next background image, if available and necessary
+  let oldBg   = bgImage res
+      oldBgFP = maybe "" imgName oldBg
+
+  newBg <- if oldBgFP == newBgFP
+             then return oldBg
+             else loadImage (newBgFP, Nothing)
+
+  return (res { bgImage = newBg, bgMusic = newMusic })
 
 -- ** Resources
 
@@ -153,7 +167,16 @@ loadSoundFX (fp, dur) = loadAudio fp dur
 
 loadImage :: ImageSpec -> IO (Maybe Image)
 loadImage (fp, Nothing) = Just <$> Res.loadImage fp
+#ifdef sdl
+loadImage (fp, mask)    = Just <$> tryLoadImage fp mask
+#elif sdl2
 loadImage (fp, mask)    = Just <$> tryLoadImage fp mask Nothing
+#endif
 
 loadFont :: FontSpec -> IO (Maybe Font)
 loadFont (fp, lh) = Just . (\ttf -> Font fp ttf) <$> TTF.openFont fp lh
+
+localizeResource :: (FilePath, a) -> IO (FilePath, a)
+localizeResource (fp, extra) = do
+  fp' <- getDataFileName fp
+  return (fp', extra)

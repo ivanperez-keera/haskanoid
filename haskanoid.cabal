@@ -117,7 +117,8 @@ executable haskanoid
                    sage-temporary
     other-modules: Display
                    Resources
-                   ResourceManager
+                   ResourceManagerSDL2
+                   ResourcesSDL2
 
   if flag(sdl2)
     cpp-options: -Dsdl2

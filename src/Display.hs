@@ -28,7 +28,7 @@ import Game.AssetManager.SDL1
 import Game.Audio.SDL
 
 import RenderSDL1
-import ResourceManager as ResourceManager
+import ResourceManagerSDL2 as ResourceManager
 #elif sdl2
 import Data.IORef
 import Game.AssetManager.SDL2
