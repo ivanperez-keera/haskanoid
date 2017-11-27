@@ -77,11 +77,7 @@ initGraphs mgr = do
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
-#ifdef sdl
   res <- loadNewResources resourceManager shownState
-#elif sdl2
-  res <- resources <$> readIORef (unResMgr resourceManager)
-#endif
   audio   res shownState
   display (res, shownState) ctx
 
