@@ -145,8 +145,8 @@ paintObject screen resources object =
 
     objectImg = case objectKind object of
       Paddle            -> paddleImg
-      Block             -> let (BlockProps e _) = objectProperties object
-                           in blockImgF e
+      Block             -> let (BlockProps e pu _) = objectProperties object
+                           in if pu then blockpuImg else blockImgF e
       Ball              -> ballImg
       PowerUp PointsUp  -> pointsUpImg
       PowerUp LivesUp   -> livesUpImg

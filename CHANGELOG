@@ -1,6 +1,8 @@
 2017-11-28 Christina Zeller <chriz@keera.co.uk>:
         * Adds two more kinds of powerups (levels down & nothing happens)
         * Adds and changes images for powerups.
+        * Adds block property indication block with powerup.
+        * Adds image for indication of block with powerup.
 
 2017-11-26 Christina Zeller <chriz@keera.co.uk>:
         * Adds levels with powerups.

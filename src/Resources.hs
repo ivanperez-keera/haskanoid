@@ -19,6 +19,7 @@ data Resources = Resources
   , block1Img    :: Image
   , block2Img    :: Image
   , block3Img    :: Image
+  , blockpuImg   :: Image -- indicating powerup
   , paddleImg    :: Image
   , pointsUpImg  :: Image
   , livesUpImg   :: Image

@@ -615,8 +615,8 @@ yPosPaddle = gameHeight - paddleMargin
 -- which means that two simulatenously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
-objBlock :: (Pos2D, Int, Maybe PowerUpKind) -> Size2D -> ObjectSF
-objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
+objBlock :: (Pos2D, Int, Maybe PowerUpKind, SignalPowerUp) -> Size2D -> ObjectSF
+objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
@@ -657,7 +657,7 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
   returnA -< ObjectOutput 
                 Object{ objectName           = name
                       , objectKind           = Block
-                      , objectProperties     = BlockProps lives (w, h)
+                      , objectProperties     = BlockProps lives spu (w, h)
                       , objectPos            = (x,y)
                       , objectVel            = (0,0)
                       , objectAcc            = (0,0)

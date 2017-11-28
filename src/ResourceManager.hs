@@ -72,6 +72,9 @@ loadResources = runMaybeT $ do
   b3Img <- liftIO $ getDataFileName "data/block3.png"
   b3 <- lift $ Image b3Img <$> load b3Img
 
+  bpuImg <- liftIO $ getDataFileName "data/blockP.png" -- block indicating powerup
+  bpu <- lift $ Image b3Img <$> load bpuImg
+
   paddleImg <- liftIO $ getDataFileName "data/paddleBlu.png"
   paddle <- lift $ Image paddleImg <$> do img <- load paddleImg
                                           t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
@@ -104,7 +107,7 @@ loadResources = runMaybeT $ do
   -- Return Nothing or embed in Resources
   res <- case (myFont, blockHit) of
            (Just f, Just b) -> let
-                               in return (Resources f b Nothing ball b1 b2 b3 paddle pointsUp livesUp nothingUp destroyUp Nothing)
+                               in return (Resources f b Nothing ball b1 b2 b3 bpu paddle pointsUp livesUp nothingUp destroyUp Nothing)
            _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
                                           mzero
 

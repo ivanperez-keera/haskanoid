@@ -51,7 +51,7 @@ data ObjectKind = Ball
 -- | Properties associated to each kind of object.
 data ObjectProperties  = BallProps     Double -- radius?
                        | PaddleProps   Size2D
-                       | BlockProps    BlockEnergy Size2D
+                       | BlockProps    BlockEnergy SignalPowerUp Size2D
                        | SideProps     Side
                        | PowerUpProps Size2D -- A powerup with a given size
   deriving (Show,Eq)
@@ -59,6 +59,12 @@ data ObjectProperties  = BallProps     Double -- radius?
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
 --   means "dead".
 type BlockEnergy = Int
+
+-- | Indicates whether a block signals that it contains a powerup (True)
+--   or not (False).
+--
+--   Note: The signal is independent from the actual creating of powerups. 
+type SignalPowerUp = Bool 
 
 -- | The kind of powerup: Either points or levels are powered up.
 data PowerUpKind = PointsUp | LivesUp | NothingUp | DestroyUp
@@ -79,10 +85,10 @@ isPaddle o = case objectKind o of
 -- Partial function!
 objectSize :: Object -> Size2D
 objectSize object = case objectProperties object of
-  (PaddleProps sz)  -> sz
-  (BlockProps _ sz) -> sz
-  (BallProps r)     -> let w = 2*r in (w, w)
-  (PowerUpProps sz) -> sz
+  (PaddleProps sz  )  -> sz
+  (BlockProps _ _ sz) -> sz
+  (BallProps r)       -> let w = 2*r in (w, w)
+  (PowerUpProps sz)   -> sz
 
 -- Partial function. Object has size.
 objectTopLevelCorner :: Object -> Pos2D
@@ -111,7 +117,7 @@ objShape :: Object -> Shape
 objShape obj = case objectProperties obj of
   BallProps r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
   PaddleProps sz       -> Rectangle pos sz
-  BlockProps _ sz      -> Rectangle pos sz
+  BlockProps _ _ sz    -> Rectangle pos sz
   PowerUpProps sz      -> Rectangle pos sz
   SideProps TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
   SideProps LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
