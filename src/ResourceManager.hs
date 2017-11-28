@@ -88,13 +88,23 @@ loadResources = runMaybeT $ do
                                             t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
                                             setColorKey img [SrcColorKey, RLEAccel] t
                                             return img
+  nothingUpImg <- liftIO $ getDataFileName "data/spike-y.png"
+  nothingUp <- lift $ Image nothingUpImg <$> do img <- load nothingUpImg
+                                                t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
+                                                setColorKey img [SrcColorKey, RLEAccel] t
+                                                return img
+  destroyUpImg <- liftIO $ getDataFileName "data/spike-b.png"
+  destroyUp <- lift $ Image destroyUpImg <$> do img <- load destroyUpImg
+                                                t   <- mapRGB (surfaceGetPixelFormat img) 0 255 0
+                                                setColorKey img [SrcColorKey, RLEAccel] t
+                                                return img
   -- Start playing music
   -- when (isJust bgM) $ lift (playMusic (fromJust bgM))
 
   -- Return Nothing or embed in Resources
   res <- case (myFont, blockHit) of
            (Just f, Just b) -> let
-                               in return (Resources f b Nothing ball b1 b2 b3 paddle pointsUp livesUp Nothing)
+                               in return (Resources f b Nothing ball b1 b2 b3 paddle pointsUp livesUp nothingUp destroyUp Nothing)
            _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
                                           mzero
 

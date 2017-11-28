@@ -230,7 +230,7 @@ composeGameState lives level pts = futureDSwitch
 -- state.
 composeGameState' :: Int -> Int -> Int
                   -> SF (ObjectOutputs, Int, Event (), Int) (GameState, Event GameState)
-composeGameState' lives level pts = proc (oos,lives', dead, points) -> do
+composeGameState' lives level pts = proc (oos, lives', dead, points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
   let lives'' = lives + lives'
@@ -266,17 +266,20 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
    let inputs = ObjectInput userInput cols (map outputObject objs)
 
-   outputs      <- processMovement objs     -< inputs
-   cols'        <- detectObjectCollisions   -< outputs
-   hitBottom    <- collisionWithBottom      -< cols'
-   hitLivesUps <- collisionLivesUpsPaddle -< cols'
+   outputs       <- processMovement objs     -< inputs
+   cols'         <- detectObjectCollisions   -< outputs
+   hitBottom     <- collisionWithBottom      -< cols'
+   hitDestroyUp  <- collisionDestroyUpPaddle -< cols'
+   hitLivesUps   <- collisionLivesUpsPaddle  -< cols'
+
+   let hbod = hitBottomOrDestroyUp hitBottom hitDestroyUp
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
 
    lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
-   returnA -< ((objs', lvs', hitBottom, pts'), (objs', cols', pts'))
+   returnA -< ((objs', lvs', hbod, pts'), (objs', cols', pts'))
 
  where
 
@@ -323,6 +326,11 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
        createPowerUp (PowerUpDef puk pos sz) = powerUp puk pos sz
+
+       -- Hit bottom or catched a PowerUp DestroyUp
+       hitBottomOrDestroyUp :: Event () -> Event () -> Event ()
+       hitBottomOrDestroyUp NoEvent NoEvent = NoEvent
+       hitBottomOrDestroyUp _ _ = Event ()
 
 -- * Game objects
 --
@@ -373,6 +381,27 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 -- the event only take place once per collision.
 collisionWithBottom :: SF Collisions (Event ())
 collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> edge
+
+-- | Fires an event when the ball *enters in* a collision with the
+-- bottom wall.
+--
+-- NOTE: even if the overlap is not corrected, 'edge' makes
+-- the event only take place once per collision.
+collisionDestroyUpPaddle :: SF Collisions (Event ())
+collisionDestroyUpPaddle = proc cs -> do
+
+  -- Has the powerup been hit?
+  let hits :: Collisions
+      hits = filter (any (collisionObjectKind (PowerUp DestroyUp)) . collisionData) cs
+
+      paddleHits :: Collisions
+      paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
+
+      isHit :: Bool
+      isHit = not (null $ concatMap collisionData paddleHits)
+
+  dead <- edge -< isHit
+  returnA -< dead
 
 -- | Fires an event when a PowerUp LivesUp *enters in* a collision with the
 -- paddle.
@@ -616,6 +645,8 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
   let pukWidthHeight :: PowerUpKind -> (Double, Double)
       pukWidthHeight PointsUp = (pointsUpWidth, pointsUpHeight)
       pukWidthHeight LivesUp = (livesUpWidth, livesUpHeight)
+      pukWidthHeight NothingUp = (nothingUpWidth, nothingUpHeight)
+      pukWidthHeight DestroyUp = (destroyUpWidth, destroyUpHeight)
 
   let createPowerUpF :: Maybe PowerUpKind -> Event () -> Event PowerUpDef 
       createPowerUpF (Just puk) dead = dead `tag` PowerUpDef puk (x,y) (pukWidthHeight puk)

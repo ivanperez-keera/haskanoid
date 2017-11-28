@@ -59,10 +59,16 @@ blockSeparation :: Double
 blockSeparation = 10
 pointsUpWidth, pointsUpHeight :: Double
 pointsUpWidth = 30
-pointsUpHeight = 24
+pointsUpHeight = 30 
 livesUpWidth, livesUpHeight :: Double
 livesUpWidth = 30
 livesUpHeight = 27
+nothingUpWidth, nothingUpHeight :: Double
+nothingUpWidth = 18
+nothingUpHeight = 18
+destroyUpWidth, destroyUpHeight :: Double
+destroyUpWidth = 18
+destroyUpHeight = 18
 
 -- * Lives
 

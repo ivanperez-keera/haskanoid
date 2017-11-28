@@ -12,15 +12,17 @@ import Game.Audio.SDL2
 
 -- | Includes all the assets needed at the current time in the game.
 data Resources = Resources
-  { resFont     :: Font
-  , blockHitSnd :: Audio
-  , bgImage     :: Maybe Image
-  , ballImg     :: Image
-  , block1Img   :: Image
-  , block2Img   :: Image
-  , block3Img   :: Image
-  , paddleImg   :: Image
-  , pointsUpImg :: Image
-  , livesUpImg  :: Image
-  , bgMusic     :: Maybe Music
+  { resFont      :: Font
+  , blockHitSnd  :: Audio
+  , bgImage      :: Maybe Image
+  , ballImg      :: Image
+  , block1Img    :: Image
+  , block2Img    :: Image
+  , block3Img    :: Image
+  , paddleImg    :: Image
+  , pointsUpImg  :: Image
+  , livesUpImg   :: Image
+  , nothingUpImg :: Image
+  , destroyUpImg :: Image
+  , bgMusic      :: Maybe Music
   }

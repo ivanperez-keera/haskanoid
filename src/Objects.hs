@@ -61,7 +61,7 @@ data ObjectProperties  = BallProps     Double -- radius?
 type BlockEnergy = Int
 
 -- | The kind of powerup: Either points or levels are powered up.
-data PowerUpKind = PointsUp | LivesUp
+data PowerUpKind = PointsUp | LivesUp | NothingUp | DestroyUp
   deriving (Show,Eq)
 
 -- ** Distinguish objects by kind.

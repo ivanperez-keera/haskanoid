@@ -144,12 +144,14 @@ paintObject screen resources object =
     bI = imgSurface $ objectImg resources
 
     objectImg = case objectKind object of
-      Paddle           -> paddleImg
-      Block            -> let (BlockProps e _) = objectProperties object
-                          in blockImgF e
-      Ball             -> ballImg
-      PowerUp PointsUp -> pointsUpImg
-      PowerUp LivesUp  -> livesUpImg
+      Paddle            -> paddleImg
+      Block             -> let (BlockProps e _) = objectProperties object
+                           in blockImgF e
+      Ball              -> ballImg
+      PowerUp PointsUp  -> pointsUpImg
+      PowerUp LivesUp   -> livesUpImg
+      PowerUp NothingUp -> nothingUpImg
+      PowerUp DestroyUp -> destroyUpImg
 
     blockImgF 3 = block1Img
     blockImgF 2 = block2Img
