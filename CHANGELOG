@@ -1,3 +1,8 @@
+2017-11-29 Christina Zeller <chriz@keera.co.uk>:
+        * Adjusts levels
+        * Adds property that powerups appear for every time that a block
+          gets hit.
+
 2017-11-28 Christina Zeller <chriz@keera.co.uk>:
         * Adds two more kinds of powerups (levels down & nothing happens)
         * Adds and changes images for powerups.

@@ -325,7 +325,7 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
-       createPowerUp (PowerUpDef puk pos sz) = powerUp puk pos sz
+       createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
 
        -- Hit bottom or catched a PowerUp DestroyUp
        hitBottomOrDestroyUp :: Event () -> Event () -> Event ()
@@ -615,7 +615,7 @@ yPosPaddle = gameHeight - paddleMargin
 -- which means that two simulatenously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
-objBlock :: (Pos2D, Int, Maybe PowerUpKind, SignalPowerUp) -> Size2D -> ObjectSF
+objBlock :: (Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp) -> Size2D -> ObjectSF
 objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
@@ -640,7 +640,7 @@ objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
   dead <- edge -< isDead
   -- let isDead = False -- immortal blocks
 
-  -- If it's dead, does it create a 'powerup'?
+  -- If it's hit or dead, does it create a 'powerup'?
 
   let pukWidthHeight :: PowerUpKind -> (Double, Double)
       pukWidthHeight PointsUp = (pointsUpWidth, pointsUpHeight)
@@ -648,11 +648,19 @@ objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
       pukWidthHeight NothingUp = (nothingUpWidth, nothingUpHeight)
       pukWidthHeight DestroyUp = (destroyUpWidth, destroyUpHeight)
 
-  let createPowerUpF :: Maybe PowerUpKind -> Event () -> Event PowerUpDef 
-      createPowerUpF (Just puk) dead = dead `tag` PowerUpDef puk (x,y) (pukWidthHeight puk)
-      createPowerUpF Nothing _       = noEvent
+  -- create powerup if event happens (hit or dead)
+  let createPowerUpF :: String -> PowerUpKind -> Event () -> Event PowerUpDef 
+      createPowerUpF idprefix puk event = event `tag` PowerUpDef idprefix puk (x,y) (pukWidthHeight puk)
 
-  let createPowerUp = createPowerUpF mpuk dead
+  -- first event input is hit, second is dead
+  let createPowerUpF' :: (String, Maybe (PowerUpKind, AlwaysPowerUp)) -> Event () -> Event () -> Event PowerUpDef
+      createPowerUpF' (idprefix, (Just (puk, True)))  hit _    = createPowerUpF idprefix puk hit
+      createPowerUpF' (idprefix, (Just (puk, False))) _   dead = createPowerUpF idprefix puk dead
+      createPowerUpF' (_, Nothing) _ _ = noEvent
+
+  t <- localTime -< ()
+
+  let createPowerUp = createPowerUpF' (show t, mpuk) hit dead
 
   returnA -< ObjectOutput 
                 Object{ objectName           = name
@@ -670,10 +678,10 @@ objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
                createPowerUp
 
 -- *** Powerups
-powerUp :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
-powerUp puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+powerUp :: String -> PowerUpKind -> Pos2D -> Size2D -> ObjectSF
+powerUp idprefix puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
-  let name = "powerup" ++ show (x,y)
+  let name = idprefix ++ "powerup" ++ show (x,y)
 
   -- Has the powerup been hit?
   let hits :: Collisions

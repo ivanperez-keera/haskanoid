@@ -40,7 +40,7 @@ data Object = Object { objectName           :: ObjectName
 -- | Type for object id.
 type ObjectName = String
 
--- | The kind of object and any size properties.
+-- | The kind of object.
 data ObjectKind = Ball
                 | Paddle
                 | Block
@@ -53,7 +53,7 @@ data ObjectProperties  = BallProps     Double -- radius?
                        | PaddleProps   Size2D
                        | BlockProps    BlockEnergy SignalPowerUp Size2D
                        | SideProps     Side
-                       | PowerUpProps Size2D -- A powerup with a given size
+                       | PowerUpProps  Size2D
   deriving (Show,Eq)
 
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
@@ -65,6 +65,11 @@ type BlockEnergy = Int
 --
 --   Note: The signal is independent from the actual creating of powerups. 
 type SignalPowerUp = Bool 
+
+
+-- | Indicates whether a powerup is created everytime if the ball hits
+--   the block (True) or only when the block is "dead" (False).
+type AlwaysPowerUp = Bool
 
 -- | The kind of powerup: Either points or levels are powered up.
 data PowerUpKind = PointsUp | LivesUp | NothingUp | DestroyUp

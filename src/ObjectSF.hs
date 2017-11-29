@@ -52,7 +52,8 @@ data ObjectOutput = ObjectOutput
   , births       :: Event PowerUpDef
   } 
 
-data PowerUpDef = PowerUpDef PowerUpKind Pos2D Size2D
+-- | Definition of a powerup with id-Prefix, kind, position and size.
+data PowerUpDef = PowerUpDef String PowerUpKind Pos2D Size2D
 
 -- | Handy function to create an object that is currently alive.
 livingObject :: Object -> ObjectOutput
