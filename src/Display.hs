@@ -5,34 +5,42 @@
 {-# LANGUAGE FlexibleInstances           #-}
 {-# LANGUAGE MultiParamTypeClasses       #-}
 {-# LANGUAGE TypeSynonymInstances        #-}
+{-# LANGUAGE UndecidableInstances        #-}
 module Display
   ( module Display
   , module ResourceManager
   )
   where
 
-import Control.Arrow         ((***))
+import Control.Arrow            ((***))
 import Control.Monad
-import Control.Monad.IfElse  (awhen)
+import Control.Monad.IfElse     (awhen)
+import Data.Word
 import FRP.Yampa.VectorSpace
-import Game.Render.Renderer  as Render
-import Graphics.UI.SDL       as SDL
+import Game.Render.Renderer     as Render
+import Game.ResourceManager.Ref (getResourceFont, getResourceImage,
+                                 prepareAllResources, tryGetResourceAudio)
+import Game.VisualElem
+import Graphics.UI.SDL          as SDL
+
 
 import Constants
 import GameState
 import Objects
-import Resources
 import ResourceManager as ResourceManager
 
 #ifdef sdl
+
 import Game.AssetManager.SDL1
 import Game.Audio.SDL
+import Graphics.UI.SDL.TTF.Types as TTF
 
 import RenderSDL1
+
 #elif sdl2
-import Data.IORef
 import Game.AssetManager.SDL2
 import Game.Audio.SDL2
+import Graphics.UI.SDL.TTF.Types as TTF
 
 import RenderSDL2
 #endif
@@ -46,7 +54,7 @@ initializeDisplay = do
 
   initAudio
 
-initGraphs :: ResourceMgr -> IO RenderingCtx
+initGraphs :: ResourceManager.ResourceMgr -> IO RenderingCtx
 #ifdef sdl
 initGraphs _mgr = do
   -- Create window
@@ -67,7 +75,7 @@ initGraphs mgr = do
   (window,renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
   renderSetLogicalSize renderer width height
 
-  preloadResources mgr renderer
+  prepareAllResources mgr renderer
 
   return (renderer, window)
 #endif
@@ -77,25 +85,25 @@ initGraphs mgr = do
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
-  res <- loadNewResources resourceManager shownState
-  audio   res shownState
-  display (res, shownState) ctx
+  audio   resourceManager shownState
+  display (resourceManager, shownState) ctx
 
 -- ** Audio
 
-audio :: Resources -> GameState -> IO ()
-audio resources shownState = do
+audio :: ResourceMgr -> GameState -> IO ()
+audio resourceManager shownState = do
   -- Start bg music if necessary
-  playing <- musicPlaying
-  unless playing $ awhen (bgMusic resources) playMusic
+  -- playing <- musicPlaying
+  -- unless playing $ awhen (bgMusic resources) playMusic
 
   -- Play object hits
-  mapM_ (audioObject resources) $ gameObjects shownState
+  mapM_ (audioObject resourceManager) $ gameObjects shownState
 
-audioObject :: Resources -> Object -> IO ()
-audioObject resources object = when (objectHit object) $
+audioObject :: ResourceMgr -> Object -> IO ()
+audioObject resourceManager object = when (objectHit object) $
   case objectKind object of
-    Block -> playFile (blockHitSnd resources)
+    Block -> do bhit <- tryGetResourceAudio resourceManager IdBlockHitFX undefined
+                awhen bhit $ playFile
     _     -> return ()
 
 -- ** Visual rendering
@@ -103,17 +111,18 @@ display :: Renderizable a RealRenderingCtx => a -> RenderingCtx -> IO ()
 display a = onRenderingCtx $ \ctx -> 
   Render.render ctx a (0, 0)
 
-instance Renderizable (Resources, GameState) RealRenderingCtx where
+instance Renderizable (ResourceMgr, GameState) RealRenderingCtx where
   render screen (resources, shownState) (baseX, baseY) = do
 
     -- Render background
-    Render.render screen (resources, bgImage resources) (0, 0)
+    img <- getResourceImage resources IdBgImg undefined
+    Render.render screen (resources, img) (0, 0)
 
     Render.render screen (resources, gameInfo shownState) (0, 0)
     Render.render screen (resources, gameStatus (gameInfo shownState)) (gameLeft, gameTop)
     mapM_ (\obj -> Render.render screen (resources, obj) (gameLeft, gameTop)) $ gameObjects shownState
 
-instance Renderizable (Resources, GameInfo) RealRenderingCtx where
+instance Renderizable (ResourceMgr, GameInfo) RealRenderingCtx where
 
  -- Paint HUD
  render ctx (resources, over) (baseX, baseY) = do
@@ -124,7 +133,7 @@ instance Renderizable (Resources, GameInfo) RealRenderingCtx where
    renderAlignLeft  ctx (resources, "Points: " ++ show (gamePoints over)) (10, 10 + h1 + 5)
    renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
 
-instance Renderizable (Resources, GameStatus) RealRenderingCtx where
+instance Renderizable (ResourceMgr, GameStatus) RealRenderingCtx where
   renderTexture screen (resources, status) =
     renderTexture screen (resources, statusMsg status)
 
@@ -141,9 +150,11 @@ statusMsg GamePaused      = Just "Paused"
 statusMsg (GameLoading n) = Just ("Level " ++ show n)
 statusMsg GameOver        = Just "GAME OVER!!!"
 statusMsg GameFinished    = Just "You won!!! Well done :)"
+statusMsg GameStarted     = Nothing
 
-instance Renderizable (Resources, Object) RealRenderingCtx where
-  renderTexture r  = renderTexture r . objectImage
+instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
+  renderTexture r (res, obj) = do img <- getResourceImage res (objectImage obj) undefined
+                                  renderTexture r img
   renderSize       = return . (round *** round) . objectSize . snd
   render screen (resources, object) base =
     case objectKind object of
@@ -155,14 +166,31 @@ instance Renderizable (Resources, Object) RealRenderingCtx where
           base' = (fromIntegral *** fromIntegral) base
 
 -- Partial function. Object has image.
-objectImage :: (Resources, Object) -> Image
-objectImage (resources, object) = case objectKind object of
-  Paddle           -> paddleImg resources
+objectImage :: Object -> ResourceId
+objectImage object = case objectKind object of
+  Paddle           -> IdPaddleImg
   Block            -> let (BlockProps e _) = objectProperties object 
                       in case e of 
-                           3 -> block1Img resources
-                           2 -> block2Img resources
-                           n -> block3Img resources
-  Ball             -> ballImg resources
-  PowerUp PointsUp -> pointsUpImg resources
-  PowerUp LivesUp  -> livesUpImg  resources
+                           3 -> IdBlock1Img
+                           2 -> IdBlock2Img
+                           n -> IdBlock3Img
+  Ball             -> IdBallImg
+  PowerUp PointsUp -> IdPointsUpImg
+  PowerUp LivesUp  -> IdLivesUpImg
+
+-- TODO: Change this ugly constraint.
+instance 
+#ifdef sdl
+  Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx
+#elif sdl2
+  Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) ctx
+#endif
+  => Renderizable (ResourceMgr, String) ctx where
+
+  renderTexture surface (resources, msg) = do
+    font <- unFont <$> getResourceFont resources IdGameFont undefined
+    renderTexture surface (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
+
+  renderSize (resources, msg) = do
+    font <- unFont <$> getResourceFont resources IdGameFont undefined
+    renderSize (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))

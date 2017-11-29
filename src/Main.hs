@@ -6,6 +6,7 @@ import FRP.Yampa            as Yampa
 
 import GamePlay
 import Input
+import Game.ResourceManager.Ref
 
 #ifdef sdl
 import Display
@@ -35,7 +36,7 @@ main = (`catchAny` print) $ do
 
   timeRef       <- initializeTimeRef
   controllerRef <- initializeInputDevices
-  res           <- loadResources
+  res           <- loadResources gameResourceSpec
 
   awhen res $ \res' -> do
     renderingCtx <- initGraphs res'

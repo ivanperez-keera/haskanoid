@@ -41,7 +41,7 @@ import           Linear
 import Constants
 import GameState
 import Objects
-import Resources hiding (audio)
+-- import Resources hiding (audio)
 import Levels
 import Paths_haskanoid
 

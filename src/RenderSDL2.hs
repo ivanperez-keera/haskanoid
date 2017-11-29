@@ -14,8 +14,6 @@ import Graphics.UI.SDL.Surface   as SDL
 import Graphics.UI.SDL.TTF       as TTF
 import Graphics.UI.SDL.TTF.Types as TTF
 
-import Resources
-
 type RenderingCtx     = (Renderer, Window)
 type RealRenderingCtx = Renderer
 
@@ -44,7 +42,7 @@ instance Renderizable (res, a) Renderer => Renderizable (res, Maybe a) Renderer 
   renderSize (resources, Nothing) = return (0, 0)
   renderSize (resources, Just x)  = renderSize (resources, x)
 
-instance Renderizable (Resources, Image) Renderer where
+instance Renderizable (a, Image) Renderer where
   renderTexture ctx (resources, img) = renderTexture ctx img
   renderSize (resources, img) = renderSize img
 
@@ -66,14 +64,3 @@ instance Renderizable (Texture, Surface) Renderer where
   renderSize       = renderSize . fst
   render screen (texture, _surface) base =
     Render.render screen texture base
-
-instance Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) ctx
-         => Renderizable (Resources, String) ctx where
-
-  renderTexture surface (resources, msg) = do
-    let font = unFont $ resFont resources
-    renderTexture surface (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
-
-  renderSize (resources, msg) = do
-    let font = unFont $ resFont resources
-    renderSize (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))

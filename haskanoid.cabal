@@ -114,9 +114,9 @@ executable haskanoid
                    sage-backends-sdl1-audio,
                    sage-backends-sdl1-clock,
                    sage-backends-sdl1-drawing,
-                   sage-temporary
+                   sage-temporary,
+                   sage-temporary-sdl1
     other-modules: Display
-                   Resources
                    ResourceManager
                    ResourceSpecs
 
@@ -130,7 +130,6 @@ executable haskanoid
                    sage-temporary,
                    sage-temporary-sdl2
     other-modules: Display
-                   Resources
                    ResourceManager
                    ResourceSpecs
     extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2

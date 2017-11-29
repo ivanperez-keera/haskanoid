@@ -16,8 +16,6 @@ import Game.Render.Renderer   as Renderer
 import Graphics.UI.SDL        as SDL
 import Graphics.UI.SDL.TTF    as TTF
 
-import Resources
-
 type RenderingCtx     = ()
 type RealRenderingCtx = Surface
 
@@ -43,7 +41,7 @@ instance Renderizable (res, a) Surface => Renderizable (res, Maybe a) Surface wh
   renderSize (resources, Nothing) = return (0, 0)
   renderSize (resources, Just x)  = renderSize (resources, x)
 
-instance Renderizable (Resources, Image) Surface where
+instance Renderizable (a, Image) Surface where
   renderTexture ctx (resources, img) = renderTexture ctx img
   renderSize (resources, img) = renderSize img
 
@@ -64,17 +62,6 @@ instance Renderizable Surface Surface where
   renderSize surface = do
     screen <- getVideoSurface
     renderingSize screen (Just surface)
-
-instance Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx
-         => Renderizable (Resources, String) ctx where
-
-  renderTexture surface (resources, msg) = do
-    let font = unFont $ resFont resources
-    renderTexture surface (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
-
-  renderSize (resources, msg) = do
-    let font = unFont $ resFont resources
-    renderSize (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
 
 instance RenderingContext Surface where
   type RenderingUnit Surface = Maybe Surface
