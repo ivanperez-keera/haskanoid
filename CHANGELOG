@@ -1,3 +1,9 @@
+2017-11-30 Christina Zeller <chriz@keera.co.uk>:
+        * Adjusts more levels.
+        * Changes result of powerup DestroyUp.
+        * Adds and displays name of a level.
+        * Adds a delay to level finished.
+
 2017-11-29 Christina Zeller <chriz@keera.co.uk>:
         * Adjusts levels
         * Adds property that powerups appear for every time that a block

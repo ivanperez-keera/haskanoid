@@ -51,6 +51,7 @@ import Physics.CollisionEngine
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.PhysicalObjects(Collision(..))
+import Debug.Trace
 
 -- Internal imports
 import Constants
@@ -142,7 +143,7 @@ loadLevel lives level pts time next = switch
 -- forever.
 levelLoading :: Int -> Int -> Int -> SF a GameState
 levelLoading lvs lvl pts = arr $ const $
-  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl
+  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl (levelName (levels !! lvl))
                                          , gameLevel  = lvl
                                          , gameLives  = lvs
                                          , gamePoints = pts
@@ -161,13 +162,15 @@ levelLoading lvs lvl pts = arr $ const $
 gameWithLives :: Int -> Int -> Int -> SF Controller GameState
 gameWithLives numLives level pts = dSwitch
   -- Run normal game until level is completed
-  (gamePlayOrPause numLives level pts >>> (arr id &&& isLevelCompleted))
+  (gamePlayOrPause numLives level pts >>> (arr id &&& isLevelCompleted'))
 
   -- Take last game state, extract basic info, and load the next level
   (\g -> let level' = level + 1
              lives' = gameLives  $ gameInfo g
              pts    = gamePoints $ gameInfo g
          in runLevel lives' level' pts)
+  where
+    isLevelCompleted' = isLevelCompleted >>> delay levelFinishedDelay NoEvent
 
 -- | Detect if the level is completed (ie. if there are no more blocks).
 isLevelCompleted :: SF GameState (Event GameState)
@@ -268,16 +271,16 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
    outputs       <- processMovement objs     -< inputs
    cols'         <- detectObjectCollisions   -< outputs
+
    hitBottom     <- collisionWithBottom      -< cols'
    hitDestroyUp  <- collisionDestroyUpPaddle -< cols'
-   hitLivesUps   <- collisionLivesUpsPaddle  -< cols'
-
    let hbod = hitBottomOrDestroyUp hitBottom hitDestroyUp
+
+   hitLivesUps   <- collisionLivesUpsPaddle  -< cols'
+   lvs'          <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
-
-   lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
    returnA -< ((objs', lvs', hbod, pts'), (objs', cols', pts'))
 
@@ -370,9 +373,12 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
             returnA -< (o, click `tag` objectPos (outputObject o))
 
         bounceAroundDetectMiss p = proc oi -> do
-            o    <- bouncingBall p initialBallVel -< oi
-            miss <- collisionWithBottom           -< collisions oi
-            returnA -< (o, miss) 
+            o            <- bouncingBall p initialBallVel -< oi
+            miss         <- collisionWithBottom           -< collisions oi
+            hitDestroyUp <- collisionDestroyUpPaddle      -< collisions oi
+
+            let hbod = lMerge miss hitDestroyUp
+            returnA -< (o, hbod) 
 
 -- | Fires an event when the ball *enters in* a collision with the
 -- bottom wall.

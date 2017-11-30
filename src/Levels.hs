@@ -32,6 +32,7 @@ data LevelSpec = LevelSpec
                 -- not signaling it.
  , levelBg    :: ImageResource  -- ^ Background image
  , levelMusic :: MusicResource  -- ^ Background music
+ , levelName  :: String
  }
 
 -- | Number of levels. Change this in the code to finish
@@ -41,7 +42,7 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m))
+levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m) "Awesome level")
   [ (blockDescS 0,  "data/level1.png", "data/level0.mp3")
   , (blockDescS 1,  "data/level1.png", "data/level1.mp3")
   , (blockDescS 2,  "data/level2.png", "data/level2.mp3")

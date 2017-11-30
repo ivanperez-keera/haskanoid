@@ -125,11 +125,11 @@ paintMessage screen resources status =
       message <- printSolid resources msg'
       renderAlignCenter screen message
   where
-    msg GamePlaying     = Nothing
-    msg GamePaused      = Just "Paused"
-    msg (GameLoading n) = Just ("Level " ++ show n)
-    msg GameOver        = Just "GAME OVER!!!"
-    msg GameFinished    = Just "You won!!! Well done :)"
+    msg GamePlaying          = Nothing
+    msg GamePaused           = Just "Paused"
+    msg (GameLoading n name) = Just ("Level " ++ name)
+    msg GameOver             = Just "GAME OVER!!!"
+    msg GameFinished         = Just "You won!!! Well done :)"
 
 -- | Paints a game object on a surface.
 paintObject :: Surface -> Resources -> Object -> IO ()

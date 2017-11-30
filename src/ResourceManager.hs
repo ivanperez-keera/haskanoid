@@ -123,9 +123,9 @@ loadNewResources mgr state = do
       oldResources = resources manager
 
   newResources <- case newState of
-                    (GameLoading _) | newState /= oldState
-                                    -> updateAllResources oldResources newState
-                    _               -> return oldResources
+                    (GameLoading {}) | newState /= oldState
+                                     -> updateAllResources oldResources newState
+                    _                -> return oldResources
 
   let manager' = ResourceManager { lastKnownStatus = newState
                                  , resources       = newResources
@@ -135,7 +135,7 @@ loadNewResources mgr state = do
   return newResources
 
 updateAllResources :: Resources -> GameStatus -> IO Resources
-updateAllResources res (GameLoading n) = do
+updateAllResources res (GameLoading n _) = do
   -- Load new music
   let newMusicFP' = _resourceFP $ levelMusic $ levels !! n
   newMusicFP <- getDataFileName newMusicFP'

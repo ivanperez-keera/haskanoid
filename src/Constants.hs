@@ -34,6 +34,9 @@ gameAreaMinLeftMargin = 25
 loadingDelay :: DTime
 loadingDelay = 2 -- seconds
       
+levelFinishedDelay :: DTime
+levelFinishedDelay = 4 -- seconds
+      
 -- restartDelay :: Time
 -- restartDelay = 3
 -- 
@@ -100,4 +103,4 @@ maxVNorm = 300
 -- | Initial level. Change this in the code to start
 -- from a different level.
 initialLevel :: Int
-initialLevel = 0
+initialLevel = 8
