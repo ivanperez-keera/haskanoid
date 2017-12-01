@@ -2,15 +2,15 @@
 module ResourceManager where
 
 import Data.IORef
-import Game.ResourceManager.IORef ()
-import Game.ResourceSpec
+import Game.Resource.Manager.IORef ()
+import Game.Resource.Spec
 
 import ResourceSpecs
 
 #ifdef sdl
-import Game.ResourceManager.SDL1 as SDLResourceMgr
+import Game.Resource.Manager.SDL1 as SDLResourceMgr
 #elif sdl2
-import Game.ResourceManager.SDL2 as SDLResourceMgr
+import Game.Resource.Manager.SDL2 as SDLResourceMgr
 #endif
 
 data ResourceId = IdGameFont

@@ -6,7 +6,7 @@ import FRP.Yampa            as Yampa
 
 import GamePlay
 import Input
-import Game.ResourceManager.Ref
+import Game.Resource.Manager.Ref
 
 #ifdef sdl
 import Display
