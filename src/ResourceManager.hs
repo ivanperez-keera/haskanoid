@@ -24,19 +24,23 @@ data ResourceId = IdGameFont
                 | IdPaddleImg
                 | IdPointsUpImg
                 | IdLivesUpImg
+                | IdNothingUpImg
+                | IdDestroyUpImg
   deriving (Ord, Eq)
 
 gameResourceSpec :: ResourceSpec ResourceId
 gameResourceSpec = ResourceSpec
-  { fonts  = [ (IdGameFont,    gameFontSpec) ]
-  , images = [ (IdBgImg,       initialBG)
-             , (IdBallImg,     ballImage)
-             , (IdBlock1Img,   block1Image)
-             , (IdBlock2Img,   block2Image)
-             , (IdBlock3Img,   block3Image)
-             , (IdPaddleImg,   paddleImage)
-             , (IdPointsUpImg, pointsUpImage)
-             , (IdLivesUpImg,  livesUpImage)
+  { fonts  = [ (IdGameFont,      gameFontSpec) ]
+  , images = [ (IdBgImg,         initialBG)
+             , (IdBallImg,       ballImage)
+             , (IdBlock1Img,     block1Image)
+             , (IdBlock2Img,     block2Image)
+             , (IdBlock3Img,     block3Image)
+             , (IdPaddleImg,     paddleImage)
+             , (IdPointsUpImg,   pointsUpImage)
+             , (IdLivesUpImg,    livesUpImage)
+             , (IdNothingUpImg,  nothingUpImage)
+             , (IdDestroyUpImg,  destroyUpImage)
              ]
   , sounds = [ (IdBlockHitFX, blockHitSFX) ]
   , colors = []

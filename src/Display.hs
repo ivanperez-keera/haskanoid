@@ -172,7 +172,7 @@ instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
 objectImage :: Object -> ResourceId
 objectImage object = case objectKind object of
   Paddle           -> IdPaddleImg
-  Block            -> let (BlockProps e _) = objectProperties object 
+  Block            -> let (BlockProps e _ _) = objectProperties object 
                       in case e of 
                            3 -> IdBlock1Img
                            2 -> IdBlock2Img
