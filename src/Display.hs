@@ -184,12 +184,13 @@ objectImage object = case objectKind object of
   PowerUp DestroyUp -> IdDestroyUpImg
 
 -- TODO: Change this ugly constraint.
-instance 
+instance  (
 #ifdef sdl
-  Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx
+  Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx,
 #elif sdl2
-  Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) ctx
+  Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) ctx,
 #endif
+  RenderingContext ctx)
   => Renderizable (ResourceMgr, String) ctx where
 
   renderTexture surface (resources, msg) = do
