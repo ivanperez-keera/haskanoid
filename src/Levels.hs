@@ -11,9 +11,9 @@
 -- Together they form 'levels'.
 module Levels where
 
-import Control.Arrow                    ((***), first)
+import Control.Arrow                    (first, (***))
 import Data.List                        (nub)
-import Game.AssetManager
+import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions
 
 import Constants
@@ -23,8 +23,8 @@ import Objects
 -- ** Level specification
 data LevelSpec = LevelSpec
  { blockCfgs  :: [(Pos2D, Int, Maybe PowerUpKind)] -- ^ Block positions, block lives and kind of powerups
- , levelBg    :: ImageResource  -- ^ Background image
- , levelMusic :: MusicResource  -- ^ Background music
+ , levelBg    :: ImageSpec  -- ^ Background image
+ , levelMusic :: MusicSpec  -- ^ Background music
  }
 
 -- | Number of levels. Change this in the code to finish
@@ -34,25 +34,25 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m))
-  [ (blockDescS 0,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 1,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 2,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 3,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 4,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 5,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 6,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 7,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 8,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 9,  "data/level0.png", "data/level1.mp3")
-  , (blockDescS 10, "data/level1.png", "data/level1.mp3")
-  , (blockDescS 11, "data/level2.png", "data/level2.mp3")
-  , (blockDescS 12, "data/level0.png", "data/level1.mp3")
-  , (blockDescS 13, "data/level1.png", "data/level1.mp3")
-  , (blockDescS 14, "data/level2.png", "data/level2.mp3")
-  , (blockDescS 15, "data/level1.png", "data/level0.mp3")
-  , (blockDescS 16, "data/level1.png", "data/level1.mp3")
-  , (blockDescS 17, "data/level2.png", "data/level2.mp3")
+levels = map (\(d,b,m) -> LevelSpec d b m)
+  [ (blockDescS 0,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 1,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 2,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 3,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 4,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 5,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 6,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 7,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 8,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 9,  ("data/level0.png", Nothing), "data/level1.mp3")
+  , (blockDescS 10, ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 11, ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 12, ("data/level0.png", Nothing), "data/level1.mp3")
+  , (blockDescS 13, ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 14, ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 15, ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 16, ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 17, ("data/level2.png", Nothing), "data/level2.mp3")
   ]
 
 -- | Level block specification (positions,lives of block, maybe powerup)

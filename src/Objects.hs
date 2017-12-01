@@ -24,16 +24,16 @@ type Objects = [Object]
 --
 -- The properties need to agree with the kind. The kind is necessary to
 -- avoid using string matching on the name to determine the object kind.
-data Object = Object { objectName           :: ObjectName
-                     , objectKind           :: ObjectKind
-                     , objectProperties     :: ObjectProperties
-                     , objectPos            :: Pos2D
-                     , objectVel            :: Vel2D
-                     , objectAcc            :: Acc2D
-                     , objectDead           :: Bool
-                     , objectHit            :: Bool
-                     , canCauseCollisions   :: Bool
-                     , collisionEnergy      :: Double
+data Object = Object { objectName           :: !ObjectName
+                     , objectKind           :: !ObjectKind
+                     , objectProperties     :: !ObjectProperties
+                     , objectPos            :: !Pos2D
+                     , objectVel            :: !Vel2D
+                     , objectAcc            :: !Acc2D
+                     , objectDead           :: !Bool
+                     , objectHit            :: !Bool
+                     , canCauseCollisions   :: !Bool
+                     , collisionEnergy      :: !Double
                      }
  deriving (Show)
 
@@ -49,11 +49,11 @@ data ObjectKind = Ball
   deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
-data ObjectProperties  = BallProps     Double -- radius?
-                       | PaddleProps   Size2D
-                       | BlockProps    BlockEnergy Size2D
-                       | SideProps     Side
-                       | PowerUpProps Size2D -- A powerup with a given size
+data ObjectProperties  = BallProps     !Double -- radius?
+                       | PaddleProps   !Size2D
+                       | BlockProps    !BlockEnergy !Size2D
+                       | SideProps     !Side
+                       | PowerUpProps  !Size2D -- A powerup with a given size
   deriving (Show,Eq)
 
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former

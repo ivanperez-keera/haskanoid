@@ -101,7 +101,6 @@ executable haskanoid
                        MissingH,
                        Yampa >= 0.9.6 && < 0.11,
                        IfElse,
-                       sage-assetmanager,
                        sage-data-extra,
                        sage-data-identity-list,
                        sage-physics-2d-rectangles,
