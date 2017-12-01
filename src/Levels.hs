@@ -12,8 +12,8 @@
 module Levels where
 
 import Control.Arrow                    ((***))
-import Data.List                        (nub,zip4)
-import Game.AssetManager
+import Data.List                        (nub, zip4)
+import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions
 
 import Constants
@@ -26,12 +26,12 @@ data LevelSpec = LevelSpec
                 -- ^ Block positions, block lives, kind of powerups,
                 -- and whether the block signals that it contains a powerup.
                 -- Note: SignalPowerUp is not logically related to the kind
-                -- of powerups and can be used to irritate the player.
+               -- of powerups and can be used to irritate the player.
                 -- For example, signalling that it contains a powerup, but 
                 -- the powerup kind is Nothing. Or containing a powerup, but
                 -- not signaling it.
- , levelBg    :: ImageResource  -- ^ Background image
- , levelMusic :: MusicResource  -- ^ Background music
+ , levelBg    :: ImageSpec  -- ^ Background image
+ , levelMusic :: MusicSpec  -- ^ Background music
  , levelName  :: String
  }
 
@@ -42,24 +42,24 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m) -> LevelSpec d (Resource b) (Resource m) "Awesome level")
-  [ (blockDescS 0,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 1,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 2,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 3,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 4,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 5,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 6,  "data/level1.png", "data/level0.mp3")
-  , (blockDescS 7,  "data/level1.png", "data/level1.mp3")
-  , (blockDescS 8,  "data/level2.png", "data/level2.mp3")
-  , (blockDescS 9,  "data/level0.png", "data/level1.mp3")
-  , (blockDescS 10, "data/level1.png", "data/level1.mp3")
-  , (blockDescS 11, "data/level2.png", "data/level2.mp3")
-  , (blockDescS 12, "data/level0.png", "data/level1.mp3")
-  , (blockDescS 13, "data/level1.png", "data/level1.mp3")
-  , (blockDescS 14, "data/level2.png", "data/level2.mp3")
-  , (blockDescS 15, "data/level1.png", "data/level0.mp3")
-  , (blockDescS 16, "data/level1.png", "data/level1.mp3")
+levels = map (\(d,b,m) -> LevelSpec d b m "Awesome level")
+  [ (blockDescS 0,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 1,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 2,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 3,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 4,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 5,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 6,  ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 7,  ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 8,  ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 9,  ("data/level0.png", Nothing), "data/level1.mp3")
+  , (blockDescS 10, ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 11, ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 12, ("data/level0.png", Nothing), "data/level1.mp3")
+  , (blockDescS 13, ("data/level1.png", Nothing), "data/level1.mp3")
+  , (blockDescS 14, ("data/level2.png", Nothing), "data/level2.mp3")
+  , (blockDescS 15, ("data/level1.png", Nothing), "data/level0.mp3")
+  , (blockDescS 16, ("data/level1.png", Nothing), "data/level1.mp3")
   ]
 
 -- | Level block specification (positions,lives of block, maybe powerup)

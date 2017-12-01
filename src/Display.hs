@@ -18,8 +18,8 @@ import Control.Monad.IfElse     (awhen)
 import Data.Word
 import FRP.Yampa.VectorSpace
 import Game.Render.Renderer     as Render
-import Game.ResourceManager.Ref (getResourceFont, getResourceImage,
-                                 prepareAllResources, tryGetResourceAudio)
+import Game.Resource.Manager.Ref (getResourceFont, getResourceImage,
+                                  prepareAllResources, tryGetResourceAudio)
 import Game.VisualElem
 import Graphics.UI.SDL          as SDL
 
