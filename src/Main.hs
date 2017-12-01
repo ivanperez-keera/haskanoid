@@ -1,11 +1,12 @@
 {-# LANGUAGE CPP #-}
-import Control.Applicative ((<$>))
+import Control.Applicative  ((<$>))
 import Control.Exception
 import Control.Monad.IfElse
-import FRP.Yampa as Yampa
+import FRP.Yampa            as Yampa
 
 import GamePlay
 import Input
+import Game.Resource.Manager.Ref
 
 #ifdef sdl
 import Display
@@ -13,15 +14,15 @@ import Graphics.UI.SDL.Clock
 #endif
 
 #ifdef sdl2
-import DisplaySDL2
+import Display
 import Game.Clock.SDL2
 #endif
 
 #ifdef ghcjs
-import Control.Concurrent
 import DisplayGHCJS
 import GHCJSNow
-import System.Mem
+-- import Control.Concurrent
+-- import System.Mem
 #endif
 
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
@@ -35,7 +36,7 @@ main = (`catchAny` print) $ do
 
   timeRef       <- initializeTimeRef
   controllerRef <- initializeInputDevices
-  res           <- loadResources
+  res           <- loadResources gameResourceSpec
 
   awhen res $ \res' -> do
     renderingCtx <- initGraphs res'
