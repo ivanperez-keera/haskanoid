@@ -51,6 +51,7 @@ import Physics.CollisionEngine
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.PhysicalObjects(Collision(..))
+import Debug.Trace
 
 -- Internal imports
 import Constants
@@ -142,7 +143,7 @@ loadLevel lives level pts time next = switch
 -- forever.
 levelLoading :: Int -> Int -> Int -> SF a GameState
 levelLoading lvs lvl pts = arr $ const $
-  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl
+  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl (levelName (levels !! lvl))
                                          , gameLevel  = lvl
                                          , gameLives  = lvs
                                          , gamePoints = pts
@@ -161,20 +162,23 @@ levelLoading lvs lvl pts = arr $ const $
 gameWithLives :: Int -> Int -> Int -> SF Controller GameState
 gameWithLives numLives level pts = dSwitch
   -- Run normal game until level is completed
-  (gamePlayOrPause numLives level pts >>> (arr id &&& isLevelCompleted))
+  (proc ctrl -> do
+     gState     <- gamePlayOrPause numLives level pts -< ctrl
+     gCompleted <- isLevelCompleted'                  -< gState
+     returnA -< (gState, gCompleted `tag` gState)
+  )
 
   -- Take last game state, extract basic info, and load the next level
   (\g -> let level' = level + 1
              lives' = gameLives  $ gameInfo g
              pts    = gamePoints $ gameInfo g
          in runLevel lives' level' pts)
+  where
+    isLevelCompleted' = isLevelCompleted >>> delay levelFinishedDelay NoEvent
 
 -- | Detect if the level is completed (ie. if there are no more blocks).
-isLevelCompleted :: SF GameState (Event GameState)
-isLevelCompleted = proc s -> do
-  over <- edge -< not $ any isBlock (gameObjects s)
-  let snapshot = over `tag` s
-  returnA -< snapshot
+isLevelCompleted :: SF GameState (Event ())
+isLevelCompleted = (not . any isBlock . gameObjects) ^>> edge
 
 -- ** Pausing
 
@@ -230,7 +234,7 @@ composeGameState lives level pts = futureDSwitch
 -- state.
 composeGameState' :: Int -> Int -> Int
                   -> SF (ObjectOutputs, Int, Event (), Int) (GameState, Event GameState)
-composeGameState' lives level pts = proc (oos,lives', dead, points) -> do
+composeGameState' lives level pts = proc (oos, lives', dead, points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
   let lives'' = lives + lives'
@@ -266,17 +270,20 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
    let inputs = ObjectInput userInput cols (map outputObject objs)
 
-   outputs      <- processMovement objs     -< inputs
-   cols'        <- detectObjectCollisions   -< outputs
-   hitBottom    <- collisionWithBottom      -< cols'
-   hitLivesUps <- collisionLivesUpsPaddle -< cols'
+   outputs           <- processMovement objs         -< inputs
+   cols'             <- detectObjectCollisions       -< outputs
+
+   hitBottom         <- collisionWithBottom          -< cols'
+   hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols'
+   let hbod = lMerge hitBottom hitDestroyBallUp
+
+   hitLivesUps       <- collisionLivesUpsPaddle      -< cols'
+   lvs'              <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
 
-   lvs' <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
-
-   returnA -< ((objs', lvs', hitBottom, pts'), (objs', cols', pts'))
+   returnA -< ((objs', lvs', hbod, pts'), (objs', cols', pts'))
 
  where
 
@@ -322,7 +329,7 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
-       createPowerUp (PowerUpDef puk pos sz) = powerUp puk pos sz
+       createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
 
 -- * Game objects
 --
@@ -362,9 +369,12 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
             returnA -< (o, click `tag` objectPos (outputObject o))
 
         bounceAroundDetectMiss p = proc oi -> do
-            o    <- bouncingBall p initialBallVel -< oi
-            miss <- collisionWithBottom           -< collisions oi
-            returnA -< (o, miss) 
+            o                <- bouncingBall p initialBallVel -< oi
+            miss             <- collisionWithBottom           -< collisions oi
+            hitDestroyBallUp <- collisionDestroyBallUpPaddle  -< collisions oi
+
+            let hbod = lMerge miss hitDestroyBallUp
+            returnA -< (o, hbod) 
 
 -- | Fires an event when the ball *enters in* a collision with the
 -- bottom wall.
@@ -373,6 +383,27 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 -- the event only take place once per collision.
 collisionWithBottom :: SF Collisions (Event ())
 collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> edge
+
+-- | Fires an event when the ball *enters in* a collision with the
+-- bottom wall.
+--
+-- NOTE: even if the overlap is not corrected, 'edge' makes
+-- the event only take place once per collision.
+collisionDestroyBallUpPaddle :: SF Collisions (Event ())
+collisionDestroyBallUpPaddle = proc cs -> do
+
+  -- Has the powerup been hit?
+  let hits :: Collisions
+      hits = filter (any (collisionObjectKind (PowerUp DestroyBallUp)) . collisionData) cs
+
+      paddleHits :: Collisions
+      paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
+
+      isHit :: Bool
+      isHit = not (null $ concatMap collisionData paddleHits)
+
+  dead <- edge -< isHit
+  returnA -< dead
 
 -- | Fires an event when a PowerUp LivesUp *enters in* a collision with the
 -- paddle.
@@ -586,8 +617,8 @@ yPosPaddle = gameHeight - paddleMargin
 -- which means that two simulatenously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
-objBlock :: (Pos2D, Int, Maybe PowerUpKind) -> Size2D -> ObjectSF
-objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
+objBlock :: (Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp) -> Size2D -> ObjectSF
+objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
@@ -611,22 +642,32 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
   dead <- edge -< isDead
   -- let isDead = False -- immortal blocks
 
-  -- If it's dead, does it create a 'powerup'?
+  -- If it's hit or dead, does it create a 'powerup'?
 
   let pukWidthHeight :: PowerUpKind -> (Double, Double)
       pukWidthHeight PointsUp = (pointsUpWidth, pointsUpHeight)
       pukWidthHeight LivesUp = (livesUpWidth, livesUpHeight)
+      pukWidthHeight MockUp = (mockUpWidth, mockUpHeight)
+      pukWidthHeight DestroyBallUp = (destroyBallUpWidth, destroyBallUpHeight)
 
-  let createPowerUpF :: Maybe PowerUpKind -> Event () -> Event PowerUpDef 
-      createPowerUpF (Just puk) dead = dead `tag` PowerUpDef puk (x,y) (pukWidthHeight puk)
-      createPowerUpF Nothing _       = noEvent
+  -- create powerup if event happens (hit or dead)
+  let createPowerUpF :: String -> PowerUpKind -> Event () -> Event PowerUpDef 
+      createPowerUpF idprefix puk event = event `tag` PowerUpDef idprefix puk (x,y) (pukWidthHeight puk)
 
-  let createPowerUp = createPowerUpF mpuk dead
+  -- first event input is hit, second is dead
+  let createPowerUpF' :: (String, Maybe (PowerUpKind, AlwaysPowerUp)) -> Event () -> Event () -> Event PowerUpDef
+      createPowerUpF' (idprefix, (Just (puk, True)))  hit _    = createPowerUpF idprefix puk hit
+      createPowerUpF' (idprefix, (Just (puk, False))) _   dead = createPowerUpF idprefix puk dead
+      createPowerUpF' (_, Nothing) _ _ = noEvent
+
+  t <- localTime -< ()
+
+  let createPowerUp = createPowerUpF' (show t, mpuk) hit dead
 
   returnA -< ObjectOutput 
                 Object{ objectName           = name
                       , objectKind           = Block
-                      , objectProperties     = BlockProps lives (w, h)
+                      , objectProperties     = BlockProps lives spu (w, h)
                       , objectPos            = (x,y)
                       , objectVel            = (0,0)
                       , objectAcc            = (0,0)
@@ -639,10 +680,10 @@ objBlock ((x,y), initlives, mpuk) (w,h) = proc (ObjectInput ci cs os) -> do
                createPowerUp
 
 -- *** Powerups
-powerUp :: PowerUpKind -> Pos2D -> Size2D -> ObjectSF
-powerUp puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+powerUp :: String -> PowerUpKind -> Pos2D -> Size2D -> ObjectSF
+powerUp idprefix puk (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
 
-  let name = "powerup" ++ show (x,y)
+  let name = idprefix ++ "powerup" ++ show (x,y)
 
   -- Has the powerup been hit?
   let hits :: Collisions

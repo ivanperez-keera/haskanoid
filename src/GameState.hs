@@ -57,7 +57,7 @@ neutralGameInfo = GameInfo
 -- changes presentation depending on the status.
 data GameStatus = GamePlaying
                 | GamePaused
-                | GameLoading Int
+                | GameLoading Int String
                 | GameOver
                 | GameFinished
                 | GameStarted

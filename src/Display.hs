@@ -24,7 +24,6 @@ import Game.Resource.Manager.Ref (getResourceColor, getResourceFont,
 import Game.VisualElem
 import Graphics.UI.SDL           as SDL
 
-
 import Constants
 import GameState
 import Objects
@@ -146,17 +145,20 @@ instance Renderizable (ResourceMgr, GameStatus) RealRenderingCtx where
     renderAlignCenter screen txt (x, y)
 
 statusMsg :: GameStatus -> Maybe String
-statusMsg GamePlaying     = Nothing
-statusMsg GamePaused      = Just "Paused"
-statusMsg (GameLoading n) = Just ("Level " ++ show n)
-statusMsg GameOver        = Just "GAME OVER!!!"
-statusMsg GameFinished    = Just "You won!!! Well done :)"
-statusMsg GameStarted     = Nothing
+statusMsg GamePlaying          = Nothing
+statusMsg GamePaused           = Just "Paused"
+statusMsg (GameLoading n name) = Just ("Level " ++ name)
+statusMsg GameOver             = Just "GAME OVER!!!"
+statusMsg GameFinished         = Just "You won!!! Well done :)"
+statusMsg GameStarted          = Nothing
 
 instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
+
   renderTexture r (res, obj) = do img <- getResourceImage res (objectImage obj) undefined
                                   renderTexture r img
-  renderSize       = return . (round *** round) . objectSize . snd
+
+  renderSize = return . (round *** round) . objectSize . snd
+
   render screen (resources, object) base =
     case objectKind object of
       (Side {}) -> return ()
@@ -169,15 +171,19 @@ instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
 -- Partial function. Object has image.
 objectImage :: Object -> ResourceId
 objectImage object = case objectKind object of
-  Paddle           -> IdPaddleImg
-  Block            -> let (BlockProps e _) = objectProperties object 
-                      in case e of 
-                           3 -> IdBlock1Img
-                           2 -> IdBlock2Img
-                           n -> IdBlock3Img
-  Ball             -> IdBallImg
-  PowerUp PointsUp -> IdPointsUpImg
-  PowerUp LivesUp  -> IdLivesUpImg
+  Paddle                -> IdPaddleImg
+  Block                 -> let (BlockProps e pu _) = objectProperties object 
+                           in case pu of
+                                True  -> IdBlockPuImg -- signals powerup
+                                False -> case e of 
+                                           3 -> IdBlock1Img
+                                           2 -> IdBlock2Img
+                                           n -> IdBlock3Img
+  Ball                  -> IdBallImg
+  PowerUp PointsUp      -> IdPointsUpImg
+  PowerUp LivesUp       -> IdLivesUpImg
+  PowerUp MockUp        -> IdMockUpImg
+  PowerUp DestroyBallUp -> IdDestroyBallUpImg
 
 -- -- TODO: Change this ugly constraint.
 instance  (

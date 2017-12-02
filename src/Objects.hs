@@ -24,44 +24,58 @@ type Objects = [Object]
 --
 -- The properties need to agree with the kind. The kind is necessary to
 -- avoid using string matching on the name to determine the object kind.
-data Object = Object { objectName           :: !ObjectName
-                     , objectKind           :: !ObjectKind
-                     , objectProperties     :: !ObjectProperties
-                     , objectPos            :: !Pos2D
-                     , objectVel            :: !Vel2D
-                     , objectAcc            :: !Acc2D
-                     , objectDead           :: !Bool
-                     , objectHit            :: !Bool
-                     , canCauseCollisions   :: !Bool
-                     , collisionEnergy      :: !Double
+data Object = Object { objectName           :: ObjectName
+                     , objectKind           :: ObjectKind
+                     , objectProperties     :: ObjectProperties
+                     , objectPos            :: Pos2D
+                     , objectVel            :: Vel2D
+                     , objectAcc            :: Acc2D
+                     , objectDead           :: Bool
+                     , objectHit            :: Bool
+                     , canCauseCollisions   :: Bool
+                     , collisionEnergy      :: Double
                      }
  deriving (Show)
 
 -- | Type for object id.
 type ObjectName = String
 
--- | The kind of object and any size properties.
+-- | The kind of object.
 data ObjectKind = Ball
                 | Paddle
                 | Block
                 | Side
-                | PowerUp PowerUpKind -- powerup
+                | PowerUp PowerUpKind 
   deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
-data ObjectProperties  = BallProps     !Double -- radius?
-                       | PaddleProps   !Size2D
-                       | BlockProps    !BlockEnergy !Size2D
-                       | SideProps     !Side
-                       | PowerUpProps  !Size2D -- A powerup with a given size
+data ObjectProperties  = BallProps     Double -- radius?
+                       | PaddleProps   Size2D
+                       | BlockProps    BlockEnergy SignalPowerUp Size2D
+                       | SideProps     Side
+                       | PowerUpProps  Size2D
   deriving (Show,Eq)
 
 -- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
 --   means "dead".
 type BlockEnergy = Int
 
--- | The kind of powerup: Either points or levels are powered up.
-data PowerUpKind = PointsUp | LivesUp
+-- | Indicates whether a block signals that it contains a powerup (True)
+--   or not (False).
+--
+--   Note: The signal is independent from the actual creating of powerups. 
+type SignalPowerUp = Bool 
+
+
+-- | Indicates whether a powerup is created everytime if the ball hits
+--   the block (True) or only when the block is "dead" (False).
+type AlwaysPowerUp = Bool
+
+-- | The kind of powerup:
+--   PointsUp and LivesUp add points and lives, respectively.
+--   MockUp does not add anything.
+--   DestroyBallUp destroys the ball (and therefore takes one life).
+data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
   deriving (Show,Eq)
 
 -- ** Distinguish objects by kind.
@@ -79,10 +93,10 @@ isPaddle o = case objectKind o of
 -- Partial function!
 objectSize :: Object -> Size2D
 objectSize object = case objectProperties object of
-  (PaddleProps sz)  -> sz
-  (BlockProps _ sz) -> sz
-  (BallProps r)     -> let w = 2*r in (w, w)
-  (PowerUpProps sz) -> sz
+  (PaddleProps sz  )  -> sz
+  (BlockProps _ _ sz) -> sz
+  (BallProps r)       -> let w = 2*r in (w, w)
+  (PowerUpProps sz)   -> sz
 
 -- Partial function. Object has size.
 objectTopLevelCorner :: Object -> Pos2D
@@ -111,7 +125,7 @@ objShape :: Object -> Shape
 objShape obj = case objectProperties obj of
   BallProps r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
   PaddleProps sz       -> Rectangle pos sz
-  BlockProps _ sz      -> Rectangle pos sz
+  BlockProps _ _ sz    -> Rectangle pos sz
   PowerUpProps sz      -> Rectangle pos sz
   SideProps TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
   SideProps LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
@@ -128,10 +142,10 @@ objShape obj = case objectProperties obj of
 type Collision  = P.Collision  (ObjectName, ObjectKind)
 type Collisions = P.Collisions (ObjectName, ObjectKind)
 
--- |Check if collision is with a given kind.
+-- | Check if collision is with a given kind.
 collisionObjectKind :: ObjectKind -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
 
--- |Check if collision is with a given id.
+-- | Check if collision is with a given id.
 collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectName on1 ((on2, _),_) = on1 == on2

@@ -34,6 +34,9 @@ gameAreaMinLeftMargin = 25
 loadingDelay :: DTime
 loadingDelay = 2 -- seconds
       
+levelFinishedDelay :: DTime
+levelFinishedDelay = 4 -- seconds
+      
 -- restartDelay :: Time
 -- restartDelay = 3
 -- 
@@ -59,10 +62,16 @@ blockSeparation :: Double
 blockSeparation = 10
 pointsUpWidth, pointsUpHeight :: Double
 pointsUpWidth = 30
-pointsUpHeight = 24
+pointsUpHeight = 30 
 livesUpWidth, livesUpHeight :: Double
 livesUpWidth = 30
 livesUpHeight = 27
+mockUpWidth, mockUpHeight :: Double
+mockUpWidth = 18
+mockUpHeight = 18
+destroyBallUpWidth, destroyBallUpHeight :: Double
+destroyBallUpWidth = 18
+destroyBallUpHeight = 18
 
 -- * Lives
 
