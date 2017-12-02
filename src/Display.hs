@@ -6,6 +6,7 @@
 {-# LANGUAGE MultiParamTypeClasses       #-}
 {-# LANGUAGE TypeSynonymInstances        #-}
 {-# LANGUAGE UndecidableInstances        #-}
+{-# LANGUAGE OverlappingInstances        #-}
 module Display
   ( module Display
   , module ResourceManager
@@ -15,13 +16,11 @@ module Display
 import Control.Arrow             ((***))
 import Control.Monad
 import Control.Monad.IfElse      (awhen)
-import Data.Word
 import FRP.Yampa.VectorSpace
 import Game.Render.Renderer      as Render
 import Game.Resource.Manager.Ref (getResourceColor, getResourceFont,
                                   getResourceImage, prepareAllResources,
                                   tryGetResourceAudio)
-import Game.VisualElem
 import Graphics.UI.SDL           as SDL
 
 import Constants
@@ -134,11 +133,15 @@ instance Renderizable (ResourceMgr, GameInfo) RealRenderingCtx where
    renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
 
 instance Renderizable (ResourceMgr, GameStatus) RealRenderingCtx where
-  renderTexture screen (resources, status) =
-    renderTexture screen (resources, statusMsg status)
+  renderTexture screen (resources, status) = do
+    case statusMsg status of
+      Nothing   -> return Nothing
+      Just msg' -> renderTexture screen (resources, msg')
 
-  renderSize (resources, status) =
-    renderSize (resources, statusMsg status)
+  renderSize (resources, status) = do
+    case statusMsg status of
+      Nothing   -> return (0, 0)
+      Just msg' -> renderSize (resources, msg')
 
   render screen txt (x, y) = do
     txt <- renderTexture screen txt
