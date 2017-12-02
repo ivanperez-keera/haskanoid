@@ -6,8 +6,7 @@
 {-# LANGUAGE TypeFamilies                #-}
 {-# LANGUAGE TypeSynonymInstances        #-}
 {-# LANGUAGE UndecidableInstances        #-}
-module RenderSDL1
-  where
+module RenderSDL1 where
 
 import Control.Monad
 import Data.Word
@@ -15,6 +14,9 @@ import Game.AssetManager.SDL1
 import Game.Render.Renderer   as Renderer
 import Graphics.UI.SDL        as SDL
 import Graphics.UI.SDL.TTF    as TTF
+import Game.Render.Monad
+import Control.Monad.Trans.Class (lift)
+import Control.Monad.Trans.Reader
 
 type RenderingCtx     = ()
 type RealRenderingCtx = Surface
@@ -22,28 +24,12 @@ type RealRenderingCtx = Surface
 getRealRenderingCtx :: RenderingCtx -> IO RealRenderingCtx
 getRealRenderingCtx () = getVideoSurface
 
-onRenderingCtx :: (RealRenderingCtx -> IO ()) -> RenderingCtx -> IO ()
-onRenderingCtx f ctx = do
-  screen <- getRealRenderingCtx ctx
-  f screen
-  SDL.flip screen
-
 instance Renderizable x Surface => Renderizable (Maybe x) Surface where
   renderTexture surface Nothing  = return Nothing
   renderTexture surface (Just x) = renderTexture surface x
   renderSize Nothing  = return (0, 0)
   renderSize (Just x) = renderSize x
 
-instance Renderizable (res, a) Surface => Renderizable (res, Maybe a) Surface where
-
-  renderTexture _surface (res, Nothing) = return Nothing
-  renderTexture surface  (res, Just x)  = renderTexture surface (res, x)
-  renderSize (resources, Nothing) = return (0, 0)
-  renderSize (resources, Just x)  = renderSize (resources, x)
-
-instance Renderizable (a, Image) Surface where
-  renderTexture ctx (resources, img) = renderTexture ctx img
-  renderSize (resources, img) = renderSize img
 
 instance Renderizable (TTF.Font, Color, String) Surface where
 
@@ -81,3 +67,22 @@ clearScreen screen (r,g,b) = do
 instance Renderizable Image Surface where
   renderTexture ctx img = renderTexture ctx (imgSurface img)
   renderSize img = renderSize (imgSurface img)
+
+instance RenderingContextC Surface where
+  type ColorT Surface = Color
+  type ImageT Surface = Surface
+  type FontT  Surface = TTF.Font
+  renderWith f = do
+    screen <- ask
+    f
+    lift $ SDL.flip screen
+
+instance Renderizable (Game.AssetManager.SDL1.Font, Color, String) Surface where
+
+  renderTexture ctx (font, color, msg) = do
+    let font' = unFont font
+    renderTexture ctx (font', color, msg)
+
+  renderSize (font, color, msg) = do
+    let font' = unFont font
+    renderSize (font', color, msg)

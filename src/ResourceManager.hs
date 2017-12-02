@@ -38,15 +38,15 @@ gameResourceSpec = ResourceSpec
              , (IdBlock1Img,        block1Image)
              , (IdBlock2Img,        block2Image)
              , (IdBlock3Img,        block3Image)
-             , (IdBlockPuImg,        blockPuImage)
+             , (IdBlockPuImg,       blockPuImage)
              , (IdPaddleImg,        paddleImage)
              , (IdPointsUpImg,      pointsUpImage)
              , (IdLivesUpImg,       livesUpImage)
              , (IdMockUpImg,        mockUpImage)
              , (IdDestroyBallUpImg, destroyBallUpImage)
              ]
-  , sounds = [ (IdBlockHitFX, blockHitSFX) ]
-  , colors = [ (IdGameFontColor, fontColor) ]
+  , sounds = [ (IdBlockHitFX,       blockHitSFX) ]
+  , colors = [ (IdGameFontColor,    fontColor) ]
   }
 
 type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId

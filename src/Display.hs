@@ -1,28 +1,25 @@
 {-# OPTIONS_GHC -fno-warn-orphans        #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 {-# LANGUAGE CPP                         #-}
-{-# LANGUAGE FlexibleContexts            #-}
-{-# LANGUAGE FlexibleInstances           #-}
-{-# LANGUAGE MultiParamTypeClasses       #-}
-{-# LANGUAGE TypeSynonymInstances        #-}
-{-# LANGUAGE UndecidableInstances        #-}
-{-# LANGUAGE OverlappingInstances        #-}
 module Display
   ( module Display
   , module ResourceManager
   )
   where
 
-import Control.Arrow             ((***))
+import Control.Arrow              ((***))
 import Control.Monad
-import Control.Monad.IfElse      (awhen)
+import Control.Monad.IfElse       (awhen)
+import Control.Monad.Trans.Reader
+import Data.Maybe
 import FRP.Yampa.VectorSpace
 import Game.Render.Monad
-import Game.Render.Renderer      as Render
-import Game.Resource.Manager.Ref (getResourceColor, getResourceFont,
-                                  getResourceImage, prepareAllResources,
-                                  tryGetResourceAudio)
-import Graphics.UI.SDL           as SDL
+import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceAudio)
+import Game.VisualElem
+import Game.VisualElem.Render
+import Graphics.UI.Align
+import Graphics.UI.Collage
+import Graphics.UI.SDL            as SDL hiding (flip)
 
 import Constants
 import GameState
@@ -31,20 +28,18 @@ import ResourceManager
 
 #ifdef sdl
 
-import Game.AssetManager.SDL1
 import Game.Audio.SDL
-import Graphics.UI.SDL.TTF.Types as TTF
 
 import RenderSDL1
 
 #elif sdl2
-import Game.AssetManager.SDL2
 import Game.Audio.SDL2
-import Graphics.UI.SDL.TTF.Types as TTF
 
-import RenderSDL2
 import Game.Render.Renderer.SDL2 ()
 import Game.Render.Monad.SDL2    ()
+
+type RealRenderingCtx = (Renderer, Window)
+type RenderingCtx     = (Renderer, Window)
 #endif
 
 -- * Initialization
@@ -88,7 +83,7 @@ initGraphs mgr = do
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
   audio   resourceManager shownState
-  display (resourceManager, shownState) ctx
+  display resourceManager shownState =<< getRealRenderingCtx ctx
 
 -- ** Audio
 
@@ -109,46 +104,40 @@ audioObject resourceManager object = when (objectHit object) $
     _     -> return ()
 
 -- ** Visual rendering
-display :: Renderizable a RealRenderingCtx => a -> RenderingCtx -> IO ()
-display a = onRenderingCtx $ \ctx -> 
-  Render.render ctx a (0, 0)
+-- TODO: Uses undefined for rendering context, should get from Main
+display :: ResourceMgr -> GameState -> RealRenderingCtx -> IO ()
+display resourceManager shownState = onRenderingCtx $ \ctx -> 
+  flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
+    [ bgItem, levelTxt, pointsTxt, livesTxt ] ++ mStatusTxt ++ objItems
+  where
+    -- Background
+    bgItem     = CollageItem (VisualImage IdBgImg)
+                             (const ((0, 0), Align HLeft VTop))
+    -- HUD
+    levelTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Level: "  ++ show (gameLevel over)))
+                             (const ((10, 10), Align HLeft  VTop))
+    pointsTxt  = CollageItem (VisualText IdGameFont IdGameFontColor ("Points: " ++ show (gamePoints over)))
+                             (const ((10, 40), Align HLeft  VTop))
+    livesTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Lives: "  ++ show (gameLives over)))
+                             (const ((10, 40), Align HRight VTop))
+    -- Game status
+    mStatusTxt = [ CollageItem (VisualText IdGameFont IdGameFontColor msg)
+                               (const ((0, 0), Align HCenter VCenter))
+                 | isJust (statusMsg status), let msg = fromJust (statusMsg status) ]
 
-instance Renderizable (ResourceMgr, GameState) RealRenderingCtx where
-  render screen (resources, shownState) (baseX, baseY) = do
+    -- Game objectsj
+    objItems   = map objItem (gameObjects shownState)
+    objItem object =
+      case objectKind object of
+        (Side {}) -> CollageItems []
+        other     -> let objPos = objectTopLevelCorner object 
+                         pos    = (round *** round) (objPos^+^ (gameLeft, gameTop))
+                     in  CollageItem (VisualImage (objectImage object))
+                                     (const (pos, Align HLeft VTop))
 
-    -- Render background
-    img <- getResourceImage resources IdBgImg undefined
-    Render.render screen (resources, img) (0, 0)
+    over   = gameInfo shownState
+    status = gameStatus over
 
-    Render.render screen (resources, gameInfo shownState) (0, 0)
-    Render.render screen (resources, gameStatus (gameInfo shownState)) (gameLeft, gameTop)
-    mapM_ (\obj -> Render.render screen (resources, obj) (gameLeft, gameTop)) $ gameObjects shownState
-
-instance Renderizable (ResourceMgr, GameInfo) RealRenderingCtx where
-
- -- Paint HUD
- render ctx (resources, over) (baseX, baseY) = do
-   let message1 = (resources, "Level: " ++ show (gameLevel over))
-   h1 <- renderHeight message1
-
-   renderAlignLeft  ctx message1                                          (10, 10)
-   renderAlignLeft  ctx (resources, "Points: " ++ show (gamePoints over)) (10, 10 + h1 + 5)
-   renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
-
-instance Renderizable (ResourceMgr, GameStatus) RealRenderingCtx where
-  renderTexture screen (resources, status) =
-    case statusMsg status of
-      Nothing   -> return Nothing
-      Just msg' -> renderTexture screen (resources, msg')
-
-  renderSize (resources, status) =
-    case statusMsg status of
-      Nothing   -> return (0, 0)
-      Just msg' -> renderSize (resources, msg')
-
-  render screen txt (x, y) = do
-    txt <- renderTexture screen txt
-    renderAlignCenter screen txt (x, y)
 
 statusMsg :: GameStatus -> Maybe String
 statusMsg GamePlaying          = Nothing
@@ -157,22 +146,6 @@ statusMsg (GameLoading n name) = Just ("Level " ++ name)
 statusMsg GameOver             = Just "GAME OVER!!!"
 statusMsg GameFinished         = Just "You won!!! Well done :)"
 statusMsg GameStarted          = Nothing
-
-instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
-
-  renderTexture r (res, obj) = do img <- getResourceImage res (objectImage obj) undefined
-                                  renderTexture r img
-
-  renderSize = return . (round *** round) . objectSize . snd
-
-  render screen (resources, object) base =
-    case objectKind object of
-      (Side {}) -> return ()
-      other     -> do tex <- renderTexture screen (resources, object)
-                      Render.render screen tex (x,y)
-
-    where (x,y) = (round *** round) (objectTopLevelCorner object ^+^ base')
-          base' = (fromIntegral *** fromIntegral) base
 
 -- Partial function. Object has image.
 objectImage :: Object -> ResourceId
@@ -190,23 +163,3 @@ objectImage object = case objectKind object of
   PowerUp LivesUp       -> IdLivesUpImg
   PowerUp MockUp        -> IdMockUpImg
   PowerUp DestroyBallUp -> IdDestroyBallUpImg
-
--- -- TODO: Change this ugly constraint.
-instance  (
-#ifdef sdl
-  Renderizable (TTF.Font, Color, String) ctx,
-#elif sdl2
-  Renderizable (TTF.TTFFont, Color, String) ctx,
-#endif
-  RenderingContext ctx)
-  => Renderizable (ResourceMgr, String) ctx where
-
-  renderTexture surface (resources, msg) = do
-    font  <- unFont <$> getResourceFont resources IdGameFont undefined
-    color <- getResourceColor resources IdGameFontColor undefined
-    renderTexture surface (font, color, msg)
-
-  renderSize (resources, msg) = do
-    font  <- unFont <$> getResourceFont resources IdGameFont undefined
-    color <- getResourceColor resources IdGameFontColor undefined
-    renderSize (font, color, msg)
