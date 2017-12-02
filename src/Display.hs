@@ -17,6 +17,7 @@ import Control.Arrow             ((***))
 import Control.Monad
 import Control.Monad.IfElse      (awhen)
 import FRP.Yampa.VectorSpace
+import Game.Render.Monad
 import Game.Render.Renderer      as Render
 import Game.Resource.Manager.Ref (getResourceColor, getResourceFont,
                                   getResourceImage, prepareAllResources,
@@ -26,7 +27,7 @@ import Graphics.UI.SDL           as SDL
 import Constants
 import GameState
 import Objects
-import ResourceManager as ResourceManager
+import ResourceManager
 
 #ifdef sdl
 
@@ -42,6 +43,8 @@ import Game.Audio.SDL2
 import Graphics.UI.SDL.TTF.Types as TTF
 
 import RenderSDL2
+import Game.Render.Renderer.SDL2 ()
+import Game.Render.Monad.SDL2    ()
 #endif
 
 -- * Initialization
@@ -71,7 +74,7 @@ initGraphs _mgr = do
 
 initGraphs mgr = do
   -- Create window
-  (window,renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
+  (window, renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
   renderSetLogicalSize renderer width height
 
   prepareAllResources mgr renderer
@@ -102,7 +105,7 @@ audioObject :: ResourceMgr -> Object -> IO ()
 audioObject resourceManager object = when (objectHit object) $
   case objectKind object of
     Block -> do bhit <- tryGetResourceAudio resourceManager IdBlockHitFX undefined
-                awhen bhit $ playFile
+                awhen bhit playFile
     _     -> return ()
 
 -- ** Visual rendering
@@ -133,12 +136,12 @@ instance Renderizable (ResourceMgr, GameInfo) RealRenderingCtx where
    renderAlignRight ctx (resources, "Lives: "  ++ show (gameLives over))  (10, 10)
 
 instance Renderizable (ResourceMgr, GameStatus) RealRenderingCtx where
-  renderTexture screen (resources, status) = do
+  renderTexture screen (resources, status) =
     case statusMsg status of
       Nothing   -> return Nothing
       Just msg' -> renderTexture screen (resources, msg')
 
-  renderSize (resources, status) = do
+  renderSize (resources, status) =
     case statusMsg status of
       Nothing   -> return (0, 0)
       Just msg' -> renderSize (resources, msg')
