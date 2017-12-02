@@ -15,51 +15,42 @@ import Graphics.UI.SDL.TTF       as TTF
 import Graphics.UI.SDL.TTF.Types as TTF
 
 type RenderingCtx     = (Renderer, Window)
-type RealRenderingCtx = Renderer
+type RealRenderingCtx = RenderingCtx
 
-getRealRenderingCtx :: RenderingCtx -> IO RealRenderingCtx
-getRealRenderingCtx (ctx, window) = return ctx
-
-onRenderingCtx :: (RealRenderingCtx -> IO ()) -> RenderingCtx -> IO ()
+onRenderingCtx :: (RenderingCtx -> IO ()) -> RenderingCtx -> IO ()
 onRenderingCtx f (rdr, window) = do
   SDL.showWindow window
 
-  f rdr
+  f (rdr, window)
 
   -- Double buffering
   SDL.renderPresent rdr
 
-instance Renderizable x Renderer => Renderizable (Maybe x) Renderer where
-  renderTexture renderer Nothing  = return Nothing
-  renderTexture renderer (Just x) = renderTexture renderer x
-  renderSize Nothing  = return (0, 0)
-  renderSize (Just x) = renderSize x
-
-instance Renderizable (res, a) Renderer => Renderizable (res, Maybe a) Renderer where
+instance Renderizable (res, a) (Renderer, Window) => Renderizable (res, Maybe a) (Renderer, Window) where
 
   renderTexture _surface (res, Nothing) = return Nothing
   renderTexture surface  (res, Just x)  = renderTexture surface (res, x)
   renderSize (resources, Nothing) = return (0, 0)
   renderSize (resources, Just x)  = renderSize (resources, x)
 
-instance Renderizable (a, Image) Renderer where
+instance Renderizable (a, Image) (Renderer, Window) where
   renderTexture ctx (resources, img) = renderTexture ctx img
   renderSize (resources, img) = renderSize img
 
-instance Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) Renderer where
+-- instance Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) (Renderer, Window) where
+-- 
+--   renderTexture renderer (font, msg, (r,g,b)) = do
+--     message <- TTF.renderTextSolid font msg (SDL.Color r g b 255)
+--     txt     <- createTextureFromSurface renderer message
+--     return $ Just txt
+-- 
+--   renderSize (font, msg, (r, g, b)) = do
+--     message <- TTF.renderTextSolid font msg (SDL.Color r g b 255)
+--     let w = surfaceGetWidth message
+--         h = surfaceGetHeight message
+--     return (w, h)
 
-  renderTexture renderer (font, msg, (r,g,b)) = do
-    message <- TTF.renderTextSolid font msg (SDL.Color r g b 255)
-    txt     <- createTextureFromSurface renderer message
-    return $ Just txt
-
-  renderSize (font, msg, (r, g, b)) = do
-    message <- TTF.renderTextSolid font msg (SDL.Color r g b 255)
-    let w = surfaceGetWidth message
-        h = surfaceGetHeight message
-    return (w, h)
-
-instance Renderizable (Texture, Surface) Renderer where
+instance Renderizable (Texture, Surface) (Renderer, Window) where
   renderTexture r  = renderTexture r . fst
   renderSize       = renderSize . fst
   render screen (texture, _surface) base =

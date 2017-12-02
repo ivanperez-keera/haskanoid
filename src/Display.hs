@@ -12,16 +12,17 @@ module Display
   )
   where
 
-import Control.Arrow            ((***))
+import Control.Arrow             ((***))
 import Control.Monad
-import Control.Monad.IfElse     (awhen)
+import Control.Monad.IfElse      (awhen)
 import Data.Word
 import FRP.Yampa.VectorSpace
-import Game.Render.Renderer     as Render
-import Game.Resource.Manager.Ref (getResourceFont, getResourceImage,
-                                  prepareAllResources, tryGetResourceAudio)
+import Game.Render.Renderer      as Render
+import Game.Resource.Manager.Ref (getResourceColor, getResourceFont,
+                                  getResourceImage, prepareAllResources,
+                                  tryGetResourceAudio)
 import Game.VisualElem
-import Graphics.UI.SDL          as SDL
+import Graphics.UI.SDL           as SDL
 
 
 import Constants
@@ -178,20 +179,22 @@ objectImage object = case objectKind object of
   PowerUp PointsUp -> IdPointsUpImg
   PowerUp LivesUp  -> IdLivesUpImg
 
--- TODO: Change this ugly constraint.
+-- -- TODO: Change this ugly constraint.
 instance  (
 #ifdef sdl
-  Renderizable (TTF.Font, String, (Word8, Word8, Word8)) ctx,
+  Renderizable (TTF.Font, Color, String) ctx,
 #elif sdl2
-  Renderizable (TTF.TTFFont, String, (Word8, Word8, Word8)) ctx,
+  Renderizable (TTF.TTFFont, Color, String) ctx,
 #endif
   RenderingContext ctx)
   => Renderizable (ResourceMgr, String) ctx where
 
   renderTexture surface (resources, msg) = do
     font <- unFont <$> getResourceFont resources IdGameFont undefined
-    renderTexture surface (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
+    color <- getResourceColor resources IdGameFontColor undefined
+    renderTexture surface (font, color, msg)
 
   renderSize (resources, msg) = do
-    font <- unFont <$> getResourceFont resources IdGameFont undefined
-    renderSize (font, msg, (128 :: Word8, 128 :: Word8, 128 :: Word8))
+    font  <- unFont <$> getResourceFont resources IdGameFont undefined
+    color <- getResourceColor resources IdGameFontColor undefined
+    renderSize (font, color, msg)

@@ -14,6 +14,7 @@ import Game.Resource.Manager.SDL2 as SDLResourceMgr
 #endif
 
 data ResourceId = IdGameFont
+                | IdGameFontColor
                 | IdBgMusic
                 | IdBlockHitFX
                 | IdBgImg
@@ -39,7 +40,7 @@ gameResourceSpec = ResourceSpec
              , (IdLivesUpImg, livesUpImage)
              ]
   , sounds = [ (IdBlockHitFX, blockHitSFX) ]
-  , colors = []
+  , colors = [ (IdGameFontColor, fontColor) ]
   }
 
 type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
