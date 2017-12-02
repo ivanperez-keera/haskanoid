@@ -45,14 +45,14 @@ instance Renderizable (a, Image) Surface where
   renderTexture ctx (resources, img) = renderTexture ctx img
   renderSize (resources, img) = renderSize img
 
-instance Renderizable (TTF.Font, String, (Word8, Word8, Word8)) Surface where
+instance Renderizable (TTF.Font, Color, String) Surface where
 
-  renderTexture _surface (font, msg, (r,g,b)) = do
-    message <- TTF.renderTextSolid font msg (SDL.Color r g b)
+  renderTexture _surface (font, color, msg) = do
+    message <- TTF.renderTextSolid font msg color
     return $ Just message
 
-  renderSize (font, msg, (r, g, b)) = do
-    message <- TTF.renderTextSolid font msg (SDL.Color r g b)
+  renderSize (font, color, msg) = do
+    message <- TTF.renderTextSolid font msg color
     let w = surfaceGetWidth message
         h = surfaceGetHeight message
     return (w, h)

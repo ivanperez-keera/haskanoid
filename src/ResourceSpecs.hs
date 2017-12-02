@@ -39,7 +39,7 @@ pointsUpImage       :: ImageSpec
 #ifdef sdl
 pointsUpImage       = ("data/diamond2.png", Just (0, 255, 0))
 #elif sdl2
-pointsUpImage       = ("data/diamond2-alpha.png", Nothing)
+pointsUpImage       = ("data/diamond-alpha.png", Nothing)
 #endif
 
 livesUpImage       :: ImageSpec

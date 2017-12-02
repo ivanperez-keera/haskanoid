@@ -196,7 +196,7 @@ instance  (
   => Renderizable (ResourceMgr, String) ctx where
 
   renderTexture surface (resources, msg) = do
-    font <- unFont <$> getResourceFont resources IdGameFont undefined
+    font  <- unFont <$> getResourceFont resources IdGameFont undefined
     color <- getResourceColor resources IdGameFontColor undefined
     renderTexture surface (font, color, msg)
 
