@@ -23,7 +23,6 @@ import Game.Resource.Manager.Ref (getResourceFont, getResourceImage,
 import Game.VisualElem
 import Graphics.UI.SDL          as SDL
 
-
 import Constants
 import GameState
 import Objects
@@ -171,17 +170,19 @@ instance Renderizable (ResourceMgr, Object) RealRenderingCtx where
 -- Partial function. Object has image.
 objectImage :: Object -> ResourceId
 objectImage object = case objectKind object of
-  Paddle           -> IdPaddleImg
-  Block            -> let (BlockProps e _ _) = objectProperties object 
-                      in case e of 
-                           3 -> IdBlock1Img
-                           2 -> IdBlock2Img
-                           n -> IdBlock3Img
-  Ball             -> IdBallImg
-  PowerUp PointsUp -> IdPointsUpImg
-  PowerUp LivesUp  -> IdLivesUpImg
-  PowerUp NothingUp -> IdNothingUpImg
-  PowerUp DestroyUp -> IdDestroyUpImg
+  Paddle                -> IdPaddleImg
+  Block                 -> let (BlockProps e pu _) = objectProperties object 
+                           in case pu of
+                                True  -> IdBlockPuImg -- signals powerup
+                                False -> case e of 
+                                           3 -> IdBlock1Img
+                                           2 -> IdBlock2Img
+                                           n -> IdBlock3Img
+  Ball                  -> IdBallImg
+  PowerUp PointsUp      -> IdPointsUpImg
+  PowerUp LivesUp       -> IdLivesUpImg
+  PowerUp MockUp        -> IdMockUpImg
+  PowerUp DestroyBallUp -> IdDestroyBallUpImg
 
 -- TODO: Change this ugly constraint.
 instance  (

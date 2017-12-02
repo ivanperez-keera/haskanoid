@@ -66,12 +66,12 @@ pointsUpHeight = 30
 livesUpWidth, livesUpHeight :: Double
 livesUpWidth = 30
 livesUpHeight = 27
-nothingUpWidth, nothingUpHeight :: Double
-nothingUpWidth = 18
-nothingUpHeight = 18
-destroyUpWidth, destroyUpHeight :: Double
-destroyUpWidth = 18
-destroyUpHeight = 18
+mockUpWidth, mockUpHeight :: Double
+mockUpWidth = 18
+mockUpHeight = 18
+destroyBallUpWidth, destroyBallUpHeight :: Double
+destroyBallUpWidth = 18
+destroyBallUpHeight = 18
 
 -- * Lives
 
@@ -103,4 +103,4 @@ maxVNorm = 300
 -- | Initial level. Change this in the code to start
 -- from a different level.
 initialLevel :: Int
-initialLevel = 8
+initialLevel = 0

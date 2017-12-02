@@ -21,26 +21,28 @@ data ResourceId = IdGameFont
                 | IdBlock1Img
                 | IdBlock2Img
                 | IdBlock3Img
+                | IdBlockPuImg
                 | IdPaddleImg
                 | IdPointsUpImg
                 | IdLivesUpImg
-                | IdNothingUpImg
-                | IdDestroyUpImg
+                | IdMockUpImg
+                | IdDestroyBallUpImg
   deriving (Ord, Eq)
 
 gameResourceSpec :: ResourceSpec ResourceId
 gameResourceSpec = ResourceSpec
-  { fonts  = [ (IdGameFont,      gameFontSpec) ]
-  , images = [ (IdBgImg,         initialBG)
-             , (IdBallImg,       ballImage)
-             , (IdBlock1Img,     block1Image)
-             , (IdBlock2Img,     block2Image)
-             , (IdBlock3Img,     block3Image)
-             , (IdPaddleImg,     paddleImage)
-             , (IdPointsUpImg,   pointsUpImage)
-             , (IdLivesUpImg,    livesUpImage)
-             , (IdNothingUpImg,  nothingUpImage)
-             , (IdDestroyUpImg,  destroyUpImage)
+  { fonts  = [ (IdGameFont,         gameFontSpec) ]
+  , images = [ (IdBgImg,            initialBG)
+             , (IdBallImg,          ballImage)
+             , (IdBlock1Img,        block1Image)
+             , (IdBlock2Img,        block2Image)
+             , (IdBlock3Img,        block3Image)
+             , (IdBlockPuImg,        blockPuImage)
+             , (IdPaddleImg,        paddleImage)
+             , (IdPointsUpImg,      pointsUpImage)
+             , (IdLivesUpImg,       livesUpImage)
+             , (IdMockUpImg,        mockUpImage)
+             , (IdDestroyBallUpImg, destroyBallUpImage)
              ]
   , sounds = [ (IdBlockHitFX, blockHitSFX) ]
   , colors = []

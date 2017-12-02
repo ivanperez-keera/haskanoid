@@ -162,7 +162,11 @@ levelLoading lvs lvl pts = arr $ const $
 gameWithLives :: Int -> Int -> Int -> SF Controller GameState
 gameWithLives numLives level pts = dSwitch
   -- Run normal game until level is completed
-  (gamePlayOrPause numLives level pts >>> (arr id &&& isLevelCompleted'))
+  (proc ctrl -> do
+     gState     <- gamePlayOrPause numLives level pts -< ctrl
+     gCompleted <- isLevelCompleted'                  -< gState
+     returnA -< (gState, gCompleted `tag` gState)
+  )
 
   -- Take last game state, extract basic info, and load the next level
   (\g -> let level' = level + 1
@@ -173,11 +177,8 @@ gameWithLives numLives level pts = dSwitch
     isLevelCompleted' = isLevelCompleted >>> delay levelFinishedDelay NoEvent
 
 -- | Detect if the level is completed (ie. if there are no more blocks).
-isLevelCompleted :: SF GameState (Event GameState)
-isLevelCompleted = proc s -> do
-  over <- edge -< not $ any isBlock (gameObjects s)
-  let snapshot = over `tag` s
-  returnA -< snapshot
+isLevelCompleted :: SF GameState (Event ())
+isLevelCompleted = (not . any isBlock . gameObjects) ^>> edge
 
 -- ** Pausing
 
@@ -269,15 +270,15 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
    let inputs = ObjectInput userInput cols (map outputObject objs)
 
-   outputs       <- processMovement objs     -< inputs
-   cols'         <- detectObjectCollisions   -< outputs
+   outputs           <- processMovement objs         -< inputs
+   cols'             <- detectObjectCollisions       -< outputs
 
-   hitBottom     <- collisionWithBottom      -< cols'
-   hitDestroyUp  <- collisionDestroyUpPaddle -< cols'
-   let hbod = hitBottomOrDestroyUp hitBottom hitDestroyUp
+   hitBottom         <- collisionWithBottom          -< cols'
+   hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols'
+   let hbod = lMerge hitBottom hitDestroyBallUp
 
-   hitLivesUps   <- collisionLivesUpsPaddle  -< cols'
-   lvs'          <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
+   hitLivesUps       <- collisionLivesUpsPaddle      -< cols'
+   lvs'              <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
 
    let objs' = elemsIL outputs
        pts'  = pts + countPoints cols'
@@ -330,11 +331,6 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        createPowerUp :: PowerUpDef -> ObjectSF
        createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
 
-       -- Hit bottom or catched a PowerUp DestroyUp
-       hitBottomOrDestroyUp :: Event () -> Event () -> Event ()
-       hitBottomOrDestroyUp NoEvent NoEvent = NoEvent
-       hitBottomOrDestroyUp _ _ = Event ()
-
 -- * Game objects
 --
 -- | Objects initially present: the walls, the ball, the paddle and the blocks.
@@ -373,11 +369,11 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
             returnA -< (o, click `tag` objectPos (outputObject o))
 
         bounceAroundDetectMiss p = proc oi -> do
-            o            <- bouncingBall p initialBallVel -< oi
-            miss         <- collisionWithBottom           -< collisions oi
-            hitDestroyUp <- collisionDestroyUpPaddle      -< collisions oi
+            o                <- bouncingBall p initialBallVel -< oi
+            miss             <- collisionWithBottom           -< collisions oi
+            hitDestroyBallUp <- collisionDestroyBallUpPaddle  -< collisions oi
 
-            let hbod = lMerge miss hitDestroyUp
+            let hbod = lMerge miss hitDestroyBallUp
             returnA -< (o, hbod) 
 
 -- | Fires an event when the ball *enters in* a collision with the
@@ -393,12 +389,12 @@ collisionWithBottom = inCollisionWith ("ball", Ball) ("bottomWall", Side) ^>> ed
 --
 -- NOTE: even if the overlap is not corrected, 'edge' makes
 -- the event only take place once per collision.
-collisionDestroyUpPaddle :: SF Collisions (Event ())
-collisionDestroyUpPaddle = proc cs -> do
+collisionDestroyBallUpPaddle :: SF Collisions (Event ())
+collisionDestroyBallUpPaddle = proc cs -> do
 
   -- Has the powerup been hit?
   let hits :: Collisions
-      hits = filter (any (collisionObjectKind (PowerUp DestroyUp)) . collisionData) cs
+      hits = filter (any (collisionObjectKind (PowerUp DestroyBallUp)) . collisionData) cs
 
       paddleHits :: Collisions
       paddleHits = filter (any (collisionObjectKind Paddle) . collisionData) hits
@@ -651,8 +647,8 @@ objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
   let pukWidthHeight :: PowerUpKind -> (Double, Double)
       pukWidthHeight PointsUp = (pointsUpWidth, pointsUpHeight)
       pukWidthHeight LivesUp = (livesUpWidth, livesUpHeight)
-      pukWidthHeight NothingUp = (nothingUpWidth, nothingUpHeight)
-      pukWidthHeight DestroyUp = (destroyUpWidth, destroyUpHeight)
+      pukWidthHeight MockUp = (mockUpWidth, mockUpHeight)
+      pukWidthHeight DestroyBallUp = (destroyBallUpWidth, destroyBallUpHeight)
 
   -- create powerup if event happens (hit or dead)
   let createPowerUpF :: String -> PowerUpKind -> Event () -> Event PowerUpDef 

@@ -45,7 +45,7 @@ data ObjectKind = Ball
                 | Paddle
                 | Block
                 | Side
-                | PowerUp PowerUpKind -- powerup
+                | PowerUp PowerUpKind 
   deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
@@ -71,8 +71,11 @@ type SignalPowerUp = Bool
 --   the block (True) or only when the block is "dead" (False).
 type AlwaysPowerUp = Bool
 
--- | The kind of powerup: Either points or levels are powered up.
-data PowerUpKind = PointsUp | LivesUp | NothingUp | DestroyUp
+-- | The kind of powerup:
+--   PointsUp and LivesUp add points and lives, respectively.
+--   MockUp does not add anything.
+--   DestroyBallUp destroys the ball (and therefore takes one life).
+data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
   deriving (Show,Eq)
 
 -- ** Distinguish objects by kind.
@@ -139,10 +142,10 @@ objShape obj = case objectProperties obj of
 type Collision  = P.Collision  (ObjectName, ObjectKind)
 type Collisions = P.Collisions (ObjectName, ObjectKind)
 
--- |Check if collision is with a given kind.
+-- | Check if collision is with a given kind.
 collisionObjectKind :: ObjectKind -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
 
--- |Check if collision is with a given id.
+-- | Check if collision is with a given id.
 collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectName on1 ((on2, _),_) = on1 == on2
