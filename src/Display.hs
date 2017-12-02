@@ -30,7 +30,10 @@ import ResourceManager
 
 import Game.Audio.SDL
 
-import RenderSDL1
+import Game.Render.Renderer.SDL1 ()
+
+type RenderingCtx     = ()
+type RealRenderingCtx = Surface
 
 #elif sdl2
 import Game.Audio.SDL2
@@ -40,6 +43,13 @@ import Game.Render.Monad.SDL2    ()
 
 type RealRenderingCtx = (Renderer, Window)
 type RenderingCtx     = (Renderer, Window)
+#endif
+
+getRealRenderingCtx :: RenderingCtx -> IO RealRenderingCtx
+#ifdef sdl
+getRealRenderingCtx () = getVideoSurface
+#else
+getRealRenderingCtx = id
 #endif
 
 -- * Initialization
