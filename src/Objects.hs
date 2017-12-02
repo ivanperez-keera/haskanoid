@@ -1,24 +1,32 @@
+{-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 -- | Game objects and collisions.
 module Objects where
 
-import FRP.Yampa.VectorSpace
-
-import Data.Extra.Num
-import Physics.TwoDimensions.Dimensions
-import Physics.TwoDimensions.Collisions
-import Physics.TwoDimensions.Physics
+import           FRP.Yampa.VectorSpace
+import           Physics.Shapes.BasicAABBCollisions
+import           Physics.TwoDimensions.Collisions
+import           Physics.TwoDimensions.Dimensions
+import           Physics.TwoDimensions.Physics
+import qualified Physics.TwoDimensions.PhysicalObjects as P
 
 import Constants
 
 -- * Objects
 
-type ObjectName = String
+-- | Object collection.
+type Objects = [Object]
 
 -- | Objects have logical properties (ID, kind, dead, hit), shape properties
 -- (kind), physical properties (kind, pos, vel, acc) and collision properties
 -- (hit, 'canCauseCollisions', energy, displaced).
+--
+-- The properties need to agree with the kind. The kind is necessary to
+-- avoid using string matching on the name to determine the object kind.
 data Object = Object { objectName           :: ObjectName
                      , objectKind           :: ObjectKind
+                     , objectProperties     :: ObjectProperties
                      , objectPos            :: Pos2D
                      , objectVel            :: Vel2D
                      , objectAcc            :: Acc2D
@@ -26,88 +34,118 @@ data Object = Object { objectName           :: ObjectName
                      , objectHit            :: Bool
                      , canCauseCollisions   :: Bool
                      , collisionEnergy      :: Double
-                     , displacedOnCollision :: Bool       -- Theoretically, setting cE == 0 should suffice
                      }
  deriving (Show)
 
-type Objects   = [Object]
+-- | Type for object id.
+type ObjectName = String
 
--- | The kind of object and any size properties.
---
--- TODO: Use a GADT to separate these properties in two types and guarantee a
--- proper correspondence in 'Object'.
-data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D 
-                | Block   Energy Size2D
-                | Side    Side
+-- | The kind of object.
+data ObjectKind = Ball
+                | Paddle
+                | Block
+                | Side
+                | PowerUp PowerUpKind 
   deriving (Show,Eq)
 
-type Energy = Int
+-- | Properties associated to each kind of object.
+data ObjectProperties  = BallProps     Double -- radius?
+                       | PaddleProps   Size2D
+                       | BlockProps    BlockEnergy SignalPowerUp Size2D
+                       | SideProps     Side
+                       | PowerUpProps  Size2D
+  deriving (Show,Eq)
 
-isBall :: ObjectKind -> Bool
-isBall (Ball _) = True
-isBall _        = False
+-- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
+--   means "dead".
+type BlockEnergy = Int
 
-isBlock :: ObjectKind -> Bool
-isBlock Block {} = True
-isBlock _          = False
+-- | Indicates whether a block signals that it contains a powerup (True)
+--   or not (False).
+--
+--   Note: The signal is independent from the actual creating of powerups. 
+type SignalPowerUp = Bool 
+
+
+-- | Indicates whether a powerup is created everytime if the ball hits
+--   the block (True) or only when the block is "dead" (False).
+type AlwaysPowerUp = Bool
+
+-- | The kind of powerup:
+--   PointsUp and LivesUp add points and lives, respectively.
+--   MockUp does not add anything.
+--   DestroyBallUp destroys the ball (and therefore takes one life).
+data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
+  deriving (Show,Eq)
+
+-- ** Distinguish objects by kind.
+
+isBlock :: Object -> Bool
+isBlock o = case objectKind o of
+  (Block) -> True
+  _       -> False
 
 isPaddle :: Object -> Bool
 isPaddle o = case objectKind o of
-  (Paddle _) -> True
-  _          -> False
+  (Paddle) -> True
+  _        -> False
 
+-- Partial function!
+objectSize :: Object -> Size2D
+objectSize object = case objectProperties object of
+  (PaddleProps sz  )  -> sz
+  (BlockProps _ _ sz) -> sz
+  (BallProps r)       -> let w = 2*r in (w, w)
+  (PowerUpProps sz)   -> sz
+
+-- Partial function. Object has size.
+objectTopLevelCorner :: Object -> Pos2D
+objectTopLevelCorner object = case objectKind object of
+  Paddle     -> objectPos object
+  Block      -> objectPos object
+  PowerUp {} -> objectPos object
+  _other     -> objectPos object ^-^ (0.5 *^ (objectSize object))
+
+-- * Physical properties
+
+-- | Physical object definition of an 'Object'. We use AABB for shapes.
+instance P.PhysicalObject Object (String, ObjectKind) Shape where
+  physObjectPos       = objectPos
+  physObjectVel       = objectVel
+  physObjectElas      = collisionEnergy
+  physObjectShape     = objShape
+  physObjectCollides  = canCauseCollisions
+  physObjectId x      = (objectName x, objectKind x)
+  physObjectUpdatePos = \o p -> o { objectPos = p }
+  physObjectUpdateVel = \o v -> o { objectVel = v }
+  physDetectCollision = detectCollision
+
+-- | Collision shape of an object.
 objShape :: Object -> Shape
-objShape obj = case objectKind obj of
-  (Ball r)    -> Rectangle (p ^-^ (r,r)) (2*r, 2*r)
-  (Paddle s)  -> Rectangle p s
-  (Block _ s) -> Rectangle p s
-  (Side   s)  -> sideToShape p s
- where p = objectPos obj
-       width'  = gameWidth
-       height' = gameHeight
-       d = collisionErrorMargin
-       sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2*d, d)
-       sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2*d)
-       sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2*d)
-       sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2*d, d)
+objShape obj = case objectProperties obj of
+  BallProps r          -> Rectangle (pos ^-^ (r,r)) (2*r, 2*r)
+  PaddleProps sz       -> Rectangle pos sz
+  BlockProps _ _ sz    -> Rectangle pos sz
+  PowerUpProps sz      -> Rectangle pos sz
+  SideProps TopSide    -> Rectangle (pos ^-^ (e, e)) (gameW + 2*e, e)
+  SideProps LeftSide   -> Rectangle (pos ^-^ (e, e)) (e,           gameH + 2*e)
+  SideProps RightSide  -> Rectangle (pos ^-^ (0, e)) (e,           gameH + 2*e)
+  SideProps BottomSide -> Rectangle (pos ^-^ (e, 0)) (gameW + 2*e, e)
 
--- * Collisions
-type Collisions = [Collision]
+ where pos = objectPos obj
+       e   = collisionErrorMargin
 
--- | A collision is a list of objects that collided, plus their velocities as
--- modified by the collision.
--- 
--- Take into account that the same object could take part in several
--- simultaneous collitions, so these velocities should be added (per object).
-data Collision = Collision
-  { collisionData :: [(ObjectName, Vel2D)] } -- ObjectId x Velocity
- deriving Show
+       gameW = gameWidth
+       gameH = gameHeight
 
--- | Detects a collision between one object and another regardless of
--- everything else
---
--- FIXME: should we use the last known positions? Or should velocities suffice?
-detectCollision :: Object -> Object -> Maybe Collision
-detectCollision obj1 obj2
-  | overlap obj1 obj2 = Just (collisionResponseObj obj1 obj2)
-  | otherwise         = Nothing
+-- ** Collisions
+type Collision  = P.Collision  (ObjectName, ObjectKind)
+type Collisions = P.Collisions (ObjectName, ObjectKind)
 
-overlap :: Object -> Object -> Bool
-overlap obj1 obj2 = overlapShape (objShape obj1) (objShape obj2)
+-- | Check if collision is with a given kind.
+collisionObjectKind :: ObjectKind -> ((ObjectName, ObjectKind), Vel2D) -> Bool
+collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
 
-collisionSide :: Object -> Object -> Side
-collisionSide obj1 obj2 = shapeCollisionSide (objShape obj1) (objShape obj2)
-
-collisionResponseObj :: Object -> Object -> Collision
-collisionResponseObj o1 o2 =
-  Collision $
-    map objectToCollision [(o1, side, o2), (o2, side', o1)]
-  where side  = collisionSide o1 o2
-        side' = oppositeSide side
-        objectReacts      o             = collisionEnergy o > 0 || displacedOnCollision o
-        objectToCollision (o,s,o')      = (objectName o, correctVel (objectVel o ^+^ (velTrans *^ objectVel o')) (collisionEnergy o) s)
-        correctVel (vx,vy) e TopSide    = (vx, ensurePos (vy * (-e)))
-        correctVel (vx,vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
-        correctVel (vx,vy) e LeftSide   = (ensureNeg (vx * (-e)),vy)
-        correctVel (vx,vy) e RightSide  = (ensurePos (vx * (-e)),vy)
+-- | Check if collision is with a given id.
+collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
+collisionObjectName on1 ((on2, _),_) = on1 == on2

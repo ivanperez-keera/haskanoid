@@ -11,19 +11,28 @@
 -- Together they form 'levels'.
 module Levels where
 
-import Control.Arrow ((***), first)
-import Data.List (nub)
+import Control.Arrow                    ((***))
+import Data.List                        (nub, zip4)
+import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions
 
 import Constants
-import Resources
+import Objects
 
 -- * Levels
 -- ** Level specification
 data LevelSpec = LevelSpec
- { blockCfgs  :: [(Pos2D, Int)] -- ^ Block positions and block lives
- , levelBg    :: ImageResource  -- ^ Background image
- , levelMusic :: MusicResource  -- ^ Background music
+ { blockCfgs  :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)] 
+                -- ^ Block positions, block lives, kind of powerups,
+                -- and whether the block signals that it contains a powerup.
+                -- Note: SignalPowerUp is not logically related to the kind
+               -- of powerups and can be used to irritate the player.
+                -- For example, signalling that it contains a powerup, but 
+                -- the powerup kind is Nothing. Or containing a powerup, but
+                -- not signaling it.
+ , levelBg    :: ImageSpec  -- ^ Background image
+ , levelMusic :: MusicSpec  -- ^ Background music
+ , levelName  :: String
  }
 
 -- | Number of levels. Change this in the code to finish
@@ -33,483 +42,300 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = [ -- Level 0
-           LevelSpec { blockCfgs  = blockDescS 0
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 1
-           LevelSpec { blockCfgs  = blockDescS 1
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 2
-           LevelSpec { blockCfgs  = blockDescS 2
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 3
-           LevelSpec { blockCfgs  = blockDescS 3
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 4
-           LevelSpec { blockCfgs  = blockDescS 4
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 5
-           LevelSpec { blockCfgs  = blockDescS 5
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 6
-           LevelSpec { blockCfgs  = blockDescS 6
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 7
-           LevelSpec { blockCfgs  = blockDescS 7
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 8
-           LevelSpec { blockCfgs  = blockDescS 8
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 9
-           LevelSpec { blockCfgs  = blockDescS 9
-                     , levelBg    = Resource "data/level0.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 10
-           LevelSpec { blockCfgs  = blockDescS 10
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 11
-           LevelSpec { blockCfgs  = blockDescS 11
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 12
-           LevelSpec { blockCfgs  = blockDescS 12
-                     , levelBg    = Resource "data/level0.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 13
-           LevelSpec { blockCfgs  = blockDescS 13
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 14
-           LevelSpec { blockCfgs  = blockDescS 14
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ,
-           -- Level 15
-           LevelSpec { blockCfgs  = blockDescS 15
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level0.mp3"
-                     }
-         ,
-           -- Level 16
-           LevelSpec { blockCfgs  = blockDescS 16
-                     , levelBg    = Resource "data/level1.png"
-                     , levelMusic = Resource "data/level1.mp3"
-                     }
-         ,
-           -- Level 17
-           LevelSpec { blockCfgs  = blockDescS 17
-                     , levelBg    = Resource "data/level2.png"
-                     , levelMusic = Resource "data/level2.mp3"
-                     }
-         ]
+levels = map (\(d,b,m,t) -> LevelSpec d b m t)
+  [ (blockDescS 0,  ("data/level0.png", Nothing), "data/level0.mp3", "0")
+  , (blockDescS 1,  ("data/level1.png", Nothing), "data/level1.mp3", "1")
+  , (blockDescS 2,  ("data/level2.png", Nothing), "data/level2.mp3", "2")
+  , (blockDescS 3,  ("data/level0.png", Nothing), "data/level0.mp3", "3")
+  , (blockDescS 4,  ("data/level1.png", Nothing), "data/level1.mp3", "4")
+  , (blockDescS 5,  ("data/level2.png", Nothing), "data/level2.mp3", "5")
+  , (blockDescS 6,  ("data/level0.png", Nothing), "data/level0.mp3", "6")
+  , (blockDescS 7,  ("data/level1.png", Nothing), "data/level1.mp3", "7")
+  , (blockDescS 8,  ("data/level2.png", Nothing), "data/level2.mp3", "8")
+  , (blockDescS 9,  ("data/level0.png", Nothing), "data/level1.mp3", "9")
+  , (blockDescS 10, ("data/level1.png", Nothing), "data/level1.mp3", "10")
+  , (blockDescS 11, ("data/level2.png", Nothing), "data/level2.mp3", "11")
+  , (blockDescS 12, ("data/level0.png", Nothing), "data/level1.mp3", "12")
+  , (blockDescS 13, ("data/level1.png", Nothing), "data/level1.mp3", "13")
+  , (blockDescS 14, ("data/level2.png", Nothing), "data/level2.mp3", "14")
+  , (blockDescS 15, ("data/level0.png", Nothing), "data/level0.mp3", "15")
+  , (blockDescS 16, ("data/level1.png", Nothing), "data/level1.mp3", "16")
+  ]
 
--- | Level block specification (positions,lives of block)
+-- | Level block specification (positions,lives of block, maybe powerup)
 
 -- Level 0
+--
+-- X = maxBlockLife - 1
+-- P = powerup points minBlockLife
+-- 
 --   %%%%%%%%
--- % XXXXXXXX
--- % XXXXXXXX
--- % XXXXXXXX
--- % XXXXXXXX
-blockDescS :: Int -> [(Pos2D, Int)]
-blockDescS 0 = map (first adjustPos) allBlocks
+-- % PXPXPXPX
+-- % XPXPXPXP
+-- % PXPXPXPX
+-- 
+-- Every second block is a powerup (PointsUp) with minBlockLife.
+-- All other blocks have (maxBlockLife - 1).
+-- Blocks containing powerups signal that they do.
+blockDescS :: Int -> [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+blockDescS 0 = map (first4 adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1]
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = zip4 blocks lives powerUps signalsPu
+         where
+           blocks    = blockPoss
+           blockn    = length blocks
+           lives     = blockLifeCycle blockn
+           powerUps  = powerUpList lives
+           signalsPu = signals powerUps
+ 
+       blockPoss ::[(Int, Int)]
+       blockPoss = [(x,y) | x <- [0..blockColumns - 1]
+                          , y <- [0..blockRows - 1]
                    ]
 
-       blockRows :: Num a => a
-       blockRows = 4
+       blockLifeCycle :: Int -> [Int]
+       blockLifeCycle n = take n $ cycle oneCycle
+         where 
+           oneCycle = [minBlockLife, minBlockLife + 1] 
 
+       powerUpList :: [Int] -> [Maybe (PowerUpKind, AlwaysPowerUp)]
+       powerUpList [] = []
+       powerUpList (n:ns) | n == minBlockLife = (Just (PointsUp, False) : powerUpList ns)
+                          | otherwise = (Nothing : powerUpList ns)
+
+       blockRows :: Int
+       blockRows = 3
 
 
 -- Level 1
 --   %%%%%%%%
--- %    XXXX
--- %   XXXXX 
--- %  XXXXXX
--- % XXXXXX
--- % XXXXX
--- % XXXX
+-- %  X P X P
+-- % X P X P
+-- %  X P X P
+-- % X P X P
 --
-blockDescS 1 = map (first adjustPos) allBlocks
- where
-   allBlocks :: (Enum a, Num a, Eq a, Ord a) => [((a,a), Int)]
-   allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                     , y <- [0..blockRows - 1]
-                                     , (x + y > 2) && (x + y < 10)
-               ]
-               
-   blockRows :: Num a => a
-   blockRows = 6
+-- If a block with powerup is hit it creates a powerup.
+-- Every second block in a row is a powerup (PointsUp).
+-- All blocks containing powerups signal that they do.
+-- All blocks have maxBlockLife.
+blockDescS 1 = map (first4 adjustPos) allBlocks
 
--- Level 2
-blockDescS 2  = map (first adjustPos) allBlocks
- where
-   allBlocks :: (Enum a, Num a, Eq a) => [((a,a), Int)]
-   allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                      , y <- [0..blockRows - 1]
-                                      , x /= y && (blockColumns - 1 - x) /= y
-               ]
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = zip4 blocks lives powerUps signalsPu
+         where
+           blocks    = blockPoss
+           blockn    = length blocks
+           lives     = blockLifeCycle blockn
+           powerUps  = powerUpList blockn 
+           signalsPu = signals powerUps
+ 
 
-   blockRows :: Num a => a
-   blockRows = 4
-               
 
--- Level 3
---   %%%%%%%%
--- %  X X X X
--- % X X X X
--- %  X X X X
--- % X X X X
-blockDescS 3 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1]
-                                          , ((even x) && (odd y) ||
-                                             (odd x) && (even y))
+       blockPoss :: [(Int, Int)]
+       blockPoss = [(x,y) | y <- [0..blockRows - 1] -- first create y then x:
+                          , x <- [0..blockColumns - 1] -- order matters
+                          , (even x && odd y)  ||      -- for the zipping of 
+                            (odd x  && even y)         -- blocks, lives, ...
                    ]
 
-       blockRows :: Num a => a
+       blockLifeCycle :: Int -> [Int]
+       blockLifeCycle n = take n $ cycle [maxBlockLife]
+
+       powerUpList :: Int -> [Maybe (PowerUpKind, AlwaysPowerUp)]
+       powerUpList n = take n $ cycle oneCycle
+         where
+           oneCycle = [Nothing, Just (PointsUp, True)]
+
+       blockRows :: Int
        blockRows = 4
+
+
+-- Level 2
+-- X == maxBlockLife
+-- O == maxBlockLife - 1
+-- Y == minBlockLife
+-- P == minBlockLife LivesUp
+--
+--   %%%%%%%%
+-- % YYYYYYYY
+-- % YXXXXXXY
+-- % YXOOOOXY
+-- % YXOPPOXY
+-- % YXOOOOXY
+-- % YXXXXXXY
+-- % YYYYYYYY
+blockDescS 2 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), minBlockLife, Nothing, False) -- Y
+                    | x <- [0..blockColumns - 1]
+                    , y <- [0..blockRows - 1]
+                    , (x == 0)
+                    || (y == 0)
+                    || (x == blockColumns - 1)
+                    || (y == blockRows - 1)]
+                   ++ [((x,y), maxBlockLife - 1, Nothing, False) -- O
+                       | x <- [1..blockColumns - 2]
+                       , y <- [1..blockRows - 2]
+                       , (x == 1)
+                       || (y == 1)
+                       || (x == blockColumns - 2)
+                       || (y == blockRows - 2)]
+                   ++ [((x,y), maxBlockLife, Nothing, False) -- X
+                       | x <- [2..blockColumns - 3]
+                       , y <- [2..blockRows - 3]
+                       , (x == 2)
+                       || (y == 2)
+                       || (x == blockColumns - 3)
+                       || (y == blockRows - 3)]
+                   ++ [((x,y), maxBlockLife, Just (LivesUp, False), True) -- P
+                       | x <- [3..blockColumns - 4]
+                       , y <- [3..blockRows - 4]
+                       , (x == 3)
+                       || (y == 3)
+                       || (x == blockColumns - 4)
+                       || (y == blockRows - 4)]
+                   
+       blockRows :: Int
+       blockRows = 7
+
+
+
+-- Level 3 
+--
+-- X == maxBlockLife
+-- O == minBlockLife, destroyUp 
+--
+--   %%%%%%%%
+-- %  XXXXXX
+-- % X      X
+-- %    OO  
+-- %    OO 
+-- % X      X
+-- %  XXXXXX
+blockDescS 3 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+                    | x <- [1..blockColumns - 2]
+                    , y <- [0, blockRows - 1]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                       | x <- [0, blockColumns - 1]
+                       , y <- [1, blockRows - 2]]
+                   ++ [((x,y), minBlockLife, Just (DestroyBallUp, True) , True) 
+                       | x <- midColumns
+                       , y <- [2,3]]
+
+       blockRows :: Int
+       blockRows = 6
 
 
 -- Level 4
 --   %%%%%%%%
 -- % XXXXXXXX
 -- %
--- %  X X X X
+-- %  P P P P
 -- %
--- % X X X X
+-- % L L L L
 -- %
 -- % XXXXXXXX
-blockDescS 4 = map (first adjustPos) allBlocks
+--
+-- X == maxBlockLife, MockUp
+-- P == maxBlockLife - 1, PointsUp (always)
+-- L == minBlockLife, LivesUp
+blockDescS 4 = map (first4 adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0,blockRows - 1]]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [2], odd x]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [4], even x]
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Just (MockUp, True), False) -- X 
+                    | x <- [0..blockColumns - 1]
+                    , y <- [0, blockRows - 1]]
+                   ++ [((x,y), maxBlockLife - 1, Just (PointsUp, True), True) -- P 
+                       | x <- [0..blockColumns - 1]
+                       , y <- [2], odd x]
+                   ++ [((x,y), minBlockLife, Just (LivesUp, False), True) -- L
+                       | x <- [0..blockColumns - 1]
+                       , y <- [4], even x]
 
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 7
+
 
 -- Level 5
---   %%%%%%%%
--- %    X
--- %   X X
--- %  X   X
--- % XXXXXXX
-blockDescS 5 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = nub $
-         [((3,0), maxBlockLife),((blockColumns - 4,1), maxBlockLife)]
-         ++ [((2,1), maxBlockLife),((blockColumns - 3,1), maxBlockLife)]
-         ++ [((1,2), maxBlockLife),((blockColumns - 2,2), maxBlockLife)]
-         ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1], y <- [3]]
-
--- Level 6
---   %%%%%%%%
--- %  XXXXXX
--- % X      X
--- % X      X
--- % X      X
--- %  XXXXXX
-blockDescS 6 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [1..blockColumns - 2]
-                                          , y <- [0, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife) | x <- [0, blockColumns - 1]
-                                             , y <- [1..blockRows - 2]]
-
-       blockRows :: Num a => a
-       blockRows = 5
-
-
--- Level 7
---   %%%%%%%%
--- %  XXXXXX
--- % X      X
--- %    XX  
--- %    XX 
--- % X      X
--- %  XXXXXX
-blockDescS 7 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [1..blockColumns - 2]
-                                          , y <- [0, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife) | x <- [0, blockColumns - 1]
-                                             ,  y <- [1, blockRows - 2]]
-                   ++ [((x,y), maxBlockLife) | x <- [3,4]
-                                             , y <- [2..4]]
-
-       blockRows :: Num a => a
-       blockRows = 7
-
--- Level 8
 --   %%%%%%%%
 -- % XX XXXXX
 -- % XX XXXXX
 -- % 
+-- % DD DDDDD
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
--- % XX XXXXX
-blockDescS 8 = map (first adjustPos) allBlocks
+-- 
+-- X == minBlockLife
+-- D == maxBlockLife, DestroyBallUp (always)
+blockDescS 5 = map (first4 adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1]
-                                          , x /= 2, y /= 2
-                   ]
-
-       blockRows :: Num a => a
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), minBlockLife, Nothing, False) -- X
+                    | x <- [0..blockColumns - 1]
+                    , y <- [0..blockRows - 1]
+                    , x /= 2, y /= 2, y /= 3]
+                   ++ [((x,y), maxBlockLife, Just (DestroyBallUp, True), True) -- D
+                    | x <- [0..blockColumns - 1]
+                    , y <- [3]
+                    , x /= 2]
+                    
+       blockRows :: Int
        blockRows = 9
 
--- Level 9
+
+-- Level 6 
+-- X == maxBlockLife
+-- T == maxBlockLife - 1, PointsUp
+-- O == minBlockLife
+-- L == minBlockLife, LivesUp
+-- 
 --   %%%%%%%%
--- %    X
--- %   XXX
--- %  X X X
--- % XXXXXXX
--- %  X X X
--- %   XXX
--- %    X
-blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [3], y <- [0..6]]
-                   ++ [((x,y), maxBlockLife) | x <- [0..6], y <- [3]]
-                   ++ [((x,y), maxBlockLife) | x <- [2,4], y <- [1,5]]
-                   ++ [((x,y), maxBlockLife) | x <- [1,5], y <- [2,4]]
-                   
-       adjustHPos :: Double -> Double
-       adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
-
-       leftMargin :: Num a => a
-       leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
-         where round' = fromIntegral . floor
-
-
--- Level 10
---   %%%%%%%%
--- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
--- % XXXXXXX
--- %  X X X 
--- %  X X X 
--- %  X X X
--- %  X X X 
-blockDescS 10 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1], odd x]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [midRow], even x]
-  
-       blockRows :: Num a => a
-       blockRows = 9
-
-       midRow :: Integral a => a
-       midRow = blockRows `div` 2
-
-
-
--- Level 11
---   %%%%%%%%
--- % XX     
--- % XXXX     
--- % XXXXXX  
 -- % XXXXXXXX
--- % XXXXXX  
--- % XXXX     
--- % XX     
-blockDescS 11 = map (first adjustPos) allBlocks
+-- %  O O O O
+-- %  L L L L
+-- % T T T T
+-- % T T T T
+-- %  L L L L
+-- %  O O O O
+-- % 
+-- % XXX XXXX
+blockDescS 6 = map (first4 adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | y <- [0..blockRows-1]
-                                          , x <- [0..(blockColumns-1)
-                                                 - (2 * abs (y - midRow))]
-                   ]
-                   
-
-       blockRows :: Num a => a
-       blockRows = 7
-
-       midRow :: Integral a => a
-       midRow = blockRows `div` 2
-
--- Level 12
---   %%%%%%%%
--- % XXXXXXX
--- %   X X
--- %   X X
--- %
--- %  X   X
--- % X     X
-
-blockDescS 12 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0]]
-                   ++ [((x,y), maxBlockLife) | x <- [2, blockColumns - 3]
-                                             , y <- [1, 2]]
-                   ++ [ ((1,4), maxBlockLife)
-                      , ((blockColumns - 2,4), maxBlockLife)
-                      , ((0,5), maxBlockLife)
-                      , ((blockColumns - 1,5), maxBlockLife)
-                      ]
-
-       blockRows :: Num a => a
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife - 1, Just (PointsUp, True), False) -- T
+                    | x <- [0..blockColumns - 1]
+                    , y <- [3, 4]
+                    , odd x]
+                  ++ [((x,y), minBlockLife, Nothing, False) -- O
+                       | x <- [0..blockColumns - 1]
+                       , y <- [1, blockRows - 3]
+                       , even x ]
+                  ++ [((x,y), minBlockLife, Just (LivesUp, False), True) -- L
+                       | x <- [0..blockColumns - 1]
+                       , y <- [2, blockRows - 4]
+                       , even x ]
+                   ++ [((x,y), maxBlockLife, Nothing, False) -- X
+                       | x <- [0..blockColumns - 1]
+                       , y <- [0, blockRows - 1]
+                       , y == 0 || x /= midColumn]
+       blockRows :: Int
        blockRows = 9
 
--- Level 13
+
+-- Level 7 
 -- X == maxBlockLife
--- O == maxBlockLife - minBlockLife
---   %%%%%%%%
--- % XOXOXOXO
--- % OXOXOXOX
--- % XOXOXOXO
--- % OXOXOXOX
-blockDescS 13 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), blockLife) | x <- [0..blockColumns - 1]
-                                       , y <- [0..blockRows - 1]
-                                       , let blockLife = if even (x + y)
-                                                           then maxBlockLife
-                                                           else maxBlockLife - 1
-                                       ]
-                   
-       blockRows :: Num a => a
-       blockRows = 4
-
--- Level 14
--- X == maxBlockLife
--- O == maxBlockLife - minBlockLife
--- Y == minBlockLife
---   %%%%%%%%
--- % YYYYYYYY
--- % YXXXXXXY
--- % YXOOOOXY
--- % YXXXXXXY
--- % YYYYYYYY
-blockDescS 14 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), minBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..blockRows - 1]
-                                          , (x == 0)
-                                            || (y == 0)
-                                            || (x == blockColumns - 1)
-                                            || (y == blockRows - 1)]
-                   ++ [((x,y), maxBlockLife - 1) | x <- [1..blockColumns - 2]
-                                                 , y <- [1..blockRows - 2]
-                                                 , (x == 1)
-                                                   || (y == 1)
-                                                   || (x == blockColumns - 2)
-                                                   || (y == blockRows - 2)]
-                   ++ [((x,y), maxBlockLife) | x <- [2..blockColumns - 3]
-                                          , y <- [2..blockRows - 3]
-                                          , (x == 2)
-                                            || (y == 2)
-                                            || (x == blockColumns - 3)
-                                            || (y == blockRows - 3)]
-                   
-       blockRows :: Num a => a
-       blockRows = 5
-
-
--- Level 15
--- maxBlockLife == X
--- minBlockLife == O
--- blockLife == T
---   %%%%%%%%
--- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
--- % OXOXOXO
--- % T T T 
--- % T T T 
--- % T T T
--- % T T T 
-blockDescS 15 = map (first adjustPos) allBlocks
-
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                          , y <- [0..midRow], odd x]
-                   ++ [((x,y), minBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [midRow], even x]
-                   ++ [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                                 , y <- [midRow
-                                                         + 1..blockColumns - 1]
-                                                 , even x]
-  
-       blockRows :: Num a => a
-       blockRows = 9
-
-       midRow :: Integral a => a
-       midRow = blockRows `div` 2
-
-
--- Level 16
--- maxBlockLife == X
--- minBlockLife == O
--- blockLife == T
+-- O == minBlockLife
+-- T == maxBlockLife - 1, PointsUp
+-- 
 --   %%%%%%%%
 -- % XXXOOXXX
 -- % XXXOOXXX
@@ -519,97 +345,297 @@ blockDescS 15 = map (first adjustPos) allBlocks
 -- % 
 -- % XXXOOXXX
 -- % XXXOOXXX
+blockDescS 7 = map (first4 adjustPos) allBlocks
 
-blockDescS 16 = map (first adjustPos) allBlocks
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife - 1, Just (PointsUp, False), True)
+                    | x <- [0..blockColumns - 1]
+                    , y <- midColumns
+                    , (even x && y == midColumn)
+                    || (odd x && y == midColumn -1)]
+                   ++ [((x,y), minBlockLife, Just (MockUp, True), False) 
+                       | x <- [midColumn - 1, midColumn]
+                       , y <- [0, 1, blockRows - 2, blockRows - 1]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                       | x <- [0..blockColumns - 1]
+                       , y <- [0, 1, blockRows - 2, blockRows - 1]
+                       , x /= midColumn - 1, x /= midColumn]
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                              , y <- [midColumn - 1, midColumn]
-                                              , (even x && y == midColumn)
-                                                || (odd x && y == midColumn -1)]
-                   ++ [((x,y), minBlockLife) | x <- [midColumn - 1, midColumn]
-                                             , y <- [0, 1,
-                                                     blockRows - 2, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [0, 1,
-                                                     blockRows - 2, blockRows - 1]
-                                             , x /= midColumn - 1, x /= midColumn]
 
-
-       blockRows :: Num a => a
+       blockRows :: Int
        blockRows = 8
 
-       midRow :: Integral a => a
-       midRow = blockRows `div` 2
 
-       midColumn :: Integral a => a
-       midColumn = blockColumns `div` 2
 
--- Level 17
--- maxBlockLife == X
--- minBlockLife == O
--- blockLife == T
+-- Level 8 
 --   %%%%%%%%
--- % XXXXXXXX
--- %  O O O O
--- %  O O O O
--- % T T T T
--- % T T T T
--- %  O O O O
--- %  O O O O
--- % 
--- % XXX XXXX
-blockDescS 17 = map (first adjustPos) allBlocks
+-- % XXXXXXX
+-- %   D D
+-- %   D D
+-- %
+-- %  D   D
+-- % D     D
+-- 
+-- X = maxBlockLife, LivesUp (always)
+-- D = maxBlockLife, DestroyBallUp (always)
+blockDescS 8 = map (first4 adjustPos) allBlocks
 
- where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-       allBlocks = [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                              , y <- [3, 4]
-                                              , odd x]
-                   ++ [((x,y), minBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [1, 2, 
-                                                     blockRows - 4, blockRows - 3]
-                                             , even x ]
-                   ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                             , y <- [0, blockRows - 1]
-                                             , y == 0 || x /= midColumn]
-       blockRows :: Num a => a
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Just (LivesUp, True), False) 
+                    | x <- [0..blockColumns - 1]
+                    , y <- [0]]
+                   ++ [((x,y), maxBlockLife, Just (DestroyBallUp, True), False) 
+                       | x <- [2, blockColumns - 3]
+                       , y <- [1, 2]]
+                   ++ [ ((1,4), maxBlockLife, Just (DestroyBallUp, True), False)
+                      , ((blockColumns - 2,4), maxBlockLife, Just (DestroyBallUp, True), False)
+                      , ((0,5), maxBlockLife, Just (DestroyBallUp, True), False)
+                      , ((blockColumns - 1,5), maxBlockLife, Just (DestroyBallUp, True), False)
+                      ]
+
+
+
+-- Level 9
+-- X == maxBlockLife
+-- P == minBlockLife, PointsUp
+-- L == minBlockLife, LivesUp
+-- T == maxBlockLife - 1
+-- 
+--   %%%%%%%%
+-- %  X X X
+-- %  X X X 
+-- %  X X X 
+-- %  X X X 
+-- % LPLPLPL
+-- % T T T 
+-- % T T T 
+-- % T T T
+-- % T T T 
+blockDescS 9 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Just (MockUp, True), False) -- X
+                    | x <- [0..blockColumns - 1]
+                    , y <- [0..midRow - 1], odd x]
+                   ++ [((x,y), minBlockLife, powerUps x, True) -- O
+                       | x <- [0..blockColumns - 1]
+                       , y <- [midRow]]
+                   ++ [((x,y), maxBlockLife - 1, Just (MockUp, True), False) -- T
+                       | x <- [0..blockColumns - 1]
+                       , y <- [midRow + 1..blockColumns - 1]
+                       , even x]
+
+
+       powerUps :: Int -> Maybe (PowerUpKind, AlwaysPowerUp)
+       powerUps x | even x     = Just (PointsUp, True)
+                  | odd x      = Just (LivesUp, True)
+ 
+       blockRows :: Int
        blockRows = 9
 
-       midColumn :: Integral a => a
-       midColumn = blockColumns `div` 2
+       midRow :: Int
+       midRow = blockRows `div` 2
 
+
+
+-- Level 10 
+--   %%%%%%%%
+-- %  X X X
+-- %  X X X 
+-- %  X X X 
+-- %  X X X 
+-- % PPPPPPP
+-- %  X X X 
+-- %  X X X 
+-- %  X X X
+-- %  X X X
+--
+-- X == maxBlockLife, MockUp
+-- P == maxBlockLife - 1, DestroyBallUp 
+blockDescS 10 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks =  [((x,y), blockLife y, powerUps y, False) 
+                     | x <- [0..blockColumns - 1]
+                     , y <- [0..blockRows - 1]
+                     , odd x || (y == midRow && even x)]
+
+       blockLife :: Int -> Int  
+       blockLife y | y == midRow = maxBlockLife - 1
+                   | otherwise   = maxBlockLife
+
+       powerUps :: Int -> Maybe (PowerUpKind, AlwaysPowerUp)
+       powerUps y | y == midRow = Just (DestroyBallUp, True)
+                  | otherwise   = Just (MockUp, True) 
+
+       blockRows :: Int
+       blockRows = 9
+
+       midRow :: Int
+       midRow = blockRows `div` 2
+
+
+-- BACKUP Levels
+
+-- Level 11
+--   %%%%%%%%
+-- %    XXXX
+-- %   XXXXX 
+-- %  XXXXXX
+-- % XXXXXX
+-- % XXXXX
+-- % XXXX
+--
+blockDescS 11 = map (first4 adjustPos) allBlocks
+ where
+   allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+   allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+                 | x <- [0..blockColumns - 1]
+                 , y <- [0..blockRows - 1]
+                 , (x + y > 2) && (x + y < 10)
+               ]
+               
+   blockRows :: Int
+   blockRows = 6
+
+-- Level 12
+--   %%%%%%%%
+-- % XXXXXXXX
+-- % X XXXX X
+-- % XX XX XX
+-- % XXX  XXX
+blockDescS 12  = map (first4 adjustPos) allBlocks
+ where
+   allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+   allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+                | x <- [0..blockColumns - 1]
+                , y <- [0..blockRows - 1]
+                , x /= y && (blockColumns - 1 - x) /= y
+               ]
+
+   blockRows :: Int
+   blockRows = 4
+               
+
+-- Level 13
+--   %%%%%%%%
+-- %    XX
+-- %   X  X
+-- %  X    X
+-- % XXXXXXXX
+blockDescS 13 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = nub $
+         [((3,0), maxBlockLife, Nothing, False),((blockColumns - 4,0), maxBlockLife, Nothing, False)]
+         ++ [((2,1), maxBlockLife, Nothing, False),((blockColumns - 3,1), maxBlockLife, Nothing, False)]
+         ++ [((1,2), maxBlockLife, Nothing, False),((blockColumns - 2,2), maxBlockLife, Nothing, False)]
+         ++ [((x,y), maxBlockLife, Nothing, False) | x <- [0..blockColumns - 1], y <- [3]]
+
+-- Level 14
+--   %%%%%%%%
+-- %  XXXXXX
+-- % X      X
+-- % X      X
+-- % X      X
+-- %  XXXXXX
+blockDescS 14 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+                    | x <- [1..blockColumns - 2]
+                    , y <- [0, blockRows - 1]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                       | x <- [0, blockColumns - 1]
+                       , y <- [1..blockRows - 2]]
+
+       blockRows :: Int
+       blockRows = 5
+
+
+-- Level 15
+--   %%%%%%%%
+-- %    X
+-- %   XXX
+-- %  X X X
+-- % XXXXXXX
+-- %  X X X
+-- %   XXX
+-- %    X
+blockDescS 15 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Nothing, False) | x <- midColumns, y <- [0..6]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) | x <- [0..blockColumns-1], y <- [3]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) | x <- [2,blockColumns-3], y <- [1,5]]
+                   ++ [((x,y), maxBlockLife, Nothing, False) | x <- [1,blockColumns-2], y <- [2,4]]
+
+
+-- Level 16
+--   %%%%%%%%
+-- % XX     
+-- % XXXX     
+-- % XXXXXX  
+-- % XXXXXXXX
+-- % XXXXXX  
+-- % XXXX     
+-- % XX     
+blockDescS 16 = map (first4 adjustPos) allBlocks
+
+ where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+       allBlocks = [((x,y), maxBlockLife, Nothing, False)
+                   | y <- [0..blockRows-1]
+                   , x <- [0..(blockColumns-1) - (2 * abs (y - midRow))]
+                   ]
+
+       blockRows :: Int
+       blockRows = 7
+
+       midRow :: Int
+       midRow = blockRows `div` 2
 
 
 blockDescS _ = error "No more levels"
 
+
 -- Dynamic positioning/level size
 
-adjustPos :: Integral a => (a,a) -> (Double, Double)
-adjustPos = ((adjustHPos *** adjustVPos) . fI2)
-
-adjustVPos :: Double -> Double
-adjustVPos = (topMargin +) . ((blockHeight + blockSeparation) *)
-
-adjustHPos :: Double -> Double
-adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
+adjustPos :: (Int, Int) -> (Double, Double)
+adjustPos = (adjustHPos . fI) *** (adjustVPos . fI)
+  where
+    adjustVPos = (gameAreaTopMargin +) . ((blockHeight + blockSeparation) *)
+    adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
+    fI         = fromIntegral
 
 -- Fit as many as possible
-blockColumns :: Num a => a
+blockColumns :: Int
 blockColumns =
-    1 + round' ( (gameWidth - blockWidth - 2 * leftMargin)
-               / (blockWidth + blockSeparation)
-               )
-  where round' = fromIntegral . floor
+    1 + floor ( (gameWidth - blockWidth - 2 * gameAreaMinLeftMargin)
+              / (blockWidth + blockSeparation)
+              )
 
--- * Constants
+midColumn :: Int
+midColumn = blockColumns `div` 2
 
-topMargin :: Num a => a
-topMargin = 10
+midColumns :: [Int]
+midColumns | odd blockColumns = [midColumn]
+           | otherwise        = [midColumn - 1, midColumn]
 
-leftMargin :: Num a => a
-leftMargin = 25
+leftMargin :: Double
+leftMargin = round' $ (gameWidth - maxBlocksWidth) / 2
+  where
+    round' :: Double -> Double
+    round' x = fromIntegral (floor x :: Int)
+    maxBlocksWidth =
+      blockWidth + (blockWidth + blockSeparation) * (fromIntegral blockColumns - 1)
 
--- * Auxiliary functions
+-- Matching list of powerups with a list that signals that powerup
+signals :: [Maybe (PowerUpKind, AlwaysPowerUp)] -> [SignalPowerUp]
+signals [] = []
+signals (Nothing :puks) = (False : signals puks)
+signals (_:puks)            = (True  : signals puks)   
 
-fI2 :: Integral a => (a,a) -> (Double, Double)
-fI2 (x,y) = (fromIntegral x, fromIntegral y)       
+-- Auxiliary functions
+
+first4 :: (a -> a') -> (a, b, c, d) -> (a', b, c, d)
+first4 f (a, b, c, d) = (f a, b, c, d)

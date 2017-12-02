@@ -1,3 +1,43 @@
+2017-11-30 Christina Zeller <chriz@keera.co.uk>:
+        * Adjusts more levels.
+        * Changes result of powerup DestroyUp.
+        * Adds and displays name of a level.
+        * Adds a delay to level finished.
+
+2017-11-29 Christina Zeller <chriz@keera.co.uk>:
+        * Adjusts levels
+        * Adds property that powerups appear for every time that a block
+          gets hit.
+
+2017-11-28 Christina Zeller <chriz@keera.co.uk>:
+        * Adds two more kinds of powerups (levels down & nothing happens)
+        * Adds and changes images for powerups.
+        * Adds block property indication block with powerup.
+        * Adds image for indication of block with powerup.
+
+2017-11-26 Christina Zeller <chriz@keera.co.uk>:
+        * Adds levels with powerups.
+
+2017-11-23 Christina Zeller <chriz@keera.co.uk>:
+        * Removes code duplication in objBlock.
+        * Adds heart image and uses different images for PowerUps.
+        * Code cleaning: change name of diamond to powerup
+
+2017-11-23 Christina Zeller <chriz@keera.co.uk>:
+        * Changes the level definitions to select which block gives what.
+
+2017-11-21 Christina Zeller <chriz@keera.co.uk>:
+        * Splits objectKind into objectKind and objectProperties.
+        * Adds to type Collision and Collisions the ObjectKind.
+
+2017-11-19 Christina Zeller <chriz@keera.co.uk>:
+        * Adds lives for every catched diamond.
+        * Adds 100 points for every catched diamond.
+        * Adds proper image for diamonds (powerups).
+
+2017-11-18 Christina Zeller <chriz@keera.co.uk>:
+        * Adds basics for powerups in SDL1.
+
 2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
         * Version bump (0.1.5.4).
         * Adds new levels.
@@ -19,6 +59,5 @@
         * Version bump (0.1.5.1).
 
 2015-06-23 Ivan Perez <ivan.perez@keera.co.uk>:
-
-	* Version bump (0.1.5).
+        * Version bump (0.1.5).
         * Bumps base upper bound (now compiles with GHC 7.10).
