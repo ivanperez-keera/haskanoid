@@ -7,12 +7,9 @@ module Display
   )
   where
 
-import Control.Arrow              ((***))
 import Control.Monad
 import Control.Monad.IfElse       (awhen)
 import Control.Monad.Trans.Reader
-import Data.Maybe
-import FRP.Yampa.VectorSpace
 import Game.Render.Monad
 import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceAudio)
 import Game.VisualElem
@@ -65,7 +62,7 @@ initGraphs :: ResourceManager.ResourceMgr -> IO RenderingCtx
 #ifdef sdl
 initGraphs _mgr = do
   -- Create window
-  screen <- SDL.setVideoMode width height 32 [SWSurface]
+  _screen <- SDL.setVideoMode width height 32 [SWSurface]
   SDL.setCaption "Test" ""
 
   -- Important if we want the keyboard to work right (I don't know
@@ -118,7 +115,7 @@ audioObject resourceManager object = when (objectHit object) $
 display :: ResourceMgr -> GameState -> RealRenderingCtx -> IO ()
 display resourceManager shownState = onRenderingCtx $ \ctx -> 
   flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
-    [ bgItem, levelTxt, pointsTxt, livesTxt ] ++ mStatusTxt ++ objItems
+    concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ]
   where
     -- Background
     bgItem     = CollageItem (VisualImage IdBgImg)
@@ -133,41 +130,38 @@ display resourceManager shownState = onRenderingCtx $ \ctx ->
     -- Game status
     mStatusTxt = [ CollageItem (VisualText IdGameFont IdGameFontColor msg)
                                (const ((0, 0), Align HCenter VCenter))
-                 | isJust (statusMsg status), let msg = fromJust (statusMsg status) ]
+                 | Just msg <- [ statusMsg status ] ]
 
-    -- Game objectsj
-    objItems   = map objItem (gameObjects shownState)
-    objItem object =
-      case objectKind object of
-        (Side {}) -> CollageItems []
-        other     -> let objPos = objectTopLevelCorner object 
-                         pos    = (round *** round) (objPos^+^ (gameLeft, gameTop))
-                     in  CollageItem (VisualImage (objectImage object))
-                                     (const (pos, Align HLeft VTop))
+    -- Game objects
+    objItems = map objItem $ filter (not . isSide) $ gameObjects shownState
+    objItem object = CollageItem (VisualImage (objectImage object))
+                                 (const (pos, Align HLeft VTop))
+      where
+        pos      = (round (ox + gameLeft), round (oy + gameTop))
+        (ox, oy) = objectTopLevelCorner object 
 
     over   = gameInfo shownState
     status = gameStatus over
 
-
 statusMsg :: GameStatus -> Maybe String
-statusMsg GamePlaying          = Nothing
-statusMsg GamePaused           = Just "Paused"
-statusMsg (GameLoading n name) = Just ("Level " ++ name)
-statusMsg GameOver             = Just "GAME OVER!!!"
-statusMsg GameFinished         = Just "You won!!! Well done :)"
-statusMsg GameStarted          = Nothing
+statusMsg GamePlaying               = Nothing
+statusMsg GamePaused                = Just "Paused"
+statusMsg (GameLoading _ levelName) = Just ("Level " ++ levelName)
+statusMsg GameOver                  = Just "GAME OVER!!!"
+statusMsg GameFinished              = Just "You won!!! Well done :)"
+statusMsg GameStarted               = Nothing
 
 -- Partial function. Object has image.
 objectImage :: Object -> ResourceId
 objectImage object = case objectKind object of
   Paddle                -> IdPaddleImg
   Block                 -> let (BlockProps e pu _) = objectProperties object 
-                           in case pu of
-                                True  -> IdBlockPuImg -- signals powerup
-                                False -> case e of 
-                                           3 -> IdBlock1Img
-                                           2 -> IdBlock2Img
-                                           n -> IdBlock3Img
+                           in if pu 
+                                then IdBlockPuImg -- signals powerup
+                                else case e of 
+                                       3 -> IdBlock1Img
+                                       2 -> IdBlock2Img
+                                       _ -> IdBlock3Img
   Ball                  -> IdBallImg
   PowerUp PointsUp      -> IdPointsUpImg
   PowerUp LivesUp       -> IdLivesUpImg

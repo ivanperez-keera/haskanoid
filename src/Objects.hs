@@ -90,6 +90,11 @@ isPaddle o = case objectKind o of
   (Paddle) -> True
   _        -> False
 
+isSide :: Object -> Bool
+isSide o = case objectKind o of
+  Side -> True
+  _    -> False
+
 -- Partial function!
 objectSize :: Object -> Size2D
 objectSize object = case objectProperties object of
