@@ -6,33 +6,33 @@ import Game.Resource.Spec
 -- * Game assets
 
 -- ** Images
-initialBG          :: ImageSpec
-initialBG          = ("data/level0.png", Nothing)
+initialBG           :: ImageSpec
+initialBG           = ("data/level0.png", Nothing)
 
-ballImage          :: ImageSpec
+ballImage           :: ImageSpec
 #ifdef sdl
-ballImage          = ("data/ball2.png", Just (0, 255, 0))
+ballImage           = ("data/ball2.png", Just (0, 255, 0))
 #elif sdl2
-ballImage          = ("data/ball-alpha.png", Nothing)
+ballImage           = ("data/ball-alpha.png", Nothing)
 #endif
 
-block1Image        :: ImageSpec
-block1Image        = ("data/block1.png", Nothing)
+block1Image         :: ImageSpec
+block1Image         = ("data/block1.png", Nothing)
 
-block2Image        :: ImageSpec
-block2Image        = ("data/block2.png", Nothing)
+block2Image         :: ImageSpec
+block2Image         = ("data/block2.png", Nothing)
 
-block3Image        :: ImageSpec
-block3Image        = ("data/block3.png", Nothing)
+block3Image         :: ImageSpec
+block3Image         = ("data/block3.png", Nothing)
 
-blockPuImage       :: ImageSpec
-blockPuImage       = ("data/blockP.png", Nothing)
+blockPuImage        :: ImageSpec
+blockPuImage        = ("data/blockP.png", Nothing)
 
-paddleImage        :: ImageSpec
+paddleImage         :: ImageSpec
 #ifdef sdl
-paddleImage        = ("data/paddleBlu.png", Just (0, 255, 0))
+paddleImage         = ("data/paddleBlu.png", Just (0, 255, 0))
 #elif sdl2
-paddleImage        = ("data/paddleBluA.png", Nothing)
+paddleImage         = ("data/paddleBluA.png", Nothing)
 #endif
 
 pointsUpImage       :: ImageSpec
@@ -63,18 +63,17 @@ destroyBallUpImage = ("data/spike-b.png", Just (0, 255, 0))
 destroyBallUpImage = ("data/spike-y.png", Nothing)
 #endif
 
-
 -- ** Audio
 -- backgroundMusic :: MusicSpec
 -- backgroundMusic = "data/level0.mp3"
 
-blockHitSFX     :: SoundSpec
-blockHitSFX     = ("data/196106_aiwha_ding-cc-by.wav", 2000)
+blockHitSFX :: SoundSpec
+blockHitSFX = ("data/196106_aiwha_ding-cc-by.wav", 2000)
 
 -- ** Fonts
-gameFontSpec    :: FontSpec
-gameFontSpec    = ("data/lacuna.ttf", 32)
+gameFontSpec :: FontSpec
+gameFontSpec = ("data/lacuna.ttf", 32)
 
 -- ** Colors
-fontColor       :: ColorSpec
-fontColor       = (228, 228, 228, 255)
+fontColor :: ColorSpec
+fontColor = (228, 228, 228, 255)

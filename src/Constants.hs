@@ -5,17 +5,17 @@ import Physics.TwoDimensions.Dimensions
 
 -- * Main screen proportion
 width :: Num a => a
-width  = 640
+width = 640
 
 height ::  Num a => a
 height = 600
 
 -- * Game area
-gameTop    :: Num a => a
-gameTop    = 100
+gameTop :: Num a => a
+gameTop = 100
 
-gameLeft   :: Num a => a
-gameLeft   = 0
+gameLeft :: Num a => a
+gameLeft = 0
 
 gameWidth :: Num a => a
 gameWidth = width
@@ -48,37 +48,48 @@ levelFinishedDelay = 4 -- seconds
 paddleWidth, paddleHeight :: Double
 paddleWidth  = 104
 paddleHeight = 24
+
 paddleMargin :: Double
 paddleMargin = 50
+
 ballWidth, ballHeight :: Double
-ballWidth    = 10
-ballHeight   = 10
+ballWidth  = 10
+ballHeight = 10
+
 ballMargin :: Double
-ballMargin   = 30
+ballMargin = 30
+
 blockWidth, blockHeight :: Double
-blockWidth   = 64
-blockHeight  = 32
+blockWidth  = 64
+blockHeight = 32
+
 blockSeparation :: Double
 blockSeparation = 10
+
 pointsUpWidth, pointsUpHeight :: Double
-pointsUpWidth = 30
+pointsUpWidth  = 30
 pointsUpHeight = 30 
+
 livesUpWidth, livesUpHeight :: Double
-livesUpWidth = 30
+livesUpWidth  = 30
 livesUpHeight = 27
+
 mockUpWidth, mockUpHeight :: Double
-mockUpWidth = 18
+mockUpWidth  = 18
 mockUpHeight = 18
+
 destroyBallUpWidth, destroyBallUpHeight :: Double
-destroyBallUpWidth = 18
+destroyBallUpWidth  = 18
 destroyBallUpHeight = 18
 
 -- * Lives
 
 stdLives :: Int
 stdLives = 3
+
 maxBlockLife :: Int
 maxBlockLife = 3
+
 minBlockLife :: Int
 minBlockLife = 1
 

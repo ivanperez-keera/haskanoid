@@ -98,10 +98,10 @@ isSide o = case objectKind o of
 -- Partial function!
 objectSize :: Object -> Size2D
 objectSize object = case objectProperties object of
-  (PaddleProps sz  )  -> sz
-  (BlockProps _ _ sz) -> sz
-  (BallProps r)       -> let w = 2*r in (w, w)
-  (PowerUpProps sz)   -> sz
+  PaddleProps sz    -> sz
+  BlockProps _ _ sz -> sz
+  BallProps r       -> let w = 2*r in (w, w)
+  PowerUpProps sz   -> sz
 
 -- Partial function. Object has size.
 objectTopLevelCorner :: Object -> Pos2D
@@ -109,7 +109,7 @@ objectTopLevelCorner object = case objectKind object of
   Paddle     -> objectPos object
   Block      -> objectPos object
   PowerUp {} -> objectPos object
-  _other     -> objectPos object ^-^ (0.5 *^ (objectSize object))
+  _other     -> objectPos object ^-^ (0.5 *^ objectSize object)
 
 -- * Physical properties
 

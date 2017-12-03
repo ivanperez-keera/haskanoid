@@ -459,31 +459,22 @@ followPaddle = arr $ \oi ->
 --
 bouncingBall :: Pos2D -> Vel2D -> ObjectSF
 bouncingBall p0 v0 =
-  switch progressAndBounce
-         (uncurry bouncingBall) -- Somehow it would be clearer like this:
-                                -- \(p', v') -> bouncingBall p' v')
+  switch progressAndBounce (uncurry bouncingBall) -- Clearer: \(p', v') -> bouncingBall p' v'
  where
 
-       -- Calculate the future tentative position, and
-       -- bounce if necessary.
-       --
-       -- The ballBounce needs the ball SF' input (which has knowledge of
-       -- collisions), so we carry it parallely to the tentative new positions,
-       -- and then use it to detect when it's time to bounce
+   -- Calculate the future tentative position, and bounce if necessary.
+   --
+   -- The SF freeball p0 v0 gives the position of the ball, starting from
+   -- p0 with velicity v0, since the time of last switching (or being fired,
+   -- whatever happened last) provided that no obstacles are encountered.
+   --
+   -- The ballBounce needs the ball SF' input and detects when it's time to
+   -- bounce.
 
-       --      ==========================    ============================
-       --     -==--------------------->==--->==-   ------------------->==
-       --    / ==                      ==    == \ /                    ==
-       --  --  ==                      ==    ==  X                     ==
-       --    \ ==                      ==    == / \                    ==
-       --     -==----> freeBall' ----->==--->==--------> ballBounce -->==
-       --      ==========================    ============================
-       progressAndBounce = (arr id &&& freeBall') >>> (arr snd &&& ballBounce)
-
-       -- Position of the ball, starting from p0 with velicity v0, since the
-       -- time of last switching (or being fired, whatever happened last)
-       -- provided that no obstacles are encountered.
-       freeBall' = freeBall p0 v0
+   progressAndBounce = proc oi -> do
+     ou <- freeBall p0 v0 -< oi
+     bb <- ballBounce     -< (oi, ou)
+     returnA -< (ou, bb)
 
 -- | Detect if the ball must bounce and, if so, take a snapshot of the object's
 -- current position and velocity.
