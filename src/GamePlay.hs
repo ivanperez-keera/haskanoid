@@ -43,7 +43,6 @@ import Control.Applicative ((<$>))
 import Data.IdentityList
 import Data.List
 import Data.Ord.Extra
-import Data.Tuple.Utils
 import Data.VectorSpace.Extra
 import FRP.Yampa
 import FRP.Yampa.Extra
@@ -51,7 +50,6 @@ import Physics.CollisionEngine
 import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.PhysicalObjects(Collision(..))
-import Debug.Trace
 
 -- Internal imports
 import Constants
@@ -656,8 +654,8 @@ objBlock ((x,y), initlives, mpuk, spu) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- first event input is hit, second is dead
   let createPowerUpF' :: (String, Maybe (PowerUpKind, AlwaysPowerUp)) -> Event () -> Event () -> Event PowerUpDef
-      createPowerUpF' (idprefix, (Just (puk, True)))  hit _    = createPowerUpF idprefix puk hit
-      createPowerUpF' (idprefix, (Just (puk, False))) _   dead = createPowerUpF idprefix puk dead
+      createPowerUpF' (idprefix, Just (puk, True))  hit _    = createPowerUpF idprefix puk hit
+      createPowerUpF' (idprefix, Just (puk, False)) _   dead = createPowerUpF idprefix puk dead
       createPowerUpF' (_, Nothing) _ _ = noEvent
 
   t <- localTime -< ()
