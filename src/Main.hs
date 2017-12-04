@@ -10,12 +10,12 @@ import Game.Resource.Manager.Ref
 
 #ifdef sdl
 import Display
-import Graphics.UI.SDL.Clock
+import Game.Clock
 #endif
 
 #ifdef sdl2
 import Display
-import Game.Clock.SDL2
+import Game.Clock
 #endif
 
 #ifdef ghcjs
