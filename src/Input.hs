@@ -37,9 +37,9 @@ import Control.Monad.Extra
 -- External imports (SDL)
 #ifdef sdl
 import Graphics.UI.SDL       as SDL
-import Graphics.UI.SDL.Clock
+import Game.Clock
 #elif sdl2
-import Game.Clock.SDL2
+import Game.Clock
 import Graphics.UI.SDL       as SDL
 import Graphics.UI.SDL.Extra (isEmptyEvent)
 #endif
