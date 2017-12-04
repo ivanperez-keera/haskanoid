@@ -112,7 +112,7 @@ executable haskanoid
                    sage-audio-sdl1,
                    sage-clock-sdl1,
                    sage-sdl1-extra,
-                   sage-temporary-sdl1
+                   sage-render-sdl1
     other-modules: Display
                    ResourceManager
                    ResourceSpecs
