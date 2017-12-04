@@ -97,6 +97,7 @@ executable haskanoid
                  sage-data-extra,
                  sage-data-identity-list,
                  sage-physics-2d-rectangles,
+                 sage-render,
                  sage-temporary,
                  sage-yampa-extra
 
