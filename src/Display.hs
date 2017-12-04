@@ -25,7 +25,7 @@ import ResourceManager
 
 #ifdef sdl
 
-import Game.Audio.SDL
+import Game.Audio
 
 import Game.Render.Renderer.SDL1 ()
 
@@ -33,7 +33,7 @@ type RenderingCtx     = ()
 type RealRenderingCtx = Surface
 
 #elif sdl2
-import Game.Audio.SDL2
+import Game.Audio
 
 import Game.Render.Renderer.SDL2 ()
 import Game.Render.Monad.SDL2    ()
