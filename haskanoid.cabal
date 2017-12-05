@@ -96,7 +96,7 @@ executable haskanoid
                  sage-assetmanager,
                  sage-data-extra,
                  sage-data-identity-list,
-                 sage-physics-2d-rectangles,
+                 sage-physics-2d,
                  sage-render,
                  sage-app-mobilegame,
                  sage-yampa-extra
