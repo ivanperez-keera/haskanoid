@@ -11,7 +11,9 @@ import Control.Monad
 import Control.Monad.IfElse       (awhen)
 import Control.Monad.Trans.Reader
 import Game.Render.Monad
-import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceAudio)
+import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceAudio,
+                                   tryGetResourceMusic)
+import Game.Audio
 import Game.VisualElem
 import Game.VisualElem.Render
 import Graphics.UI.Align
@@ -24,17 +26,12 @@ import Objects
 import ResourceManager
 
 #ifdef sdl
-
-import Game.Audio
-
 import Game.Render.Renderer.SDL1 ()
 
 type RenderingCtx     = ()
 type RealRenderingCtx = Surface
 
 #elif sdl2
-import Game.Audio
-
 import Game.Render.Renderer.SDL2 ()
 import Game.Render.Monad.SDL2    ()
 
@@ -97,8 +94,10 @@ render resourceManager shownState ctx = do
 audio :: ResourceMgr -> GameState -> IO ()
 audio resourceManager shownState = do
   -- Start bg music if necessary
-  -- playing <- musicPlaying
-  -- unless playing $ awhen (bgMusic resources) playMusic
+  playing <- musicPlaying
+  unless playing $ do 
+    m <- tryGetResourceMusic resourceManager IdBgMusic undefined
+    awhen m playMusic
 
   -- Play object hits
   mapM_ (audioObject resourceManager) $ gameObjects shownState

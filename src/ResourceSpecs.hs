@@ -64,8 +64,8 @@ destroyBallUpImage = ("data/spike-y.png", Nothing)
 #endif
 
 -- ** Audio
--- backgroundMusic :: MusicSpec
--- backgroundMusic = "data/level0.mp3"
+backgroundMusic :: MusicSpec
+backgroundMusic = "data/level0.mp3"
 
 blockHitSFX :: SoundSpec
 blockHitSFX = ("data/196106_aiwha_ding-cc-by.wav", 2000)

@@ -47,6 +47,7 @@ gameResourceSpec = ResourceSpec
              ]
   , sounds = [ (IdBlockHitFX,       blockHitSFX) ]
   , colors = [ (IdGameFontColor,    fontColor) ]
+  , music  = [ (IdBgMusic,          backgroundMusic) ]
   }
 
 type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
