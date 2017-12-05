@@ -111,8 +111,9 @@ executable haskanoid
                    sage-assetmanager-sdl1,
                    sage-audio-sdl1,
                    sage-clock-sdl1,
-                   sage-sdl1-extra,
-                   sage-render-sdl1
+                   sage-render-sdl1,
+                   sage-sdl1-extra
+
     other-modules: Display
                    ResourceManager
                    ResourceSpecs
@@ -127,9 +128,9 @@ executable haskanoid
                    sage-assetmanager-sdl2,
                    sage-audio-sdl2,
                    sage-clock-sdl2,
-                   sage-sdl2-extra,
                    sage-render-sdl2,
-                   sage-temporary-sdl2
+                   sage-sdl2-extra
+
     other-modules: Display
                    ResourceManager
                    ResourceSpecs
