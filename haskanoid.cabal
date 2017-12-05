@@ -98,7 +98,7 @@ executable haskanoid
                  sage-data-identity-list,
                  sage-physics-2d-rectangles,
                  sage-render,
-                 sage-temporary,
+                 sage-app-mobilegame,
                  sage-yampa-extra
 
   if flag(sdl)
