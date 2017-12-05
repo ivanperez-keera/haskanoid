@@ -1,12 +1,14 @@
 {-# LANGUAGE CPP #-}
-import Control.Applicative  ((<$>))
+import Control.Applicative       ((<$>))
 import Control.Exception
 import Control.Monad.IfElse
-import FRP.Yampa            as Yampa
+import FRP.Yampa                 as Yampa
+import Game.Resource.Manager.Ref
+import Game.Resource.Spec
 
 import GamePlay
 import Input
-import Game.Resource.Manager.Ref
+import Paths_haskanoid
 
 #ifdef sdl
 import Display
@@ -25,6 +27,7 @@ import GHCJSNow
 -- import System.Mem
 #endif
 
+
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = Control.Exception.catch
 
@@ -36,7 +39,8 @@ main = (`catchAny` print) $ do
 
   timeRef       <- initializeTimeRef
   controllerRef <- initializeInputDevices
-  res           <- loadResources gameResourceSpec
+  resSpec       <- localizeResourceSpec getDataFileName gameResourceSpec 
+  res           <- loadResources resSpec
 
   awhen res $ \res' -> do
     renderingCtx <- initGraphs res'
