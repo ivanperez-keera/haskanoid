@@ -46,7 +46,7 @@ getRealRenderingCtx :: RenderingCtx -> IO RealRenderingCtx
 #ifdef sdl
 getRealRenderingCtx () = getVideoSurface
 #else
-getRealRenderingCtx = id
+getRealRenderingCtx = return
 #endif
 
 -- * Initialization

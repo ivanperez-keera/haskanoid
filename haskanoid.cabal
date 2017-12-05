@@ -128,6 +128,7 @@ executable haskanoid
                    sage-audio-sdl2,
                    sage-clock-sdl2,
                    sage-sdl2-extra,
+                   sage-render-sdl2,
                    sage-temporary-sdl2
     other-modules: Display
                    ResourceManager
