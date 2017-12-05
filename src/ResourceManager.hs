@@ -7,10 +7,8 @@ import Game.Resource.Spec
 
 import ResourceSpecs
 
-#ifdef sdl
-import Game.Resource.Manager.SDL1 as SDLResourceMgr
-#elif sdl2
-import Game.Resource.Manager.SDL2 as SDLResourceMgr
+#if defined(sdl) || defined (sdl2)
+import Game.Resource.Manager.SDL as SDLResourceMgr
 #endif
 
 data ResourceId = IdGameFont
