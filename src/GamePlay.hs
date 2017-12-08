@@ -47,9 +47,9 @@ import Data.VectorSpace.Extra
 import FRP.Yampa
 import FRP.Yampa.Extra
 import Physics.CollisionEngine
-import Physics.TwoDimensions.Collisions
 import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.PhysicalObjects(Collision(..))
+import Physics.TwoDimensions.Side
 
 -- Internal imports
 import Constants

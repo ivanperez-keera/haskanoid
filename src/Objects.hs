@@ -5,10 +5,11 @@
 module Objects where
 
 import           FRP.Yampa.VectorSpace
-import           Physics.Shapes.BasicAABBCollisions
-import           Physics.TwoDimensions.Collisions
+import           Physics.TwoDimensions.Shapes.BasicAABB
+import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
+import           Physics.TwoDimensions.Side
 import           Physics.TwoDimensions.Dimensions
-import           Physics.TwoDimensions.Physics
+-- import           Physics.TwoDimensions.Physics
 import qualified Physics.TwoDimensions.PhysicalObjects as P
 
 import Constants
