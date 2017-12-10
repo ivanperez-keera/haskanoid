@@ -1,29 +1,20 @@
 # The following enables several GHC versions to be tested; often it's enough to
 # test only against the last release in a major GHC version. Feel free to omit
 # lines listings versions you don't need/want testing for.
-language: c
-env:
- - GHCVER=7.6.3
- - GHCVER=7.8.4
- - GHCVER=7.10.3
- - GHCVER=8.0.1
+language: haskell
 
-# Note: the distinction between `before_install` and `install` is not important.
+ghc:
+ - "7.6.3"
+ - "7.8.4"
+ - "7.10.3"
+ - "8.0.1"
+
 before_install:
- - unset CC
-install:
- - travis_retry sudo add-apt-repository -y ppa:hvr/ghc
  - travis_retry sudo apt-get update
  - travis_retry sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev
- - travis_retry sudo apt-get install cabal-install-1.24 ghc-$GHCVER-prof ghc-$GHCVER-dyn alex-3.1.4 happy-1.19.5
- - export PATH=$HOME/.cabal/bin:/opt/ghc/$GHCVER/bin:/opt/cabal/1.24/bin:/opt/alex/3.1.4/bin:/opt/happy/1.19.5/bin:$PATH
- - travis_retry cabal update
 
 script:
  - travis_retry cabal install --run-tests -v -j1 -f-wiimote -f-kinect
-
-notifications:
- email: true
 
 branches:
     only:
@@ -37,4 +28,4 @@ deploy:
     secure: WQp6LHDPxGPlaFsFK1CGZaW5XSFX4+f3hLkglYFKTUzNNfmq0QXmqKJROLWrvwvTmipxguM0qZdsJTYIKJdIeECyD7dR2sZHMVpoaXgle9QkYyvoAs1o9wMbdjc/vYK4QpG9we9TPwHNalXJIkwKtoWA7IDxKQ56ln2sQLx6Qz2K/tDnq8bHNhe4U/7YRGc9K2TdiFkcimPY6BqPG/mRR8AI+q3P3YLg4x4GdDKXKtxwRdWuRQaidpog6H4xbdVAjEIlbCJ/Re1Ofjq1J5ESYN5NM84+b8TiMoVs7qeiqWNuid8YCGKUpuJ4JXPai63+EHP9vr0+DFxFZPEMm94f/Lo6B/2BtUB5KoC1baVItMVte9pqcjr1slf46VoeCtXmfCa3pKBQE4TZQl25pSGISHfYaiRuCZ/zo1Rd6PPOgbdaR9agHOVMugGkO55p8qWwhL7kle/Xu8oEyOiRTc/M1PAKXe5Fa1+Vz46FNtMqTlZo/Sa5ySC3QpBfhexXqbD6fO3032VRX9oNPFXuIwwjXQ0D2lGENHxxVahcqIPC4AZVDmL+9ME7k0JVDSk7zW5gQgGdEWvtCBTLahBBwbgFHoRZxlymGnMJWovcgP9cOyrjlbd/LGjd0Hp9LEaCPmMHE+yM0cgVpVUrFtTNt4O3nl14KLYCKZ+0mwkryqEF/LI=
   on:
     branch: master
-    condition: "$GHCVER = 8.0.1"
+    condition: "${TRAVIS_HASKELL_VERSION}=8.0.1
