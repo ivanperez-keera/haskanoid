@@ -17,7 +17,7 @@ install:
   - travis_retry cabal install -f-wiimote -f-kinect --only-dependencies --enable-tests
 
 script:
-  - travis_retry cabal install --run-tests -v -j1 -f-wiimote -f-kinect
+  - travis_retry cabal configure -f-wiimote -f-kinect --enable-tests && cabal build && cabal test
 
 branches:
     only:
