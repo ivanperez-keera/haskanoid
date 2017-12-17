@@ -35,10 +35,7 @@ import Data.IORef
 import Control.Monad.Extra
 
 -- External imports (SDL)
-#ifdef sdl
-import Graphics.UI.SDL       as SDL
-import Game.Clock
-#elif sdl2
+#if defined(sdl) || defined(sdl2)
 import Game.Clock
 import Graphics.UI.SDL       as SDL
 import Graphics.UI.SDL.Extra (isEmptyEvent)
