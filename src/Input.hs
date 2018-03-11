@@ -65,19 +65,20 @@ data ControllerType = KEY
                     | WIIMOTE
                     | KINECT
 
-Eq ControllerType where
-  KEY     == KEY     = True
-  MOUSE   == MOUSE   = True
-  WIIMOTE == WIIMOTE = True
-  KINECT  == KINECT  = True
-  _       == _       = False
+instance Eq ControllerType where
+    (==) KEY KEY = True
+    (==) MOUSE MOUSE = True
+    (==) WIIMOTE WIIMOTE = True
+    (==) KINECT KINECT = True
+    (==) _ _ = False
+
 
 -- | Controller info at any given point.
 data Controller = Controller
   { controllerPos   :: (Double, Double)
   , controllerClick :: Bool
   , controllerPause :: Bool
-  , controllerType  :: ControlType
+  , controllerType  :: ControllerType
   , controllerVel   :: Double
   }
 
