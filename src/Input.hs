@@ -64,6 +64,14 @@ data ControllerType = KEY
                     | MOUSE
                     | WIIMOTE
                     | KINECT
+
+Eq ControllerType where
+  KEY     == KEY     = True
+  MOUSE   == MOUSE   = True
+  WIIMOTE == WIIMOTE = True
+  KINECT  == KINECT  = True
+  _       == _       = False
+
 -- | Controller info at any given point.
 data Controller = Controller
   { controllerPos   :: (Double, Double)
