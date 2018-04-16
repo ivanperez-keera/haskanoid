@@ -93,7 +93,7 @@ executable haskanoid
                  transformers >= 0.3 && < 0.6,
                  Yampa        >= 0.9.6 && < 0.11,
 
-                 sage-assetmanager,
+                 sage-resourcemanager,
                  sage-data-extra,
                  sage-data-identity-list,
                  sage-physics-2d,
@@ -108,7 +108,7 @@ executable haskanoid
                    SDL-mixer,
                    SDL-ttf,
 
-                   sage-assetmanager-sdl1,
+                   sage-resourcemanager-sdl1,
                    sage-audio-sdl1,
                    sage-clock-sdl1,
                    sage-render-sdl1,
@@ -125,7 +125,7 @@ executable haskanoid
                    sdl2-mixer,
                    SDL2-ttf,
 
-                   sage-assetmanager-sdl2,
+                   sage-resourcemanager-sdl2,
                    sage-audio-sdl2,
                    sage-clock-sdl2,
                    sage-render-sdl2,
@@ -134,7 +134,7 @@ executable haskanoid
     other-modules: Display
                    ResourceManager
                    ResourceSpecs
-    extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2
+    extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2 SDL2_gfx
 
   if flag(ghcjs)
     cpp-options: -Dghcjs

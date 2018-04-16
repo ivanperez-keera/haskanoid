@@ -10,7 +10,7 @@ import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
 import           Physics.TwoDimensions.Side
 import           Physics.TwoDimensions.Dimensions
 -- import           Physics.TwoDimensions.Physics
-import qualified Physics.TwoDimensions.PhysicalObjects as P
+import qualified Physics.TwoDimensions.PhysicalObject as P
 
 import Constants
 
@@ -46,7 +46,7 @@ data ObjectKind = Ball
                 | Paddle
                 | Block
                 | Side
-                | PowerUp PowerUpKind 
+                | PowerUp PowerUpKind
   deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
@@ -64,8 +64,8 @@ type BlockEnergy = Int
 -- | Indicates whether a block signals that it contains a powerup (True)
 --   or not (False).
 --
---   Note: The signal is independent from the actual creating of powerups. 
-type SignalPowerUp = Bool 
+--   Note: The signal is independent from the actual creating of powerups.
+type SignalPowerUp = Bool
 
 
 -- | Indicates whether a powerup is created everytime if the ball hits
@@ -116,15 +116,15 @@ objectTopLevelCorner object = case objectKind object of
 
 -- | Physical object definition of an 'Object'. We use AABB for shapes.
 instance P.PhysicalObject Object (String, ObjectKind) Shape where
-  physObjectPos       = objectPos
-  physObjectVel       = objectVel
-  physObjectElas      = collisionEnergy
-  physObjectShape     = objShape
-  physObjectCollides  = canCauseCollisions
-  physObjectId x      = (objectName x, objectKind x)
-  physObjectUpdatePos = \o p -> o { objectPos = p }
-  physObjectUpdateVel = \o v -> o { objectVel = v }
-  physDetectCollision = detectCollision
+  physObjectPosition       = objectPos
+  physObjectVelocity       = objectVel
+  physObjectElasticity     = collisionEnergy
+  physObjectShape          = objShape
+  physObjectCollides       = canCauseCollisions
+  physObjectId x           = (objectName x, objectKind x)
+  physObjectUpdatePosition = \o p -> o { objectPos = p }
+  physObjectUpdateVelocity = \o v -> o { objectVel = v }
+  physDetectCollision      = detectCollision
 
 -- | Collision shape of an object.
 objShape :: Object -> Shape

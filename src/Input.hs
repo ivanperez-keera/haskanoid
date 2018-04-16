@@ -260,7 +260,7 @@ sdlMouseKB = return (Just sdlGetController)
 -- TODO: Check http://gameprogrammer.com/fastevents/fastevents1.html
 sdlGetController :: Controller -> IO Controller
 sdlGetController info =
-  foldLoopM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
+  foldWhileM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
 #endif
 
 #ifdef sdl
@@ -435,7 +435,7 @@ avg ls = (sumx `div` l, sumy `div` l)
         (sumx, sumy) = foldr (\(_,x,y) (rx,ry) -> (x+rx,y+ry)) (0,0) ls
 
 -- Update a value, with a max cap
--- TODO: Take from extra num? 
+-- TODO: Take from extra num?
 adjust :: (Num a, Ord a) => a -> a -> a -> a
 adjust maxD old new
   | abs (old - new) < maxD = new
