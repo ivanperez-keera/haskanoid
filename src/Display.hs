@@ -11,7 +11,8 @@ import Control.Monad
 import Control.Monad.IfElse       (awhen)
 import Control.Monad.Trans.Reader
 import Game.Render.Monad
-import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceAudio,
+import Game.Render.Renderer.SDL ()
+import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceSound,
                                    tryGetResourceMusic)
 import Game.Audio
 import Game.VisualElem
@@ -26,14 +27,12 @@ import Objects
 import ResourceManager
 
 #ifdef sdl
-import Game.Render.Renderer.SDL1 ()
 
 type RenderingCtx     = ()
 type RealRenderingCtx = Surface
 
 #elif sdl2
-import Game.Render.Renderer.SDL2 ()
-import Game.Render.Monad.SDL2    ()
+import Game.Render.Monad.SDL    ()
 
 type RealRenderingCtx = (Renderer, Window)
 type RenderingCtx     = (Renderer, Window)
@@ -94,8 +93,8 @@ render resourceManager shownState ctx = do
 audio :: ResourceMgr -> GameState -> IO ()
 audio resourceManager shownState = do
   -- Start bg music if necessary
-  playing <- musicPlaying
-  unless playing $ do 
+  playing <- musicIsPlaying
+  unless playing $ do
     m <- tryGetResourceMusic resourceManager IdBgMusic undefined
     awhen m playMusic
 
@@ -105,14 +104,14 @@ audio resourceManager shownState = do
 audioObject :: ResourceMgr -> Object -> IO ()
 audioObject resourceManager object = when (objectHit object) $
   case objectKind object of
-    Block -> do bhit <- tryGetResourceAudio resourceManager IdBlockHitFX undefined
-                awhen bhit playFile
+    Block -> do bhit <- tryGetResourceSound resourceManager IdBlockHitFX undefined
+                awhen bhit playSoundFX
     _     -> return ()
 
 -- ** Visual rendering
 -- TODO: Uses undefined for rendering context, should get from Main
 display :: ResourceMgr -> GameState -> RealRenderingCtx -> IO ()
-display resourceManager shownState = onRenderingCtx $ \ctx -> 
+display resourceManager shownState = onRenderingCtx $ \ctx ->
   flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
     concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ]
   where
@@ -137,7 +136,7 @@ display resourceManager shownState = onRenderingCtx $ \ctx ->
                                  (const (pos, Align HLeft VTop))
       where
         pos      = (round (ox + gameLeft), round (oy + gameTop))
-        (ox, oy) = objectTopLevelCorner object 
+        (ox, oy) = objectTopLevelCorner object
 
     over   = gameInfo shownState
     status = gameStatus over
@@ -154,10 +153,10 @@ statusMsg GameStarted               = Nothing
 objectImage :: Object -> ResourceId
 objectImage object = case objectKind object of
   Paddle                -> IdPaddleImg
-  Block                 -> let (BlockProps e pu _) = objectProperties object 
-                           in if pu 
+  Block                 -> let (BlockProps e pu _) = objectProperties object
+                           in if pu
                                 then IdBlockPuImg -- signals powerup
-                                else case e of 
+                                else case e of
                                        3 -> IdBlock1Img
                                        2 -> IdBlock2Img
                                        _ -> IdBlock3Img

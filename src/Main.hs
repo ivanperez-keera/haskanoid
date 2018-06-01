@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 import Control.Applicative       ((<$>))
-import Control.Exception
+import Control.Exception.Extra   (catchAny)
 import Control.Monad.IfElse
 import FRP.Yampa                 as Yampa
 import Game.Resource.Manager.Ref
@@ -22,10 +22,6 @@ import GHCJSNow
 -- import Control.Concurrent
 -- import System.Mem
 #endif
-
-
-catchAny :: IO a -> (SomeException -> IO a) -> IO a
-catchAny = Control.Exception.catch
 
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()
