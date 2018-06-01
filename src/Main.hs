@@ -10,14 +10,10 @@ import GamePlay
 import Input
 import Paths_haskanoid
 
-#ifdef sdl
+#if defined(sdl) || defined(sdl2)
 import Display
 import Game.Clock
-#endif
-
-#ifdef sdl2
-import Display
-import Game.Clock
+import ResourceManager
 #endif
 
 #ifdef ghcjs
@@ -39,7 +35,7 @@ main = (`catchAny` print) $ do
 
   timeRef       <- initializeTimeRef
   controllerRef <- initializeInputDevices
-  resSpec       <- localizeResourceSpec getDataFileName gameResourceSpec 
+  resSpec       <- localizeResourceSpec getDataFileName gameResourceSpec
   res           <- loadResources resSpec
 
   awhen res $ \res' -> do
