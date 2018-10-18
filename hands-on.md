@@ -1,8 +1,11 @@
-# Help Wanted
+# Hands-on
 
-In this file you will find suggestions for improving haskanoid.
+In this file you find ideas to improve haskanoid while focussing on (game)
+programming related areas that you might want to dive in deeper. The areas are:
+functional (reactive) programming, performance, human-computer interaction and
+input/output, and game design.
 
-# How to:
+## How to:
 
 If you want to work on one of the suggestions stated in this file (or something
 else that will improve haskanoid), check whether there is an open issue related
@@ -11,7 +14,9 @@ an issue related to this feature. Then start contributing by asking questions
 or solving the issue and creating a pull request while always referencing this
 issue.
 
-# Suggestions: Functional Reactive Programming (FRP)
+## Ideas and Suggestions
+
+### Functional Reactive Programming (FRP)
 
 If you are interested in FRP: The physics/collision subsystem,
 which works in three steps (simulation, detection and correction),
@@ -35,7 +40,7 @@ the delta times used for the simulation. Implement a better system.
   Start small, try to simplify, and grow steady. A don't, don't, don't
   even think of optimising until you have, at least, solved the problem.
 
-# Suggestions: Functional Programming (FP) and Game Programming
+### Functional Programming (FP) and Game Programming
 
 If you are interested in FP concepts and game programming, you might want
 to try and think about the following: The resource manager is very
@@ -53,7 +58,7 @@ with a pure game component. The following are suggested:
   be loaded/unloaded in the background, even before the next
   level starts, and making the display responsive (again).
 
-# Suggestions: Performance
+### Performance
 
 If you are interested in performance: you'll notice that this game has
 growing memory demands.  There's a trivial change to one module that makes
@@ -61,7 +66,7 @@ the game run in constant memory per level (using only 3M).
 
 See also: http://keera.co.uk/blog/2014/10/15/from-60-fps-to-500/
 
-# Suggestions: Human-Computer Interaction and Input/Output
+### Human-Computer Interaction and Input/Output
 
 * If you are interested in Human-Computer Interaction and Input/Output:
   adding support for new devices is really simple. Using a kinect,
@@ -70,9 +75,9 @@ See also: http://keera.co.uk/blog/2014/10/15/from-60-fps-to-500/
   devices, such as mobile phones, or brain sensors, webcams, or the new
   (upcoming) Kinect, which will do eye tracking!
 
-# Suggestions: Game Design
+### Game Design
 
-## General Thoughts
+#### General Thoughts
 
 If you are interested in game design: this game is quite simplistic,
 consisting only of blocks that must be hit. Some ideas for improvements:
@@ -82,7 +87,7 @@ a timer to complete it; the paddle might tilt to the sides as it moves,
 the inclination depending on the acceleration (or the Wiimote roll).
 
 
-## Feature Ideas created for ZuriHac2018
+#### Feature Ideas created for ZuriHac2018
 by Christina Zeller
 
 * NOTE: The unsorted tasks vary in complexity and the tasks are not at all described in detail.

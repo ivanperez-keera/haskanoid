@@ -127,14 +127,13 @@ an introductory example of how to do sphere collisions in Yampa.
 [Google
 Play](https://play.google.com/store/apps/details?id=uk.co.keera.games.magiccookies&hl=en).
 
-# Help wanted
+# Hands-on
 
-In the
-[help-wanted.md](https://github.com/keera-studios/Haskelloids/blob/master/help-wanted.md)
-you find several ideas related to functional (reactive) programming,
-performance, human-computer interaction and input/output, and game design that
-could improve the game and could give you opportunities to learn about these
-topics.
+In the [hands-on.md](https://github.com/keera-studios/Haskelloids/blob/master/hands-on.md)
+file you find ideas to improve haskanoid while focussing on (game)
+programming related areas that you might want to dive in deeper. The areas are:
+functional (reactive) programming, performance, human-computer interaction and
+input/output, and game design.
 
 # Educators
 
