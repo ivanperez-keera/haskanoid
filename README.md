@@ -129,8 +129,8 @@ Play](https://play.google.com/store/apps/details?id=uk.co.keera.games.magiccooki
 
 # Hands-on
 
-In the [hands-on-file](https://github.com/ivanperez-keera/haskanoid/blob/master/hands-on.md)
-file you find ideas to improve haskanoid while focussing on (game)
+In the [hands-on file](https://github.com/ivanperez-keera/haskanoid/blob/master/hands-on.md)
+you find ideas to improve haskanoid while focussing on (game)
 programming related areas that you might want to dive in deeper. The areas are:
 functional (reactive) programming, performance, human-computer interaction and
 input/output, and game design.
