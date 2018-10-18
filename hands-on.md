@@ -5,7 +5,7 @@ programming related areas that you might want to dive in deeper. The areas are:
 functional (reactive) programming, performance, human-computer interaction and
 input/output, and game design.
 
-## How to:
+## How-to
 
 If you want to work on one of the suggestions stated in this file (or something
 else that will improve haskanoid), check whether there is an open issue related
