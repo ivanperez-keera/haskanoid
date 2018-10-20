@@ -60,12 +60,26 @@ import Graphics.UI.Extra.SDL
 import Constants
 
 -- * Game controller
+data ControllerType = KEY
+                    | MOUSE
+                    | WIIMOTE
+                    | KINECT
+
+instance Eq ControllerType where
+    (==) KEY KEY = True
+    (==) MOUSE MOUSE = True
+    (==) WIIMOTE WIIMOTE = True
+    (==) KINECT KINECT = True
+    (==) _ _ = False
+
 
 -- | Controller info at any given point.
 data Controller = Controller
   { controllerPos   :: (Double, Double)
   , controllerClick :: Bool
   , controllerPause :: Bool
+  , controllerType  :: ControllerType
+  , controllerVel   :: Double
   }
 
 -- | Controller info at any given point, plus a pointer
@@ -105,7 +119,7 @@ initializeInputDevices = do
 
   nr <- newIORef defaultInfo
   return $ ControllerRef (nr, dev')
- where defaultInfo = Controller (0,0) False False
+ where defaultInfo = Controller (0,0) False False MOUSE 0
 
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
@@ -195,6 +209,8 @@ senseWiimote wmdev controller = do
   -- Update state
   return (controller { controllerPos   = (finX, finY) -- pos'
                      , controllerClick = isClick
+                     , controllerType  = WIIMOTE
+                     , controllerVel   = 0
                      })
 #endif
 
@@ -223,14 +239,28 @@ sdlGetController info =
 handleEvent :: Controller -> SDL.Event -> Controller
 handleEvent c e =
   case e of
-    MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
+    MouseMotion x y _ _                      -> c { controllerPos = (fromIntegral x, fromIntegral y), controllerType = MOUSE, controllerVel = 0 }
+    -- Click
     MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
+    KeyDown Keysym { symKey = SDLK_UP }      -> c { controllerClick = True }
+    -- Unclick
+    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False }
+    KeyUp Keysym { symKey = SDLK_UP }        -> c { controllerClick = False }
+    -- Slide Left
+    KeyDown Keysym { symKey = SDLK_LEFT }    -> c { controllerVel = -4, controllerType = KEY }
+    -- Slide Right 
+    KeyDown Keysym { symKey = SDLK_RIGHT }   -> c { controllerVel = 4, controllerType = KEY }
+    -- Stop Sliding 
+    KeyDown Keysym { symKey = SDLK_DOWN }    -> c { controllerVel = 0 }
+    KeyUp Keysym { symKey = SDLK_LEFT }      -> case c of
+                                                   Controller { controllerVel = -4 } -> c { controllerVel = 0 }
+                                                   _ -> c
+    KeyUp Keysym { symKey = SDLK_RIGHT }     -> case c of
+                                                   Controller { controllerVel = 4 } -> c { controllerVel = 0 }
+                                                   _ -> c
+    -- Pause
     KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
-    KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
-    KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
     _                                        -> c
-
 
 -- Kinect
 
@@ -244,7 +274,10 @@ kinectGetController :: KinectPosRef -> Controller -> IO Controller
 kinectGetController kinectPosRef c = do
   kinectPos  <- readIORef kinectPosRef
   c' <- sdlGetController c
-  let c'' = maybe c' (\p -> c' { controllerPos = p }) kinectPos
+  let c'' = maybe c' (\p -> c' { controllerPos = p
+                               , controllerType = KINECT
+                               , controllerVel = 0 })
+                     kinectPos
   return c''
 
 -- TODO Use these instead of hard-coded values

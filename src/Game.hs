@@ -511,13 +511,30 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   -- Try to get to the mouse position, but with a capped
   -- velocity.
 
-  rec
+  --rec
       -- let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
-      -- let p = refPosPaddle ci -- (initPosPaddle ^+^) ^<< integral -< v
-      let v = 100.00 *^ (refPosPaddle ci ^-^ p)
-      p <- (initPosPaddle ^+^) ^<< integral -< v
+      --let p = refPosPaddle ci -- (initPosPaddle ^+^) ^<< integral -< v
+      --let v = 100.00 *^ (refPosPaddle ci ^-^ p)
+      -- p <- (initPosPaddle ^+^) ^<< integral -< v
       -- let p = refPosPaddle ci
+  -- If anyone knows a way to have the arrows in this sort of switched function, feel free to redo this, not familiar with Arrows or what's being done with the integral exactly.
+  let pv = case ci of 
+             Controller { controllerType = MOUSE } -> 
+                 (p, 0) where 
+                     p = refPosPaddle ci
+             Controller { controllerType = KEY }   -> 
+                 (findPos p, v) where 
+                     p = objectPos <$> find isPaddle (knownObjects (ObjectInput ci cs os)) 
+                     v = controllerVel ci 
+                     findPos :: Maybe Pos2D -> Pos2D 
+                     findPos Nothing = initPosPaddle 
+                     findPos (Just p) = p 
+  let p = fst pv 
+  let v = snd pv 
+ 
+  let p' = (max 0 (min (gameWidth - paddleWidth) ((fst p) + v)), snd p) 
 
+      
   --  Use this code if you want instantaneous movement,
   --  particularly cool with the Wiimote, but remember to cap
   --  the balls velocity or you will get incredibly high
