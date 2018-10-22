@@ -6,7 +6,9 @@ env:
  - GHCVER=7.6.3
  - GHCVER=7.8.4
  - GHCVER=7.10.3
- - GHCVER=8.0.1
+ - GHCVER=8.2.2
+ - GHCVER=8.4.4
+ - GHCVER=8.6.1
 
 # Note: the distinction between `before_install` and `install` is not important.
 before_install:
@@ -37,4 +39,4 @@ deploy:
     secure: WQp6LHDPxGPlaFsFK1CGZaW5XSFX4+f3hLkglYFKTUzNNfmq0QXmqKJROLWrvwvTmipxguM0qZdsJTYIKJdIeECyD7dR2sZHMVpoaXgle9QkYyvoAs1o9wMbdjc/vYK4QpG9we9TPwHNalXJIkwKtoWA7IDxKQ56ln2sQLx6Qz2K/tDnq8bHNhe4U/7YRGc9K2TdiFkcimPY6BqPG/mRR8AI+q3P3YLg4x4GdDKXKtxwRdWuRQaidpog6H4xbdVAjEIlbCJ/Re1Ofjq1J5ESYN5NM84+b8TiMoVs7qeiqWNuid8YCGKUpuJ4JXPai63+EHP9vr0+DFxFZPEMm94f/Lo6B/2BtUB5KoC1baVItMVte9pqcjr1slf46VoeCtXmfCa3pKBQE4TZQl25pSGISHfYaiRuCZ/zo1Rd6PPOgbdaR9agHOVMugGkO55p8qWwhL7kle/Xu8oEyOiRTc/M1PAKXe5Fa1+Vz46FNtMqTlZo/Sa5ySC3QpBfhexXqbD6fO3032VRX9oNPFXuIwwjXQ0D2lGENHxxVahcqIPC4AZVDmL+9ME7k0JVDSk7zW5gQgGdEWvtCBTLahBBwbgFHoRZxlymGnMJWovcgP9cOyrjlbd/LGjd0Hp9LEaCPmMHE+yM0cgVpVUrFtTNt4O3nl14KLYCKZ+0mwkryqEF/LI=
   on:
     branch: master
-    condition: "$GHCVER = 8.0.1"
+    condition: "$GHCVER = 8.6.1"
