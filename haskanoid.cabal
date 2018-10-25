@@ -95,13 +95,14 @@ executable haskanoid
                  Physics.TwoDimensions.Dimensions
                  Physics.TwoDimensions.Physics
                  Resources
+                 Paths_haskanoid
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
                        transformers >= 0.3 && < 0.6,
                        mtl,
                        MissingH,
-                       Yampa >= 0.9.6 && < 0.11,
+                       Yampa >= 0.9.6 && < 0.12,
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse
 

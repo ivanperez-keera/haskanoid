@@ -335,8 +335,9 @@ initialObjects level = listToIL $
     , objPaddle   
     , objBall
     ]
-    ++ map (\p -> objBlockAt p (blockWidth, blockHeight)) (blockPoss $ levels!!level)
+    ++ map (\p -> objBlock p (blockWidth, blockHeight)) (blockCfgs $ levels!!level)
 
+    
 -- *** Ball
 
 -- | Ball
@@ -556,27 +557,27 @@ yPosPaddle = gameHeight - paddleMargin
 
 -- *** Blocks
 
--- | Block SF generator. It uses the blocks's size and position. The block's
--- position is used for it's unique ID, which means that two simulatenously
--- existing blocks should never have the same position. This is ok in this case
--- because they are static, but would not work if they could move and be
--- created dynamically.
-objBlockAt :: Pos2D -> Size2D -> ObjectSF
-objBlockAt (x,y) (w,h) = proc (ObjectInput ci cs os) -> do
+-- | Block SF generator. It uses the blocks's size, position and a number of
+-- lives that the block has. The block's position is used for it's unique ID,
+-- which means that two simulatenously existing blocks should never have the
+-- same position. This is ok in this case because they are static, but would not
+-- work if they could move and be created dynamically.
+objBlock :: (Pos2D, Int) -> Size2D -> ObjectSF
+objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
   let name  = "blockat" ++ show (x,y)
       isHit = inCollision name cs
   hit   <- edge -< isHit
 
-  -- Must be hit three times do disappear
+  -- Must be hit initlives times to disappear
   --
   -- If you want them to "recover" or self-heal with time,
   -- use the following code in place of lives.
   --
   -- recover <- delayEvent 5.0 -< hit
   -- lives <- accumHoldBy (+) 3 -< (hit `tag` (-1) `lMerge` recover `tag` 1) 
-  lives <- accumHoldBy (+) 3 -< (hit `tag` (-1)) 
+  lives <- accumHoldBy (+) initlives -< (hit `tag` (-1)) 
   -- 
   -- let lives = 3 -- Always perfect
 

@@ -1,4 +1,4 @@
-[![Version on Hackage](https://img.shields.io/hackage/v/haskanoid.svg)](https://hackage.haskell.org/package/haskanoid) 
+[![Version on Hackage](https://img.shields.io/hackage/v/haskanoid.svg)](https://hackage.haskell.org/package/haskanoid)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ivanperez-keera&url=https://github.com/ivanperez-keera/haskanoid&title=Haskanoid&language=&tags=github&category=software)
 
 This is a Haskell breakout game implemented using the Functional
@@ -127,67 +127,13 @@ an introductory example of how to do sphere collisions in Yampa.
 [Google
 Play](https://play.google.com/store/apps/details?id=uk.co.keera.games.magiccookies&hl=en).
 
-# Homework
+# Hands-on
 
-There are a few obvious ways to improve this code:
-
-* If you are interested in FRP: The physics/collision subsystem,
-  which works in three steps (simulation, detection and correction),
-  is too naive. Because there is no control no point-of-collision or
-  time-of-collision detection, this results in a collision engine that depends
-  greatly on the number of frames per second. In FRP there is little control over
-  the delta times used for the simulation. Implement a better system.
-
-  * NOTE: Maths are used for physics and collisions all the time. Matrices are
-    your friends. Don't reinvent the wheel, just recall freshman algebra.
-
-  * NOTE: I recommend the following introductory book, which also
-    has really good pointers: Jason Gregory's Game Engine Architecture.
-
-  * NOTE: when programming such a system, it's incredibly easy to get
-    caught up in tiny details that provoke huge increases in the complexity of
-    the problem. The kinds of shapes you allow matter. Whether they are concave or
-    convex matter. Whether you allow rotation matters. Don't underestimate this
-    problem: professional engines such as AndEngine get this wrong as well (see a
-    pinball video on Keera Studios' facebook page for details).
-	Start small, try to simplify, and grow steady. A don't, don't, don't
-    even think of optimising until you have, at least, solved the problem.
-
-* If you are interested in performance: you'll notice that this game has
-  growing memory demands.  There's a trivial change to one module that makes
-  the game run in constant memory per level (using only 3M).
-
-  See also: http://keera.co.uk/blog/2014/10/15/from-60-fps-to-500/
-
-* If you are interested in game design: this game is quite simplistic,
-  consisting only of blocks that must be hit. Some ideas for improvements:
-  things could fall when a block is hit; some blocks might be "poisonous";
-  the ball could go faster or slower with time; each level might have
-  a timer to complete it; the paddle might tilt to the sides as it moves,
-  the inclination depending on the acceleration (or the Wiimote roll).
-
-* If you are interested in FP concepts and game programming, you might want
-  to try and think about the following: The resource manager is very
-  simplistic: resouce loading happens at level transition, resources are
-  unloaded only by the garbage collector as references to them are removed from
-  memory. This overly-simplistic work might not scale well for complex
-  games. The problem, once again, of implementing such a subsystem is that it's
-  an IO component that may fail and must work asynchronously, yet synchronise
-  with a pure game component. The following are suggested:
-
-  * Implement a loading message, and make the game wait until resources
-    are loaded.
-
-  * Make the resource manager asynchronous, so that resources can
-    be loaded/unloaded in the background, even before the next
-    level starts, and making the display responsive (again).
-
-* If you are interested in Human-Computer Interaction and Input/Output:
-  adding support for new devices is really simple. Using a kinect,
-  for instance, requires minimal changes (we have code that works with
-  the freenect library). But maybe you can connect it to more interesting
-  devices, such as mobile phones, or brain sensors, webcams, or the new
-  (upcoming) Kinect, which will do eye tracking!
+In the [hands-on file](https://github.com/ivanperez-keera/haskanoid/blob/master/hands-on.md)
+you find ideas to improve haskanoid while focussing on (game)
+programming related areas that you might want to dive in deeper. The areas are:
+functional (reactive) programming, performance, human-computer interaction and
+input/output, and game design.
 
 # Educators
 
