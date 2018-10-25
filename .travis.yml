@@ -31,7 +31,6 @@ branches:
     only:
           - master
           - develop
-          - fix-travis-ghc
 
 deploy:
   provider: hackage
