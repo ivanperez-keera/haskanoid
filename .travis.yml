@@ -10,7 +10,12 @@ ghc:
   - "8.0.2"
   - "8.2.2"
   - "8.4.4"
-  - "8.6.1"
+  - "8.6.2"
+
+matrix:
+  allow_failures:
+    - ghc: "8.6.2"
+
 
 before_install:
   - travis_retry sudo apt-get update
@@ -26,6 +31,7 @@ branches:
     only:
           - master
           - develop
+          - fix-travis-ghc
 
 deploy:
   provider: hackage
