@@ -1,7 +1,7 @@
 -- | Game objects and collisions.
 module Objects where
 
-import FRP.Yampa.VectorSpace
+import Data.VectorSpace
 
 import Data.Extra.Num
 import Physics.TwoDimensions.Dimensions
@@ -37,7 +37,7 @@ type Objects   = [Object]
 -- TODO: Use a GADT to separate these properties in two types and guarantee a
 -- proper correspondence in 'Object'.
 data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D 
+                | Paddle  Size2D
                 | Block   Energy Size2D
                 | Side    Side
   deriving (Show,Eq)
@@ -77,7 +77,7 @@ type Collisions = [Collision]
 
 -- | A collision is a list of objects that collided, plus their velocities as
 -- modified by the collision.
--- 
+--
 -- Take into account that the same object could take part in several
 -- simultaneous collitions, so these velocities should be added (per object).
 data Collision = Collision

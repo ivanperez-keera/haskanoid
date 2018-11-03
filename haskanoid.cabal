@@ -99,12 +99,13 @@ executable haskanoid
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
-                       transformers >= 0.3 && < 0.6,
-                       mtl,
+                       IfElse,
                        MissingH,
-                       Yampa >= 0.9.6 && < 0.12,
+                       mtl,
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
-                       IfElse
+                       simple-affine-space,
+                       transformers >= 0.3 && < 0.6,
+                       Yampa >= 0.13 && < 0.14
 
   if flag(wiimote)
     build-depends: hcwiid
