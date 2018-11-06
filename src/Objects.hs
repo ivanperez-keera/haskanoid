@@ -4,7 +4,7 @@
 -- | Game objects and collisions.
 module Objects where
 
-import           FRP.Yampa.VectorSpace
+import           Data.VectorSpace
 import           Physics.TwoDimensions.Shapes.BasicAABB
 import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
 import           Physics.TwoDimensions.Side

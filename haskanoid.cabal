@@ -91,15 +91,18 @@ executable haskanoid
                  MissingH,
                  mtl,
                  transformers >= 0.3 && < 0.6,
-                 Yampa        >= 0.9.6 && < 0.11,
+                 Yampa        >= 0.13 && < 0.14,
 
-                 sage-resourcemanager,
+                 sage-app-mobilegame,
+                 sage-data-extra,
                  sage-data-extra,
                  sage-data-identity-list,
                  sage-physics-2d,
                  sage-render,
-                 sage-app-mobilegame,
-                 sage-yampa-extra
+                 sage-resourcemanager,
+                 sage-yampa-extra,
+                 simple-affine-space
+
 
   if flag(sdl)
     cpp-options: -Dsdl

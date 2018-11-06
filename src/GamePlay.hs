@@ -39,16 +39,16 @@
 module GamePlay (wholeGame) where
 
 -- External imports
-import Control.Applicative ((<$>))
+import Control.Applicative                  ((<$>))
 import Data.IdentityList
 import Data.List
 import Data.Ord.Extra
+import Data.VectorSpace.Extra
 import FRP.Yampa
 import FRP.Yampa.Extra
-import FRP.Yampa.VectorSpace.Extra
 import Physics.CollisionEngine
 import Physics.TwoDimensions.Dimensions
-import Physics.TwoDimensions.PhysicalObject (Collision(..))
+import Physics.TwoDimensions.PhysicalObject (Collision (..))
 import Physics.TwoDimensions.Side
 
 -- Internal imports
