@@ -10,14 +10,10 @@ import GamePlay
 import Input
 import Paths_haskanoid
 
-#ifdef sdl
+#if defined(sdl) || defined(sdl2)
 import Display
 import Game.Clock
-#endif
-
-#ifdef sdl2
-import Display
-import Game.Clock
+import ResourceManager
 #endif
 
 #ifdef ghcjs
