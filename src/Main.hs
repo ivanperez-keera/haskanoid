@@ -49,5 +49,5 @@ main = (`catchAny` print) $ do
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ e -> render res' e renderingCtx >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
+               (\_ e -> render e env >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
                wholeGame

@@ -7,6 +7,7 @@ module Display
   )
   where
 
+import App.Context              (RuntimeContext)
 import Control.Monad
 import Control.Monad.IfElse       (awhen)
 import Control.Monad.Trans.Reader
@@ -31,6 +32,16 @@ import ResourceManager
 #ifdef sdl2
 import Game.Render.Monad.SDL    ()
 #endif
+
+-- * Environment handling
+
+-- | The rendering environment given by the resource manager,
+-- runtime context, and rendering context.
+--
+-- This is a valid 'GRenderingEnv' which has functions like
+-- renderingEnvResourceMgr, renderingEnvRuntimeCtx and
+-- renderingEnvRuntimeCtx.
+type RenderEnv = (ResourceMgr, RuntimeContext, RenderingCtx)
 
 -- * Initialization
 
@@ -57,15 +68,15 @@ adjustSDLsettings = return ()
 -- * Rendering and Sound
 
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
-render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
-render resourceManager shownState ctx = do
-  audio   resourceManager shownState
-  display resourceManager shownState ctx
+render :: GameState -> RenderEnv -> IO ()
+render shownState env = do
+  audio   shownState env
+  display shownState env
 
 -- ** Audio
 
-audio :: ResourceMgr -> GameState -> IO ()
-audio resourceManager shownState = do
+audio :: GameState -> RenderEnv -> IO ()
+audio shownState (resourceManager, _, _) = do
   -- Start bg music if necessary
   playing <- musicIsPlaying
   unless playing $ do
@@ -83,11 +94,10 @@ audioObject resourceManager object = when (objectHit object) $
     _     -> return ()
 
 -- ** Visual rendering
--- TODO: Uses undefined for rendering context, should get from Main
-display :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
-display resourceManager shownState = onRenderingCtx $ \ctx ->
-  flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
-    concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ]
+display :: GameState -> RenderEnv -> IO ()
+display shownState env@(resourceManager, _runtimeCtx, renderingCtx) = onRenderingCtx ( \ctx ->
+  (flip runReaderT env $ renderVE $ CollageItems $
+    concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ])) renderingCtx
   where
     -- Background
     bgItem     = CollageItem (VisualImage IdBgImg)
