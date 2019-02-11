@@ -21,7 +21,7 @@ import Graphics.UI.Align
 import Graphics.UI.Collage
 import Graphics.UI.SDL        as SDL hiding (flip)
 import Playground             (Settings (height, width))
-import Playground.SDL         (RenderingCtx)
+import Playground.SDL         (RenderingCtx, initGraphs)
 
 import Constants
 import GameState
@@ -41,31 +41,17 @@ initializeDisplay = do
 
   initAudio
 
-initGraphs :: ResourceManager.ResourceMgr -> IO RenderingCtx
+adjustSDLsettings :: IO ()
 #ifdef sdl
-initGraphs _mgr = do
-  -- Create window
-  _screen <- SDL.setVideoMode (width settings) (height settings) 32 [SWSurface]
-  SDL.setCaption "Test" ""
-
+adjustSDLsettings = void $ do
   -- Important if we want the keyboard to work right (I don't know
   -- how to make it work otherwise)
   SDL.enableUnicode True
 
   -- Hide mouse
   SDL.showCursor False
-  SDL.getVideoSurface
-
 #elif sdl2
-
-initGraphs mgr = do
-  -- Create window
-  (window, renderer) <- SDL.createWindowAndRenderer (Size (width settings) (height settings)) [WindowShown, WindowOpengl]
-  renderSetLogicalSize renderer (width settings) (height settings)
-
-  prepareAllResources mgr renderer
-
-  return (renderer, window)
+adjustSDLsettings = return ()
 #endif
 
 -- * Rendering and Sound

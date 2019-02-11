@@ -5,7 +5,9 @@ import Control.Monad.IfElse
 import FRP.Yampa                 as Yampa
 import Game.Resource.Manager.Ref
 import Game.Resource.Spec
+import Playground.SDL            (initGraphs, loadAllResources)
 
+import Constants       (settings)
 import GamePlay
 import Input
 import Paths_haskanoid
@@ -28,6 +30,8 @@ main :: IO ()
 main = (`catchAny` print) $ do
 
   initializeDisplay
+  renderingCtx  <- initGraphs settings
+  adjustSDLsettings
 
   timeRef       <- initializeTimeRef
   controllerRef <- initializeInputDevices
@@ -35,7 +39,9 @@ main = (`catchAny` print) $ do
   res           <- loadResources resSpec
 
   awhen res $ \res' -> do
-    renderingCtx <- initGraphs res'
+    -- TODO: The 'undefined' is the runtime context.
+    let env = (res', undefined, renderingCtx)
+    loadAllResources env
     reactimate (senseInput controllerRef)
                (\_ -> do
                   -- Get clock and new input
