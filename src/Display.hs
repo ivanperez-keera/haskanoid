@@ -19,7 +19,8 @@ import Game.VisualElem
 import Game.VisualElem.Render
 import Graphics.UI.Align
 import Graphics.UI.Collage
-import Graphics.UI.SDL            as SDL hiding (flip)
+import Graphics.UI.SDL        as SDL hiding (flip)
+import Playground             (Settings (height, width))
 
 import Constants
 import GameState
@@ -58,7 +59,7 @@ initGraphs :: ResourceManager.ResourceMgr -> IO RenderingCtx
 #ifdef sdl
 initGraphs _mgr = do
   -- Create window
-  _screen <- SDL.setVideoMode width height 32 [SWSurface]
+  _screen <- SDL.setVideoMode (width settings) (height settings) 32 [SWSurface]
   SDL.setCaption "Test" ""
 
   -- Important if we want the keyboard to work right (I don't know
@@ -72,8 +73,8 @@ initGraphs _mgr = do
 
 initGraphs mgr = do
   -- Create window
-  (window, renderer) <- SDL.createWindowAndRenderer (Size width height) [WindowShown, WindowOpengl]
-  renderSetLogicalSize renderer width height
+  (window, renderer) <- SDL.createWindowAndRenderer (Size (width settings) (height settings)) [WindowShown, WindowOpengl]
+  renderSetLogicalSize renderer (width settings) (height settings)
 
   prepareAllResources mgr renderer
 

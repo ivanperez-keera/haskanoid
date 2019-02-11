@@ -1,14 +1,30 @@
 module Constants where
 
+import Data.Char (toLower)
 import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
+import Playground (Settings(..))
+import App.Context (noResourceContext)
 
--- * Main screen proportion
-width :: Num a => a
-width = 640
 
-height ::  Num a => a
-height = 600
+-- | General settings of the application.
+settings :: (Num a) => Settings a
+settings = Settings
+  { debugTag      = "uk.co.keera.game." ++ fmap toLower (gameName (settings :: Settings Double) noResourceContext)
+  , debugMain     = False
+  , debugInput    = False
+  , debugStats    = False
+  , debugMedia    = False
+  , debugAudio    = False
+  , debugOS       = False
+  , debugLogic    = False
+  , debugRenderer = False
+  , debugVerbose  = False
+  , width         = 640
+  , height        = 600
+  , gameName      = const "Haskanoid"
+  , confFilePath = fmap toLower (gameName (settings :: Settings Double) noResourceContext) ++ ".config"
+  }
 
 -- * Game area
 gameTop :: Num a => a
@@ -18,10 +34,10 @@ gameLeft :: Num a => a
 gameLeft = 0
 
 gameWidth :: Num a => a
-gameWidth = width
+gameWidth = width settings
 
 gameHeight :: Num a => a
-gameHeight = height - gameTop
+gameHeight = (height settings) - gameTop
 
 -- * Block area
 gameAreaTopMargin :: Num a => a
@@ -33,13 +49,13 @@ gameAreaMinLeftMargin = 25
 -- * Time \/ Delays
 loadingDelay :: DTime
 loadingDelay = 2 -- seconds
-      
+
 levelFinishedDelay :: DTime
 levelFinishedDelay = 4 -- seconds
-      
+
 -- restartDelay :: Time
 -- restartDelay = 3
--- 
+--
 -- wonDelay :: Time
 -- wonDelay = 3
 
@@ -68,7 +84,7 @@ blockSeparation = 10
 
 pointsUpWidth, pointsUpHeight :: Double
 pointsUpWidth  = 30
-pointsUpHeight = 30 
+pointsUpHeight = 30
 
 livesUpWidth, livesUpHeight :: Double
 livesUpWidth  = 30

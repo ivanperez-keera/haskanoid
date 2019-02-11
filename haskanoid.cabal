@@ -92,16 +92,18 @@ executable haskanoid
                  mtl,
                  transformers >= 0.3 && < 0.6,
                  Yampa        >= 0.13 && < 0.14,
+                 simple-affine-space,
 
+                 sage-app-context,
                  sage-app-mobilegame,
                  sage-data-extra,
                  sage-data-extra,
                  sage-data-identity-list,
                  sage-physics-2d,
+                 sage-playground,
                  sage-render,
                  sage-resourcemanager,
-                 sage-yampa-extra,
-                 simple-affine-space
+                 sage-yampa-extra
 
 
   if flag(sdl)
