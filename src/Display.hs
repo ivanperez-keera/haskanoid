@@ -21,29 +21,15 @@ import Graphics.UI.Align
 import Graphics.UI.Collage
 import Graphics.UI.SDL        as SDL hiding (flip)
 import Playground             (Settings (height, width))
+import Playground.SDL         (RenderingCtx)
 
 import Constants
 import GameState
 import Objects
 import ResourceManager
 
-#ifdef sdl
-
-type RenderingCtx     = ()
-type RealRenderingCtx = Surface
-
-#elif sdl2
+#ifdef sdl2
 import Game.Render.Monad.SDL    ()
-
-type RealRenderingCtx = (Renderer, Window)
-type RenderingCtx     = (Renderer, Window)
-#endif
-
-getRealRenderingCtx :: RenderingCtx -> IO RealRenderingCtx
-#ifdef sdl
-getRealRenderingCtx () = getVideoSurface
-#else
-getRealRenderingCtx = return
 #endif
 
 -- * Initialization
@@ -68,6 +54,7 @@ initGraphs _mgr = do
 
   -- Hide mouse
   SDL.showCursor False
+  SDL.getVideoSurface
 
 #elif sdl2
 
@@ -87,7 +74,7 @@ initGraphs mgr = do
 render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 render resourceManager shownState ctx = do
   audio   resourceManager shownState
-  display resourceManager shownState =<< getRealRenderingCtx ctx
+  display resourceManager shownState ctx
 
 -- ** Audio
 
@@ -111,7 +98,7 @@ audioObject resourceManager object = when (objectHit object) $
 
 -- ** Visual rendering
 -- TODO: Uses undefined for rendering context, should get from Main
-display :: ResourceMgr -> GameState -> RealRenderingCtx -> IO ()
+display :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
 display resourceManager shownState = onRenderingCtx $ \ctx ->
   flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
     concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ]

@@ -113,10 +113,11 @@ executable haskanoid
                    SDL-mixer,
                    SDL-ttf,
 
-                   sage-resourcemanager-sdl1,
                    sage-audio-sdl1,
                    sage-clock-sdl1,
+                   sage-playground-sdl1,
                    sage-render-sdl1,
+                   sage-resourcemanager-sdl1,
                    sage-sdl1-extra
 
     other-modules: Display
@@ -130,10 +131,11 @@ executable haskanoid
                    sdl2-mixer,
                    SDL2-ttf,
 
-                   sage-resourcemanager-sdl2,
                    sage-audio-sdl2,
                    sage-clock-sdl2,
+                   sage-playground-sdl2,
                    sage-render-sdl2,
+                   sage-resourcemanager-sdl2,
                    sage-sdl2-extra
 
     other-modules: Display
