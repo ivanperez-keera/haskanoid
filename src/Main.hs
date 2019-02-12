@@ -5,6 +5,7 @@ import Control.Monad.IfElse
 import FRP.Yampa                 as Yampa
 import Game.Resource.Manager.Ref
 import Game.Resource.Spec
+import Playground                (Settings)
 import Playground.SDL            (initGraphs, loadAllResources)
 
 import Constants       (settings)
@@ -15,7 +16,6 @@ import Paths_haskanoid
 #if defined(sdl) || defined(sdl2)
 import Display
 import Game.Clock
-import ResourceManager
 #endif
 
 #ifdef ghcjs
@@ -30,7 +30,7 @@ main :: IO ()
 main = (`catchAny` print) $ do
 
   initializeDisplay
-  renderingCtx  <- initGraphs settings
+  renderingCtx  <- initGraphs (settings :: Settings Int)
   adjustSDLsettings
 
   timeRef       <- initializeTimeRef
