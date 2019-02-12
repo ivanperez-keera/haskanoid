@@ -9,7 +9,6 @@ import           Physics.TwoDimensions.Shapes.BasicAABB
 import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
 import           Physics.TwoDimensions.Side
 import           Physics.TwoDimensions.Dimensions
--- import           Physics.TwoDimensions.Physics
 import qualified Physics.TwoDimensions.PhysicalObject as P
 
 import Constants
