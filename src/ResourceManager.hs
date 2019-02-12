@@ -13,6 +13,7 @@ import Game.Resource.Manager.SDL as SDLResourceMgr
 
 data ResourceId = IdGameFont
                 | IdGameFontColor
+                | IdBlack
                 | IdBgMusic
                 | IdBlockHitFX
                 | IdBgImg
@@ -44,7 +45,9 @@ gameResourceSpec = ResourceSpec
              , (IdDestroyBallUpImg, destroyBallUpImage)
              ]
   , sounds = [ (IdBlockHitFX,       blockHitSFX) ]
-  , colors = [ (IdGameFontColor,    fontColor) ]
+  , colors = [ (IdGameFontColor,    fontColor)
+             , (IdBlack,            black)
+             ]
   , music  = [ (IdBgMusic,          backgroundMusic) ]
   }
 
@@ -59,18 +62,18 @@ type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
 --   return oldResources
 
 --   newResources <- updateAllResources oldResources newState
--- 
+--
 --   let manager' = ResourceManager { resources = newResources }
--- 
+--
 --   writeIORef (unResMgr mgr) manager'
 --   return newResources
--- 
+--
 -- updateAllResources :: Resources -> GameStatus -> IO Resources
 -- updateAllResources res (GameLoading n) = do
 --   -- Load new music
 --   let newMusicFP' = _resourceFP $ levelMusic $ levels !! n
 --   newMusicFP <- fst <$> localizeResource (newMusicFP', ())
--- 
+--
 --   let oldMusic   = bgMusic res
 --       oldMusicFP = maybe "" musicName oldMusic
 --   newMusic <- if oldMusicFP == newMusicFP
@@ -84,21 +87,21 @@ type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
 --                        else do stopMusic
 --                                playMusic (fromJust bgM)
 --                                return bgM
--- 
+--
 --   -- Load new background
 --   let newBgFP' = _resourceFP $ levelBg $ levels !! n
 --   newBgFP <- fst <$> localizeResource (newBgFP', Nothing)
--- 
+--
 --   -- Load the next background image, if available and necessary
 --   let oldBg   = bgImage res
 --       oldBgFP = maybe "" imgName oldBg
--- 
+--
 --   newBg <- if oldBgFP == newBgFP
 --              then return oldBg
 --              else loadImage (newBgFP, Nothing)
--- 
+--
 --   return (res { bgImage = newBg, bgMusic = newMusic })
--- 
+--
 -- updateAllResources res _ = return res
 
 -- localizeResource :: (FilePath, a) -> IO (FilePath, a)
