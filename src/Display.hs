@@ -1,27 +1,27 @@
 {-# OPTIONS_GHC -fno-warn-orphans        #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 {-# LANGUAGE CPP                         #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE FlexibleContexts     #-}
 module Display
   ( module Display
   , module ResourceManager
   )
   where
 
+import App.Context               (RuntimeContext)
+import Control.DeepSeq           (NFData, rnf)
 import Control.Monad
-import Control.Monad.IfElse       (awhen)
-import Control.Monad.Trans.Reader
-import Game.Render.Monad
-import Game.Render.Renderer.SDL ()
-import Game.Resource.Manager.Ref  (prepareAllResources, tryGetResourceSound,
-                                   tryGetResourceMusic)
+import Control.Monad.IfElse      (awhen)
 import Game.Audio
+import Game.Resource.Manager.Ref (tryGetResourceMusic, tryGetResourceSound)
 import Game.VisualElem
-import Game.VisualElem.Render
 import Graphics.UI.Align
 import Graphics.UI.Collage
-import Graphics.UI.SDL        as SDL hiding (flip)
-import Playground             (Settings (height, width))
-import Playground.SDL         (RenderingCtx, initGraphs)
+import Graphics.UI.SDL           as SDL
+import Playground                (displayWithBGColorImage')
+import Playground.SDL            (RenderingCtx, dAlignToAbsPos')
 
 import Constants
 import GameState
@@ -29,7 +29,29 @@ import Objects
 import ResourceManager
 
 #ifdef sdl2
-import Game.Render.Monad.SDL    ()
+import Game.Render.Monad.SDL ()
+#endif
+
+-- * Environment handling
+
+-- | The rendering environment given by the resource manager,
+-- runtime context, and rendering context.
+--
+-- This is a valid 'GRenderingEnv' which has functions like
+-- renderingEnvResourceMgr, renderingEnvRuntimeCtx and
+-- renderingEnvRuntimeCtx.
+type RenderEnv = (ResourceMgr, RuntimeContext, RenderingCtx)
+
+-- Orphan instaces
+
+-- | NFData instance for Surface.
+instance NFData Surface where
+  rnf s = s `seq` ()
+
+#ifdef sdl2
+-- | NFData instances for Texture.
+instance NFData Texture where
+  rnf s = s `seq` ()
 #endif
 
 -- * Initialization
@@ -57,15 +79,15 @@ adjustSDLsettings = return ()
 -- * Rendering and Sound
 
 -- | Loads new resources, renders the game state using SDL, and adjusts music.
-render :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
-render resourceManager shownState ctx = do
-  audio   resourceManager shownState
-  display resourceManager shownState ctx
+render :: GameState -> RenderEnv -> IO ()
+render shownState env = do
+  audio   shownState env
+  display shownState env
 
 -- ** Audio
 
-audio :: ResourceMgr -> GameState -> IO ()
-audio resourceManager shownState = do
+audio :: GameState -> RenderEnv -> IO ()
+audio shownState (resourceManager, _, _) = do
   -- Start bg music if necessary
   playing <- musicIsPlaying
   unless playing $ do
@@ -83,31 +105,31 @@ audioObject resourceManager object = when (objectHit object) $
     _     -> return ()
 
 -- ** Visual rendering
--- TODO: Uses undefined for rendering context, should get from Main
-display :: ResourceMgr -> GameState -> RenderingCtx -> IO ()
-display resourceManager shownState = onRenderingCtx $ \ctx ->
-  flip runReaderT (resourceManager, undefined, ctx) $ renderVE $ CollageItems $
-    concat [ [ bgItem, levelTxt, pointsTxt, livesTxt ], mStatusTxt, objItems ]
+display :: GameState -> RenderEnv -> IO ()
+display shownState env = do
+  let (cCol, mBgImg, clg) = game shownState
+  clg' <- collageMapM (dAlignToAbsPos' env) clg
+  displayWithBGColorImage' (cCol, mBgImg, clg') env
+
+game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) ((Int, Int), Align))
+game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
   where
-    -- Background
-    bgItem     = CollageItem (VisualImage IdBgImg)
-                             (const ((0, 0), Align HLeft VTop))
     -- HUD
     levelTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Level: "  ++ show (gameLevel over)))
-                             (const ((10, 10), Align HLeft  VTop))
+                             ((10, 10), Align HLeft  VTop)
     pointsTxt  = CollageItem (VisualText IdGameFont IdGameFontColor ("Points: " ++ show (gamePoints over)))
-                             (const ((10, 40), Align HLeft  VTop))
+                             ((10, 40), Align HLeft  VTop)
     livesTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Lives: "  ++ show (gameLives over)))
-                             (const ((10, 40), Align HRight VTop))
+                             ((10, 40), Align HRight VTop)
     -- Game status
     mStatusTxt = [ CollageItem (VisualText IdGameFont IdGameFontColor msg)
-                               (const ((0, 0), Align HCenter VCenter))
+                               ((0, 0), Align HCenter VCenter)
                  | Just msg <- [ statusMsg status ] ]
 
     -- Game objects
     objItems = map objItem $ filter (not . isSide) $ gameObjects shownState
     objItem object = CollageItem (VisualImage (objectImage object))
-                                 (const (pos, Align HLeft VTop))
+                                 (pos, Align HLeft VTop)
       where
         pos      = (round (ox + gameLeft), round (oy + gameTop))
         (ox, oy) = objectTopLevelCorner object

@@ -77,3 +77,6 @@ gameFontSpec = ("data/lacuna.ttf", 32)
 -- ** Colors
 fontColor :: ColorSpec
 fontColor = (228, 228, 228, 255)
+
+black :: ColorSpec
+black = (0, 0, 0, 255)
