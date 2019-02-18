@@ -108,8 +108,9 @@ audioObject resourceManager object = when (objectHit object) $
 display :: GameState -> RenderEnv -> IO ()
 display shownState env = do
   let (cCol, mBgImg, clg) = game shownState
+  -- TODO dAlignToAbsPos' ignores the rendering context
   clg' <- collageMapM (dAlignToAbsPos' env) clg
-  displayWithBGColorImage' (cCol, mBgImg, clg') env
+  displayWithBGColorImage' (cCol, mBgImg, clg') env True
 
 game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) ((Int, Int), Align))
 game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
