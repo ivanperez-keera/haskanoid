@@ -13,7 +13,7 @@ import           Physics.TwoDimensions.Dimensions
 import qualified Physics.TwoDimensions.PhysicalObject as P
 
 -- Internal imports
-import Constants
+import Game.Constants
 
 -- * Objects
 

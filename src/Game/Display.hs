@@ -25,7 +25,7 @@ import Playground                (displayWithBGColorImage')
 import Playground.SDL            (RenderingCtx, dAlignToAbsPos')
 
 -- Internal imports
-import Constants
+import Game.Constants
 import Game.Objects
 import Game.State
 import Resource.Manager

@@ -11,7 +11,7 @@ import Playground                (Settings)
 import Playground.SDL            (initGraphs, loadAllResources)
 
 -- Internal imports
-import Constants       (settings)
+import Resource.Values (settings)
 import Game.Logic
 import Input
 import Paths_haskanoid

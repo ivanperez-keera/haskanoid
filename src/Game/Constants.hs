@@ -1,31 +1,12 @@
-module Constants where
+module Game.Constants where
 
 -- External imports
-import App.Context                      (noResourceContext)
-import Data.Char                        (toLower)
-import FRP.Yampa
-import Physics.TwoDimensions.Dimensions
-import Playground                       (Settings (..))
+import FRP.Yampa                        (DTime)
+import Physics.TwoDimensions.Dimensions (Pos2D)
+import Playground                       (Settings (height, width))
 
-
--- | General settings of the application.
-settings :: (Num a) => Settings a
-settings = Settings
-  { debugTag      = "uk.co.keera.game." ++ fmap toLower (gameName (settings :: Settings Double) noResourceContext)
-  , debugMain     = False
-  , debugInput    = False
-  , debugStats    = False
-  , debugMedia    = False
-  , debugAudio    = False
-  , debugOS       = False
-  , debugLogic    = False
-  , debugRenderer = False
-  , debugVerbose  = False
-  , width         = 640
-  , height        = 600
-  , gameName      = const "Haskanoid"
-  , confFilePath = fmap toLower (gameName (settings :: Settings Double) noResourceContext) ++ ".config"
-  }
+-- Internal imports
+import Resource.Values (settings)
 
 -- * Game area
 gameTop :: Num a => a

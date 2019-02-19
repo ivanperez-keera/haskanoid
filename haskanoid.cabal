@@ -77,13 +77,14 @@ executable haskanoid
   hs-source-dirs: src/
 
   -- Modules included in this executable, other than Main.
-  other-modules: Constants
+  other-modules: Game.Constants
                  Game.Levels
                  Game.Logic
                  Game.Objects
                  Game.ObjectSF
                  Game.State
                  Input
+                 Resource.Values
 
   -- Other library packages from which modules are imported.
   build-depends: base         >= 4.6 && < 5,

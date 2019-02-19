@@ -52,7 +52,7 @@ import Physics.TwoDimensions.PhysicalObject (Collision (..))
 import Physics.TwoDimensions.Side
 
 -- Internal imports
-import Constants
+import Game.Constants
 import Game.Levels
 import Game.Objects
 import Game.ObjectSF

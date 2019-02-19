@@ -94,7 +94,7 @@ import qualified Data.Vector.Storable as V
 
 -- Internal imports
 
-import Constants
+import Resource.Values
 
 -- * Game controller
 

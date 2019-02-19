@@ -18,7 +18,7 @@ import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions
 
 -- Internal imports
-import Constants
+import Game.Constants
 import Game.Objects
 
 -- * Levels
