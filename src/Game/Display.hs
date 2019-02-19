@@ -1,9 +1,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans        #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
-{-# LANGUAGE CPP                         #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE CPP                  #-}
 {-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 module Game.Display
   ( module Game.Display
   , module Resource.Manager
@@ -11,8 +11,6 @@ module Game.Display
   where
 
 -- External imports
-import App.Context               (RuntimeContext)
-import Control.DeepSeq           (NFData, rnf)
 import Control.Monad
 import Control.Monad.IfElse      (awhen)
 import Game.Audio
@@ -22,9 +20,10 @@ import Graphics.UI.Align
 import Graphics.UI.Collage
 import Graphics.UI.SDL           as SDL
 import Playground                (displayWithBGColorImage')
-import Playground.SDL            (RenderingCtx, dAlignToAbsPos')
+import Playground.SDL            (dAlignToAbsPos')
 
 -- Internal imports
+import DeviceOutput     (RenderEnv)
 import Game.Constants
 import Game.Objects
 import Game.State
@@ -32,28 +31,6 @@ import Resource.Manager
 
 #ifdef sdl2
 import Game.Render.Monad.SDL ()
-#endif
-
--- * Environment handling
-
--- | The rendering environment given by the resource manager,
--- runtime context, and rendering context.
---
--- This is a valid 'GRenderingEnv' which has functions like
--- renderingEnvResourceMgr, renderingEnvRuntimeCtx and
--- renderingEnvRuntimeCtx.
-type RenderEnv = (ResourceMgr, RuntimeContext, RenderingCtx)
-
--- Orphan instaces
-
--- | NFData instance for Surface.
-instance NFData Surface where
-  rnf s = s `seq` ()
-
-#ifdef sdl2
--- | NFData instances for Texture.
-instance NFData Texture where
-  rnf s = s `seq` ()
 #endif
 
 -- * Initialization
