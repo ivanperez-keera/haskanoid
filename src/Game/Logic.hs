@@ -36,7 +36,7 @@
 -- You may want to read the basic definition of 'GameState', 'Controller' and
 -- 'ObjectSF' before you attempt to go through this module.
 --
-module GamePlay (wholeGame) where
+module Game.Logic (wholeGame) where
 
 -- External imports
 import Control.Applicative                  ((<$>))
@@ -53,11 +53,11 @@ import Physics.TwoDimensions.Side
 
 -- Internal imports
 import Constants
-import GameState
+import Game.Levels
+import Game.Objects
+import Game.ObjectSF
+import Game.State
 import Input
-import Levels
-import Objects
-import ObjectSF
 
 -- * General state transitions
 

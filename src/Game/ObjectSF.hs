@@ -9,14 +9,16 @@
 -- 'harakiri'). Should you need to spawn new game elements upon
 -- events, you might want to change 'harakiri' to something more
 -- general.
-module ObjectSF where
+module Game.ObjectSF where
 
+-- External imports
+import Data.IdentityList
 import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
 
-import Objects
+-- Internal imports
+import Game.Objects
 import Input
-import Data.IdentityList
 
 -- | Objects are defined as transformations that take 'ObjectInput' signals and
 -- return 'ObjectOutput' signals.
@@ -50,7 +52,7 @@ data ObjectOutput = ObjectOutput
   { outputObject :: Object   -- ^ The object's state (position, shape, etc.).
   , harakiri     :: Event () -- ^ Whether the object has died (killed itself).
   , births       :: Event PowerUpDef
-  } 
+  }
 
 -- | Definition of a powerup with id-Prefix, kind, position and size.
 data PowerUpDef = PowerUpDef String PowerUpKind Pos2D Size2D

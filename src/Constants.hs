@@ -1,10 +1,11 @@
 module Constants where
 
-import Data.Char (toLower)
+-- External imports
+import App.Context                      (noResourceContext)
+import Data.Char                        (toLower)
 import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
-import Playground (Settings(..))
-import App.Context (noResourceContext)
+import Playground                       (Settings (..))
 
 
 -- | General settings of the application.

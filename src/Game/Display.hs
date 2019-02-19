@@ -4,12 +4,13 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE FlexibleContexts     #-}
-module Display
-  ( module Display
+module Game.Display
+  ( module Game.Display
   , module Resource.Manager
   )
   where
 
+-- External imports
 import App.Context               (RuntimeContext)
 import Control.DeepSeq           (NFData, rnf)
 import Control.Monad
@@ -23,9 +24,10 @@ import Graphics.UI.SDL           as SDL
 import Playground                (displayWithBGColorImage')
 import Playground.SDL            (RenderingCtx, dAlignToAbsPos')
 
+-- Internal imports
 import Constants
-import GameState
-import Objects
+import Game.Objects
+import Game.State
 import Resource.Manager
 
 #ifdef sdl2

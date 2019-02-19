@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP #-}
+
+-- External imports
 import Control.Applicative       ((<$>))
 import Control.Exception.Extra   (catchAny)
 import Control.Monad.IfElse
@@ -8,14 +10,18 @@ import Game.Resource.Spec
 import Playground                (Settings)
 import Playground.SDL            (initGraphs, loadAllResources)
 
+-- Internal imports
 import Constants       (settings)
-import GamePlay
+import Game.Logic
 import Input
 import Paths_haskanoid
 
 #if defined(sdl) || defined(sdl2)
-import Display
+-- External imports
 import Game.Clock
+
+-- Internal imports
+import Game.Display
 #endif
 
 #ifdef ghcjs

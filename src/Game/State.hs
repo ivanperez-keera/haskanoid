@@ -6,9 +6,10 @@
 -- (there are no menus, etc.) we assume that there's
 -- always some gameplay info, even though it can be
 -- empty.
-module GameState where
+module Game.State where
 
-import Objects
+-- Internal imports
+import Game.Objects
 
 -- | The running state is given by a bunch of 'Objects' and the current general
 -- 'GameInfo'. The latter contains info regarding the current level, the number

@@ -9,25 +9,27 @@
 --   - Multimedia properties (a background and audio file).
 --
 -- Together they form 'levels'.
-module Levels where
+module Game.Levels where
 
+-- External imports
 import Control.Arrow                    ((***))
 import Data.List                        (nub, zip4)
 import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions
 
+-- Internal imports
 import Constants
-import Objects
+import Game.Objects
 
 -- * Levels
 -- ** Level specification
 data LevelSpec = LevelSpec
- { blockCfgs  :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)] 
+ { blockCfgs  :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
                 -- ^ Block positions, block lives, kind of powerups,
                 -- and whether the block signals that it contains a powerup.
                 -- Note: SignalPowerUp is not logically related to the kind
                -- of powerups and can be used to irritate the player.
-                -- For example, signalling that it contains a powerup, but 
+                -- For example, signalling that it contains a powerup, but
                 -- the powerup kind is Nothing. Or containing a powerup, but
                 -- not signaling it.
  , levelBg    :: ImageSpec  -- ^ Background image
@@ -68,12 +70,12 @@ levels = map (\(d,b,m,t) -> LevelSpec d b m t)
 --
 -- X = maxBlockLife - 1
 -- P = powerup points minBlockLife
--- 
+--
 --   %%%%%%%%
 -- % PXPXPXPX
 -- % XPXPXPXP
 -- % PXPXPXPX
--- 
+--
 -- Every second block is a powerup (PointsUp) with minBlockLife.
 -- All other blocks have (maxBlockLife - 1).
 -- Blocks containing powerups signal that they do.
@@ -88,7 +90,7 @@ blockDescS 0 = map (first4 adjustPos) allBlocks
            lives     = blockLifeCycle blockn
            powerUps  = powerUpList lives
            signalsPu = signals powerUps
- 
+
        blockPoss ::[(Int, Int)]
        blockPoss = [(x,y) | x <- [0..blockColumns - 1]
                           , y <- [0..blockRows - 1]
@@ -96,8 +98,8 @@ blockDescS 0 = map (first4 adjustPos) allBlocks
 
        blockLifeCycle :: Int -> [Int]
        blockLifeCycle n = take n $ cycle oneCycle
-         where 
-           oneCycle = [minBlockLife, minBlockLife + 1] 
+         where
+           oneCycle = [minBlockLife, minBlockLife + 1]
 
        powerUpList :: [Int] -> [Maybe (PowerUpKind, AlwaysPowerUp)]
        powerUpList [] = []
@@ -127,15 +129,15 @@ blockDescS 1 = map (first4 adjustPos) allBlocks
            blocks    = blockPoss
            blockn    = length blocks
            lives     = blockLifeCycle blockn
-           powerUps  = powerUpList blockn 
+           powerUps  = powerUpList blockn
            signalsPu = signals powerUps
- 
+
 
 
        blockPoss :: [(Int, Int)]
        blockPoss = [(x,y) | y <- [0..blockRows - 1] -- first create y then x:
                           , x <- [0..blockColumns - 1] -- order matters
-                          , (even x && odd y)  ||      -- for the zipping of 
+                          , (even x && odd y)  ||      -- for the zipping of
                             (odd x  && even y)         -- blocks, lives, ...
                    ]
 
@@ -196,34 +198,34 @@ blockDescS 2 = map (first4 adjustPos) allBlocks
                        || (y == 3)
                        || (x == blockColumns - 4)
                        || (y == blockRows - 4)]
-                   
+
        blockRows :: Int
        blockRows = 7
 
 
 
--- Level 3 
+-- Level 3
 --
 -- X == maxBlockLife
--- O == minBlockLife, destroyUp 
+-- O == minBlockLife, destroyUp
 --
 --   %%%%%%%%
 -- %  XXXXXX
 -- % X      X
--- %    OO  
--- %    OO 
+-- %    OO
+-- %    OO
 -- % X      X
 -- %  XXXXXX
 blockDescS 3 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-       allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+       allBlocks = [((x,y), maxBlockLife, Nothing, False)
                     | x <- [1..blockColumns - 2]
                     , y <- [0, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                   ++ [((x,y), maxBlockLife, Nothing, False)
                        | x <- [0, blockColumns - 1]
                        , y <- [1, blockRows - 2]]
-                   ++ [((x,y), minBlockLife, Just (DestroyBallUp, True) , True) 
+                   ++ [((x,y), minBlockLife, Just (DestroyBallUp, True) , True)
                        | x <- midColumns
                        , y <- [2,3]]
 
@@ -247,10 +249,10 @@ blockDescS 3 = map (first4 adjustPos) allBlocks
 blockDescS 4 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-       allBlocks = [((x,y), maxBlockLife, Just (MockUp, True), False) -- X 
+       allBlocks = [((x,y), maxBlockLife, Just (MockUp, True), False) -- X
                     | x <- [0..blockColumns - 1]
                     , y <- [0, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife - 1, Just (PointsUp, True), True) -- P 
+                   ++ [((x,y), maxBlockLife - 1, Just (PointsUp, True), True) -- P
                        | x <- [0..blockColumns - 1]
                        , y <- [2], odd x]
                    ++ [((x,y), minBlockLife, Just (LivesUp, False), True) -- L
@@ -265,7 +267,7 @@ blockDescS 4 = map (first4 adjustPos) allBlocks
 --   %%%%%%%%
 -- % XX XXXXX
 -- % XX XXXXX
--- % 
+-- %
 -- % DD DDDDD
 -- % XX XXXXX
 -- % XX XXXXX
@@ -273,7 +275,7 @@ blockDescS 4 = map (first4 adjustPos) allBlocks
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
--- 
+--
 -- X == minBlockLife
 -- D == maxBlockLife, DestroyBallUp (always)
 blockDescS 5 = map (first4 adjustPos) allBlocks
@@ -287,17 +289,17 @@ blockDescS 5 = map (first4 adjustPos) allBlocks
                     | x <- [0..blockColumns - 1]
                     , y <- [3]
                     , x /= 2]
-                    
+
        blockRows :: Int
        blockRows = 9
 
 
--- Level 6 
+-- Level 6
 -- X == maxBlockLife
 -- T == maxBlockLife - 1, PointsUp
 -- O == minBlockLife
 -- L == minBlockLife, LivesUp
--- 
+--
 --   %%%%%%%%
 -- % XXXXXXXX
 -- %  O O O O
@@ -306,7 +308,7 @@ blockDescS 5 = map (first4 adjustPos) allBlocks
 -- % T T T T
 -- %  L L L L
 -- %  O O O O
--- % 
+-- %
 -- % XXX XXXX
 blockDescS 6 = map (first4 adjustPos) allBlocks
 
@@ -331,18 +333,18 @@ blockDescS 6 = map (first4 adjustPos) allBlocks
        blockRows = 9
 
 
--- Level 7 
+-- Level 7
 -- X == maxBlockLife
 -- O == minBlockLife
 -- T == maxBlockLife - 1, PointsUp
--- 
+--
 --   %%%%%%%%
 -- % XXXOOXXX
 -- % XXXOOXXX
--- % 
+-- %
 -- %  T T T T
 -- % T T T T
--- % 
+-- %
 -- % XXXOOXXX
 -- % XXXOOXXX
 blockDescS 7 = map (first4 adjustPos) allBlocks
@@ -353,10 +355,10 @@ blockDescS 7 = map (first4 adjustPos) allBlocks
                     , y <- midColumns
                     , (even x && y == midColumn)
                     || (odd x && y == midColumn -1)]
-                   ++ [((x,y), minBlockLife, Just (MockUp, True), False) 
+                   ++ [((x,y), minBlockLife, Just (MockUp, True), False)
                        | x <- [midColumn - 1, midColumn]
                        , y <- [0, 1, blockRows - 2, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                   ++ [((x,y), maxBlockLife, Nothing, False)
                        | x <- [0..blockColumns - 1]
                        , y <- [0, 1, blockRows - 2, blockRows - 1]
                        , x /= midColumn - 1, x /= midColumn]
@@ -367,7 +369,7 @@ blockDescS 7 = map (first4 adjustPos) allBlocks
 
 
 
--- Level 8 
+-- Level 8
 --   %%%%%%%%
 -- % XXXXXXX
 -- %   D D
@@ -375,16 +377,16 @@ blockDescS 7 = map (first4 adjustPos) allBlocks
 -- %
 -- %  D   D
 -- % D     D
--- 
+--
 -- X = maxBlockLife, LivesUp (always)
 -- D = maxBlockLife, DestroyBallUp (always)
 blockDescS 8 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-       allBlocks = [((x,y), maxBlockLife, Just (LivesUp, True), False) 
+       allBlocks = [((x,y), maxBlockLife, Just (LivesUp, True), False)
                     | x <- [0..blockColumns - 1]
                     , y <- [0]]
-                   ++ [((x,y), maxBlockLife, Just (DestroyBallUp, True), False) 
+                   ++ [((x,y), maxBlockLife, Just (DestroyBallUp, True), False)
                        | x <- [2, blockColumns - 3]
                        , y <- [1, 2]]
                    ++ [ ((1,4), maxBlockLife, Just (DestroyBallUp, True), False)
@@ -400,17 +402,17 @@ blockDescS 8 = map (first4 adjustPos) allBlocks
 -- P == minBlockLife, PointsUp
 -- L == minBlockLife, LivesUp
 -- T == maxBlockLife - 1
--- 
+--
 --   %%%%%%%%
 -- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
+-- %  X X X
+-- %  X X X
+-- %  X X X
 -- % LPLPLPL
--- % T T T 
--- % T T T 
 -- % T T T
--- % T T T 
+-- % T T T
+-- % T T T
+-- % T T T
 blockDescS 9 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
@@ -429,7 +431,7 @@ blockDescS 9 = map (first4 adjustPos) allBlocks
        powerUps :: Int -> Maybe (PowerUpKind, AlwaysPowerUp)
        powerUps x | even x     = Just (PointsUp, True)
                   | odd x      = Just (LivesUp, True)
- 
+
        blockRows :: Int
        blockRows = 9
 
@@ -438,35 +440,35 @@ blockDescS 9 = map (first4 adjustPos) allBlocks
 
 
 
--- Level 10 
+-- Level 10
 --   %%%%%%%%
 -- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
+-- %  X X X
+-- %  X X X
+-- %  X X X
 -- % PPPPPPP
--- %  X X X 
--- %  X X X 
+-- %  X X X
+-- %  X X X
 -- %  X X X
 -- %  X X X
 --
 -- X == maxBlockLife, MockUp
--- P == maxBlockLife - 1, DestroyBallUp 
+-- P == maxBlockLife - 1, DestroyBallUp
 blockDescS 10 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-       allBlocks =  [((x,y), blockLife y, powerUps y, False) 
+       allBlocks =  [((x,y), blockLife y, powerUps y, False)
                      | x <- [0..blockColumns - 1]
                      , y <- [0..blockRows - 1]
                      , odd x || (y == midRow && even x)]
 
-       blockLife :: Int -> Int  
+       blockLife :: Int -> Int
        blockLife y | y == midRow = maxBlockLife - 1
                    | otherwise   = maxBlockLife
 
        powerUps :: Int -> Maybe (PowerUpKind, AlwaysPowerUp)
        powerUps y | y == midRow = Just (DestroyBallUp, True)
-                  | otherwise   = Just (MockUp, True) 
+                  | otherwise   = Just (MockUp, True)
 
        blockRows :: Int
        blockRows = 9
@@ -480,7 +482,7 @@ blockDescS 10 = map (first4 adjustPos) allBlocks
 -- Level 11
 --   %%%%%%%%
 -- %    XXXX
--- %   XXXXX 
+-- %   XXXXX
 -- %  XXXXXX
 -- % XXXXXX
 -- % XXXXX
@@ -489,12 +491,12 @@ blockDescS 10 = map (first4 adjustPos) allBlocks
 blockDescS 11 = map (first4 adjustPos) allBlocks
  where
    allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-   allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+   allBlocks = [((x,y), maxBlockLife, Nothing, False)
                  | x <- [0..blockColumns - 1]
                  , y <- [0..blockRows - 1]
                  , (x + y > 2) && (x + y < 10)
                ]
-               
+
    blockRows :: Int
    blockRows = 6
 
@@ -507,7 +509,7 @@ blockDescS 11 = map (first4 adjustPos) allBlocks
 blockDescS 12  = map (first4 adjustPos) allBlocks
  where
    allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-   allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+   allBlocks = [((x,y), maxBlockLife, Nothing, False)
                 | x <- [0..blockColumns - 1]
                 , y <- [0..blockRows - 1]
                 , x /= y && (blockColumns - 1 - x) /= y
@@ -515,7 +517,7 @@ blockDescS 12  = map (first4 adjustPos) allBlocks
 
    blockRows :: Int
    blockRows = 4
-               
+
 
 -- Level 13
 --   %%%%%%%%
@@ -542,10 +544,10 @@ blockDescS 13 = map (first4 adjustPos) allBlocks
 blockDescS 14 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-       allBlocks = [((x,y), maxBlockLife, Nothing, False) 
+       allBlocks = [((x,y), maxBlockLife, Nothing, False)
                     | x <- [1..blockColumns - 2]
                     , y <- [0, blockRows - 1]]
-                   ++ [((x,y), maxBlockLife, Nothing, False) 
+                   ++ [((x,y), maxBlockLife, Nothing, False)
                        | x <- [0, blockColumns - 1]
                        , y <- [1..blockRows - 2]]
 
@@ -573,13 +575,13 @@ blockDescS 15 = map (first4 adjustPos) allBlocks
 
 -- Level 16
 --   %%%%%%%%
--- % XX     
--- % XXXX     
--- % XXXXXX  
+-- % XX
+-- % XXXX
+-- % XXXXXX
 -- % XXXXXXXX
--- % XXXXXX  
--- % XXXX     
--- % XX     
+-- % XXXXXX
+-- % XXXX
+-- % XX
 blockDescS 16 = map (first4 adjustPos) allBlocks
 
  where allBlocks :: [((Int, Int), Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
@@ -633,7 +635,7 @@ leftMargin = round' $ (gameWidth - maxBlocksWidth) / 2
 signals :: [Maybe (PowerUpKind, AlwaysPowerUp)] -> [SignalPowerUp]
 signals [] = []
 signals (Nothing :puks) = (False : signals puks)
-signals (_:puks)            = (True  : signals puks)   
+signals (_:puks)            = (True  : signals puks)
 
 -- Auxiliary functions
 

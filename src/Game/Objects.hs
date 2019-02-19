@@ -2,8 +2,9 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 -- | Game objects and collisions.
-module Objects where
+module Game.Objects where
 
+-- External imports
 import           Data.VectorSpace
 import           Physics.TwoDimensions.Shapes.BasicAABB
 import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
@@ -11,6 +12,7 @@ import           Physics.TwoDimensions.Side
 import           Physics.TwoDimensions.Dimensions
 import qualified Physics.TwoDimensions.PhysicalObject as P
 
+-- Internal imports
 import Constants
 
 -- * Objects
