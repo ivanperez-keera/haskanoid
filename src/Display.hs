@@ -6,7 +6,7 @@
 {-# LANGUAGE FlexibleContexts     #-}
 module Display
   ( module Display
-  , module ResourceManager
+  , module Resource.Manager
   )
   where
 
@@ -26,7 +26,7 @@ import Playground.SDL            (RenderingCtx, dAlignToAbsPos')
 import Constants
 import GameState
 import Objects
-import ResourceManager
+import Resource.Manager
 
 #ifdef sdl2
 import Game.Render.Monad.SDL ()

@@ -122,8 +122,8 @@ executable haskanoid
                    sage-sdl1-extra
 
     other-modules: Display
-                   ResourceManager
-                   ResourceSpecs
+                   Resource.Manager
+                   Resource.Specs
 
   if flag(sdl2)
     cpp-options: -Dsdl2
@@ -140,8 +140,8 @@ executable haskanoid
                    sage-sdl2-extra
 
     other-modules: Display
-                   ResourceManager
-                   ResourceSpecs
+                   Resource.Manager
+                   Resource.Specs
     extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2 SDL2_gfx
 
   if flag(ghcjs)

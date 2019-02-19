@@ -1,11 +1,13 @@
 {-# LANGUAGE CPP #-}
-module ResourceManager where
+module Resource.Manager where
 
+-- External imports
 import Data.IORef
 import Game.Resource.Manager.IORef ()
 import Game.Resource.Spec
 
-import ResourceSpecs
+-- Internal imports
+import Resource.Specs
 
 #if defined(sdl) || defined (sdl2)
 import Game.Resource.Manager.SDL as SDLResourceMgr
