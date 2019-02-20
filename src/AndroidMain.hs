@@ -13,7 +13,7 @@ import Playground.SDL            (initGraphs, loadAllResources)
 -- Internal imports
 import Resource.Values (settings)
 import Game.Logic
-import Input
+import UserInput
 import Paths_haskanoid
 
 #if defined(sdl) || defined(sdl2)
@@ -21,7 +21,7 @@ import Paths_haskanoid
 import Game.Clock
 
 -- Internal imports
-import Game.Display
+import Game.DeviceOutput
 #endif
 
 #ifdef ghcjs
@@ -31,9 +31,13 @@ import GHCJSNow
 -- import System.Mem
 #endif
 
--- TODO: Use MaybeT or ErrorT to report errors
+-- | Start the game.
 main :: IO ()
-main = (`catchAny` print) $ do
+main = my_main_main
+
+-- | Start the game and keep the game loop alive.
+my_main_main :: IO ()
+my_main_main = (`catchAny` print) $ do
 
   initializeDisplay
   renderingCtx  <- initGraphs (settings :: Settings Int)

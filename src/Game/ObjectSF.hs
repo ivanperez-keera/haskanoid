@@ -18,7 +18,7 @@ import Physics.TwoDimensions.Dimensions
 
 -- Internal imports
 import Game.Objects
-import Input
+import UserInput
 
 -- | Objects are defined as transformations that take 'ObjectInput' signals and
 -- return 'ObjectOutput' signals.

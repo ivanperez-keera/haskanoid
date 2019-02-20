@@ -70,7 +70,7 @@ Flag ghcjs
   Default: False
 
 executable haskanoid
-  main-is: Main.hs
+  main-is: AndroidMain.hs
 
   ghc-options: -Wall -threaded
 
@@ -83,7 +83,7 @@ executable haskanoid
                  Game.Objects
                  Game.ObjectSF
                  Game.State
-                 Input
+                 UserInput
                  Resource.Values
 
   -- Other library packages from which modules are imported.
@@ -123,7 +123,7 @@ executable haskanoid
                    sage-sdl1-extra
 
     other-modules: DeviceOutput
-                   Game.Display
+                   Game.DeviceOutput
                    Resource.Manager
                    Resource.Specs
 
@@ -142,7 +142,7 @@ executable haskanoid
                    sage-sdl2-extra
 
     other-modules: DeviceOutput
-                   Game.Display
+                   Game.DeviceOutput
                    Resource.Manager
                    Resource.Specs
     extra-libraries: SDL2_image SDL2_ttf SDL2_mixer SDL2 SDL2_gfx

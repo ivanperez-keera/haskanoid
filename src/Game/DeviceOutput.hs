@@ -4,8 +4,8 @@
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-module Game.Display
-  ( module Game.Display
+module Game.DeviceOutput
+  ( module Game.DeviceOutput
   , module Resource.Manager
   )
   where

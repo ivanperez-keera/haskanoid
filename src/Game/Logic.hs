@@ -1,6 +1,6 @@
 {-# LANGUAGE Arrows #-}
 -- | This module defines the game as a big Signal Function that transforms a
--- Signal carrying a Input 'Controller' information into a Signal carrying
+-- Signal carrying a UserInput 'Controller' information into a Signal carrying
 -- 'GameState'.
 --
 -- There is no randomness in the game, the only input is the user's.
@@ -57,7 +57,7 @@ import Game.Levels
 import Game.Objects
 import Game.ObjectSF
 import Game.State
-import Input
+import UserInput
 
 -- * General state transitions
 

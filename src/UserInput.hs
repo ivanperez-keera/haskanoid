@@ -28,7 +28,7 @@
 --    - Using more than one device at a time. Changing that would be a one-line
 --    patch.
 --
-module Input where
+module UserInput where
 
 -- External imports
 import Data.IORef
