@@ -1,24 +1,23 @@
 {-# LANGUAGE CPP #-}
 
 -- External imports
-import Control.Applicative       ((<$>))
+-- import Control.Applicative       ((<$>))
 import Control.Exception.Extra   (catchAny)
-import Control.Monad.IfElse
-import FRP.Yampa                 as Yampa
-import Game.Resource.Manager.Ref
-import Game.Resource.Spec
+import Control.Monad.IfElse      (awhen)
+import FRP.Yampa                 as Yampa (arr, reactimate, (&&&))
+import Game.Resource.Manager.Ref (loadResources)
+import Game.Resource.Spec        (localizeResourceSpec)
 import Playground                (Settings)
-import Playground.SDL            (initGraphs, loadAllResources)
 
 -- Internal imports
-import Resource.Values (settings)
-import Game.Logic
-import UserInput
-import Paths_haskanoid
+import Game.Logic      (wholeGame)
+import Resource.Values (getDataFileName, settings)
+import UserInput       (Controller, initInputDevices, senseInput)
 
 #if defined(sdl) || defined(sdl2)
 -- External imports
-import Game.Clock
+import Game.Clock     (initializeTimeRef, milisecsToSecs, senseTimeRef)
+import Playground.SDL (initGraphs, loadAllResources)
 
 -- Internal imports
 import Game.DeviceOutput
@@ -37,27 +36,36 @@ main = my_main_main
 
 -- | Start the game and keep the game loop alive.
 my_main_main :: IO ()
-my_main_main = (`catchAny` print) $ do
+my_main_main =
+  -- Print exceptions
+  (`catchAny` print) $ do
 
-  initializeDisplay
-  renderingCtx  <- initGraphs (settings :: Settings Int)
-  adjustSDLsettings
+    -- Initialize output subsystems (video, audio).
+    initDeviceOutput
+    rCtx    <- initGraphs (settings :: Settings Int)
+    adjustSDLsettings
 
-  timeRef       <- initializeTimeRef
-  controllerRef <- initializeInputDevices
-  resSpec       <- localizeResourceSpec getDataFileName gameResourceSpec
-  res           <- loadResources resSpec
+    -- Initialize and prepare clock.
+    timeRef <- initializeTimeRef
 
-  awhen res $ \res' -> do
-    -- TODO: The 'undefined' is the runtime context.
-    let env = (res', undefined, renderingCtx)
-    loadAllResources env
-    reactimate (senseInput controllerRef)
-               (\_ -> do
-                  -- Get clock and new input
-                  dtSecs <- milisecsToSecs <$> senseTimeRef timeRef
-                  mInput <- senseInput controllerRef
-                  return (dtSecs, Just mInput)
-               )
-               (\_ e -> render e env >> return False) -- GHCJS: (\_ e -> render res' e >> threadDelay 1000 >> return False)
-               wholeGame
+    -- Initiand prepare input, resources and output subsystems.
+    ctrlRef <- initInputDevices
+    resSpec <- localizeResourceSpec getDataFileName gameResourceSpec
+    rMgr    <- loadResources resSpec
+
+    awhen rMgr $ \rMgr' -> do
+      -- TODO: The 'undefined' is the runtime context.
+      let env = (rMgr', undefined, rCtx)
+      loadAllResources env
+
+      reactimate
+        (senseInput ctrlRef)
+        (\_ -> do
+           -- Get clock
+           dtSecs <- milisecsToSecs <$> senseTimeRef timeRef
+           -- Get new input
+           ctrl <- senseInput ctrlRef
+           return (dtSecs, Just ctrl)
+        )
+        (\_ e -> render e env >> return False) -- GHCJS: (\_ e -> render rMgr' e >> threadDelay 1000 >> return False)
+        wholeGame

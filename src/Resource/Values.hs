@@ -1,9 +1,10 @@
 module Resource.Values where
 
 -- External imports
-import App.Context                      (noResourceContext)
-import Data.Char                        (toLower)
-import Playground                       (Settings (..))
+import           App.Context     (noResourceContext)
+import           Data.Char       (toLower)
+import qualified Paths_haskanoid as Paths (getDataFileName)
+import           Playground      (Settings (..))
 
 -- | General settings of the application.
 settings :: (Num a) => Settings a
@@ -23,3 +24,7 @@ settings = Settings
   , gameName      = const "Haskanoid"
   , confFilePath = fmap toLower (gameName (settings :: Settings Double) noResourceContext) ++ ".config"
   }
+
+-- | Return the file path with respect to the underlying source structure.
+getDataFileName :: FilePath -> IO FilePath
+getDataFileName = Paths.getDataFileName

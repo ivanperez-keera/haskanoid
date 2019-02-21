@@ -35,8 +35,8 @@ import Game.Render.Monad.SDL ()
 
 -- * Initialization
 
-initializeDisplay :: IO ()
-initializeDisplay = do
+initDeviceOutput :: IO ()
+initDeviceOutput = do
    -- Initialise SDL
   SDL.init [InitEverything]
 

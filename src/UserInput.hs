@@ -117,8 +117,8 @@ newtype ControllerRef =
 -- returns a reference to a controller, which enables
 -- getting its state as many times as necessary. It does
 -- not provide any information about its nature, abilities, etc.
-initializeInputDevices :: IO ControllerRef
-initializeInputDevices = do
+initInputDevices :: IO ControllerRef
+initInputDevices = do
 
 #if defined(sdl) || defined(sdl2)
   let baseDev = sdlGetController
