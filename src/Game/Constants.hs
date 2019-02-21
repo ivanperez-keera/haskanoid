@@ -1,3 +1,4 @@
+-- | Definitions of game constants.
 module Game.Constants where
 
 -- External imports
@@ -41,6 +42,17 @@ levelFinishedDelay = 4 -- seconds
 -- wonDelay :: Time
 -- wonDelay = 3
 
+-- * Lives
+
+stdLives :: Int
+stdLives = 3
+
+maxBlockLife :: Int
+maxBlockLife = 3
+
+minBlockLife :: Int
+minBlockLife = 1
+
 -- * Object properties
 
 paddleWidth, paddleHeight :: Double
@@ -79,17 +91,6 @@ mockUpHeight = 18
 destroyBallUpWidth, destroyBallUpHeight :: Double
 destroyBallUpWidth  = 18
 destroyBallUpHeight = 18
-
--- * Lives
-
-stdLives :: Int
-stdLives = 3
-
-maxBlockLife :: Int
-maxBlockLife = 3
-
-minBlockLife :: Int
-minBlockLife = 1
 
 -- * Physics
 
