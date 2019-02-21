@@ -1,3 +1,4 @@
+-- | Definitions of constants.
 module Resource.Values where
 
 -- External imports
