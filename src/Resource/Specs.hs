@@ -1,8 +1,9 @@
 {-# LANGUAGE CPP #-}
+-- | Specifications of app resources.
 module Resource.Specs where
 
 -- External imports
-import Game.Resource.Spec
+import Game.Resource.Spec (ColorSpec, FontSpec, ImageSpec, MusicSpec, SoundSpec)
 
 -- * Game assets
 
