@@ -1,36 +1,41 @@
 {-# LANGUAGE CPP #-}
+-- | Resource manager.
 module Resource.Manager where
 
 -- External imports
-import Data.IORef
+import Data.IORef                  (IORef)
 import Game.Resource.Manager.IORef ()
-import Game.Resource.Spec
-
--- Internal imports
-import Resource.Specs
+import Game.Resource.Spec          (ResourceSpec (ResourceSpec), colors, fonts,
+                                    images, music, sounds)
 
 #if defined(sdl) || defined (sdl2)
-import Game.Resource.Manager.SDL as SDLResourceMgr
+import Game.Resource.Manager.SDL as SDLResourceMgr (ResourceManager)
 #endif
 
-data ResourceId = IdGameFont
-                | IdGameFontColor
-                | IdBlack
-                | IdBgMusic
-                | IdBlockHitFX
-                | IdBgImg
-                | IdBallImg
-                | IdBlock1Img
-                | IdBlock2Img
-                | IdBlock3Img
-                | IdBlockPuImg
-                | IdPaddleImg
-                | IdPointsUpImg
-                | IdLivesUpImg
-                | IdMockUpImg
-                | IdDestroyBallUpImg
-  deriving (Ord, Eq)
+-- Internal imports
+import Resource.Specs -- Complete import
 
+-- | Resource ids.
+data ResourceId
+  = IdGameFont
+  | IdGameFontColor
+  | IdBlack
+  | IdBgMusic
+  | IdBlockHitFX
+  | IdBgImg
+  | IdBallImg
+  | IdBlock1Img
+  | IdBlock2Img
+  | IdBlock3Img
+  | IdBlockPuImg
+  | IdPaddleImg
+  | IdPointsUpImg
+  | IdLivesUpImg
+  | IdMockUpImg
+  | IdDestroyBallUpImg
+  deriving (Show, Ord, Eq)
+
+-- | Specifications of the used game resources.
 gameResourceSpec :: ResourceSpec ResourceId
 gameResourceSpec = ResourceSpec
   { fonts  = [ (IdGameFont,         gameFontSpec) ]
@@ -53,7 +58,10 @@ gameResourceSpec = ResourceSpec
   , music  = [ (IdBgMusic,          backgroundMusic) ]
   }
 
+#if defined(sdl) || defined (sdl2)
+-- | A stateful collector that maps 'ResourceId' to SDL/SDL2 resources.
 type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
+#endif
 
 -- * Resource management
 -- loadNewResources :: ResourceMgr ->  GameState -> IO Resources
