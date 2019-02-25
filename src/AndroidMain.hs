@@ -17,7 +17,7 @@ import UserInput       (Controller, initInputDevices, senseInput)
 #if defined(sdl) || defined(sdl2)
 -- External imports
 import Game.Clock     (initializeTimeRef, milisecsToSecs, senseTimeRef)
-import Playground.SDL (initGraphs, loadAllResources)
+import Playground.SDL (initGraphs, loadAllResources, initDeviceOutput)
 
 -- Internal imports
 import Game.DeviceOutput

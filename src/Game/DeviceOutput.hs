@@ -33,15 +33,6 @@ import Resource.Manager
 import Game.Render.Monad.SDL ()
 #endif
 
--- * Initialization
-
-initDeviceOutput :: IO ()
-initDeviceOutput = do
-   -- Initialise SDL
-  SDL.init [InitEverything]
-
-  initAudio
-
 adjustSDLsettings :: IO ()
 #ifdef sdl
 adjustSDLsettings = void $ do
