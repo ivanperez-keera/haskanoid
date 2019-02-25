@@ -70,7 +70,7 @@ Flag ghcjs
   Default: False
 
 executable haskanoid
-  main-is: AndroidMain.hs
+  main-is: Main.hs
 
   ghc-options: -Wall -threaded
 
