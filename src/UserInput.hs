@@ -96,7 +96,7 @@ import qualified Data.Vector.Storable as V
 
 import Resource.Values
 
--- * Game controller
+-- * Controller with its instances
 
 -- | Controller info at any given point.
 data Controller = Controller
@@ -111,7 +111,7 @@ data Controller = Controller
 newtype ControllerRef =
   ControllerRef (IORef Controller, Controller -> IO Controller)
 
--- * General API
+-- ** Initialization
 
 -- | Initialize the available input devices. This operation
 -- returns a reference to a controller, which enables
@@ -149,6 +149,19 @@ initInputDevices = do
   return $ ControllerRef (nr, dev')
  where defaultInfo = Controller (0,0) False False
 
+-- | The controller device.
+type ControllerDev = IO (Maybe (Controller -> IO Controller))
+
+#if defined(sdl) || defined(sdl2)
+
+-- | Dummy initialization. No device is actually initialized.
+sdlMouseKB :: ControllerDev
+sdlMouseKB = return (Just sdlGetController)
+
+#endif
+
+-- ** Sensing
+
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
 -- if available, or the last one there was.
@@ -163,10 +176,53 @@ senseInput (ControllerRef (cref, sensor)) = do
   writeIORef cref cinfo'
   return cinfo'
 
-type ControllerDev = IO (Maybe (Controller -> IO Controller))
+#if defined(sdl) || defined(sdl2)
 
--- * WiiMote API (mid-level)
+-- | Sense the SDL keyboard and mouse and update
+-- the controller. It only senses the mouse position,
+-- the primary mouse button, and the p key to pause
+-- the game.
+--
+-- We need a non-blocking controller-polling function.
+-- TODO: Check http://gameprogrammer.com/fastevents/fastevents1.html
+sdlGetController :: Controller -> IO Controller
+sdlGetController info =
+  foldWhileM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
+#endif
+
+#ifdef sdl
+-- | Handles one event only and returns the updated controller.
+handleEvent :: Controller -> SDL.Event -> Controller
+handleEvent c e =
+  case e of
+    MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
+    MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
+    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False}
+    KeyUp   Keysym { symKey = SDLK_p }       -> c { controllerPause = not (controllerPause c) }
+    KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
+    KeyUp   Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = False }
+    _                                        -> c
+#endif
+
+#ifdef sdl2
+-- | Handles one event only and returns the updated controller.
+handleEvent :: Controller -> Maybe SDL.Event -> Controller
+handleEvent c Nothing  = c
+handleEvent c (Just e) =
+  case eventData e of
+    MouseMotion { mouseMotionPosition = Position x y }                         -> c { controllerPos        = (fromIntegral x, fromIntegral y)}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Released }      -> c { controllerClick      = False}
+    MouseButton { mouseButton = LeftButton, mouseButtonState = Pressed }       -> c { controllerClick      = True }
+    Keyboard { keySym = Keysym { keyScancode = P }, keyMovement = KeyUp   }    -> c { controllerPause      = not (controllerPause c) }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyDown } -> c { controllerClick      = True  }
+    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyUp }   -> c { controllerClick      = False }
+    _                                                                          -> c
+#endif
+
+
+
 #ifdef wiimote
+-- * WiiMote API (mid-level)
 
 -- | The wiimote controller as defined using this
 -- abstract interface. See 'initializeWiimote'.
@@ -240,57 +296,7 @@ senseWiimote wmdev controller = do
                      })
 #endif
 
--- * SDL API (mid-level)
-#if defined(sdl) || defined(sdl2)
 
--- ** Initialization
-
--- | Dummy initialization. No device is actually initialized.
-sdlMouseKB :: ControllerDev
-sdlMouseKB = return (Just sdlGetController)
-
--- ** Sensing
-
--- | Sense the SDL keyboard and mouse and update
--- the controller. It only senses the mouse position,
--- the primary mouse button, and the p key to pause
--- the game.
---
--- We need a non-blocking controller-polling function.
--- TODO: Check http://gameprogrammer.com/fastevents/fastevents1.html
-sdlGetController :: Controller -> IO Controller
-sdlGetController info =
-  foldWhileM info pollEvent (not.isEmptyEvent) ((return .) . handleEvent)
-#endif
-
-#ifdef sdl
--- | Handles one event only and returns the updated controller.
-handleEvent :: Controller -> SDL.Event -> Controller
-handleEvent c e =
-  case e of
-    MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
-    MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False}
-    KeyUp   Keysym { symKey = SDLK_p }       -> c { controllerPause = not (controllerPause c) }
-    KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
-    KeyUp   Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = False }
-    _                                        -> c
-#endif
-
-#ifdef sdl2
--- | Handles one event only and returns the updated controller.
-handleEvent :: Controller -> Maybe SDL.Event -> Controller
-handleEvent c Nothing  = c
-handleEvent c (Just e) =
-  case eventData e of
-    MouseMotion { mouseMotionPosition = Position x y }                         -> c { controllerPos        = (fromIntegral x, fromIntegral y)}
-    MouseButton { mouseButton = LeftButton, mouseButtonState = Released }      -> c { controllerClick      = False}
-    MouseButton { mouseButton = LeftButton, mouseButtonState = Pressed }       -> c { controllerClick      = True }
-    Keyboard { keySym = Keysym { keyScancode = P }, keyMovement = KeyUp   }    -> c { controllerPause      = not (controllerPause c) }
-    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyDown } -> c { controllerClick      = True  }
-    Keyboard { keySym = Keysym { keyScancode = Space}, keyMovement = KeyUp }   -> c { controllerClick      = False }
-    _                                                                          -> c
-#endif
 
 #ifdef ghcjs
 type GHCJSController = IORef (Double, Double, Bool)
@@ -443,4 +449,3 @@ adjust maxD old new
   | otherwise              = old - maxD
 
 #endif
-
