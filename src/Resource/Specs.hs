@@ -5,54 +5,93 @@ module Resource.Specs where
 -- External imports
 import Game.Resource.Spec (ColorSpec, FontSpec, ImageSpec, MusicSpec, SoundSpec)
 
--- * Game assets
+-- * Source path
 
--- ** Images
+srcPath :: FilePath
+srcPath = "data/"
+
+-- * Images
+
+imgPath :: FilePath
+imgPath = srcPath ++ "images/"
+
+-- ** Screens
+
+screensPath :: FilePath
+screensPath = imgPath ++ "screens/"
+
 initialBG           :: ImageSpec
-initialBG           = ("data/level0.png", Nothing)
+initialBG           = (screensPath ++ "level0.png", Nothing)
 
-ballImage           :: ImageSpec
-ballImage           = ("data/ball-alpha.png", Nothing)
+-- ** Icons
+-- *** Game specific resources
 
-block1Image         :: ImageSpec
-block1Image         = ("data/block1.png", Nothing)
+gameSpecificPath :: FilePath
+gameSpecificPath = imgPath ++ "res-game/"
 
-block2Image         :: ImageSpec
-block2Image         = ("data/block2.png", Nothing)
+ballImage :: ImageSpec
+ballImage = (gameSpecificPath ++ "ball-alpha.png", Nothing)
 
-block3Image         :: ImageSpec
-block3Image         = ("data/block3.png", Nothing)
+block1Image :: ImageSpec
+block1Image = (gameSpecificPath ++ "block1.png", Nothing)
 
-blockPuImage        :: ImageSpec
-blockPuImage        = ("data/blockP.png", Nothing)
+block2Image :: ImageSpec
+block2Image = (gameSpecificPath ++ "block2.png", Nothing)
 
-paddleImage         :: ImageSpec
-paddleImage         = ("data/paddleBluA.png", Nothing)
+block3Image :: ImageSpec
+block3Image = (gameSpecificPath ++ "block3.png", Nothing)
 
-pointsUpImage       :: ImageSpec
-pointsUpImage       = ("data/diamond-alpha.png", Nothing)
+blockPuImage :: ImageSpec
+blockPuImage = (gameSpecificPath ++ "blockP.png", Nothing)
 
-livesUpImage       :: ImageSpec
-livesUpImage       = ("data/heart-alpha.png", Nothing)
+paddleImage :: ImageSpec
+paddleImage = (gameSpecificPath ++ "paddleBluA.png", Nothing)
 
-mockUpImage        :: ImageSpec
-mockUpImage        = ("data/spike-y.png", Nothing)
+pointsUpImage :: ImageSpec
+pointsUpImage = (gameSpecificPath ++ "diamond-alpha.png", Nothing)
+
+livesUpImage :: ImageSpec
+livesUpImage = (gameSpecificPath ++ "heart-alpha.png", Nothing)
+
+mockUpImage :: ImageSpec
+mockUpImage = (gameSpecificPath ++ "spike-y.png", Nothing)
 
 destroyBallUpImage :: ImageSpec
-destroyBallUpImage = ("data/spike-y.png", Nothing)
+destroyBallUpImage = (gameSpecificPath ++ "spike-y.png", Nothing)
 
--- ** Audio
+-- * Audio
+
+audioPath :: FilePath
+audioPath = srcPath ++ "audio/"
+
+-- ** Music
+
+musicPath :: FilePath
+musicPath = audioPath ++ "music/"
+
 backgroundMusic :: MusicSpec
-backgroundMusic = "data/level0.mp3"
+backgroundMusic = musicPath ++ "level0.mp3"
+
+-- ** Sounds
+
+soundsPath :: FilePath
+soundsPath = audioPath ++ "sounds/"
 
 blockHitSFX :: SoundSpec
-blockHitSFX = ("data/196106_aiwha_ding-cc-by.wav", 2000)
+blockHitSFX = (soundsPath ++ "196106_aiwha_ding-cc-by.wav", 2000)
 
--- ** Fonts
+-- * Fonts
+
+fontsPath :: FilePath
+fontsPath = srcPath ++ "fonts/"
+
+fontPath :: FilePath
+fontPath = fontsPath ++ "lacuna.ttf"
+
 gameFontSpec :: FontSpec
-gameFontSpec = ("data/lacuna.ttf", 32)
+gameFontSpec = (fontPath, 32)
 
--- ** Colors
+-- * Colors
 fontColor :: ColorSpec
 fontColor = (228, 228, 228, 255)
 

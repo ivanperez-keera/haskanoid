@@ -47,7 +47,7 @@ build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
 
-data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
+-- data-files: data/audio/music/*.mp3 data/audio/sounds/*.wav data/fonts/*.ttf data/images/res-game/*.png data/images/screens/*.png
 
 Flag wiimote
   Description: Enable Wiimote support with hcwiid

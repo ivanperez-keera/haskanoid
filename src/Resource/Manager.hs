@@ -17,12 +17,9 @@ import Resource.Specs -- Complete import
 
 -- | Resource ids.
 data ResourceId
-  = IdGameFont
-  | IdGameFontColor
-  | IdBlack
-  | IdBgMusic
-  | IdBlockHitFX
-  | IdBgImg
+  -- Background and Screens
+  = IdBgImg
+  -- Icons
   | IdBallImg
   | IdBlock1Img
   | IdBlock2Img
@@ -33,29 +30,36 @@ data ResourceId
   | IdLivesUpImg
   | IdMockUpImg
   | IdDestroyBallUpImg
+  -- Fonts
+  | IdGameFont
+  -- Sounds
+  | IdBlockHitFX
+  -- Music
+  | IdBgMusic
+  -- Colors
+  | IdBlack
+  | IdGameFontColor
   deriving (Show, Ord, Eq)
 
 -- | Specifications of the used game resources.
 gameResourceSpec :: ResourceSpec ResourceId
 gameResourceSpec = ResourceSpec
-  { fonts  = [ (IdGameFont,         gameFontSpec) ]
-  , images = [ (IdBgImg,            initialBG)
-             , (IdBallImg,          ballImage)
-             , (IdBlock1Img,        block1Image)
-             , (IdBlock2Img,        block2Image)
-             , (IdBlock3Img,        block3Image)
-             , (IdBlockPuImg,       blockPuImage)
-             , (IdPaddleImg,        paddleImage)
-             , (IdPointsUpImg,      pointsUpImage)
-             , (IdLivesUpImg,       livesUpImage)
-             , (IdMockUpImg,        mockUpImage)
-             , (IdDestroyBallUpImg, destroyBallUpImage)
-             ]
-  , sounds = [ (IdBlockHitFX,       blockHitSFX) ]
-  , colors = [ (IdGameFontColor,    fontColor)
-             , (IdBlack,            black)
-             ]
-  , music  = [ (IdBgMusic,          backgroundMusic) ]
+  { images = [ (IdBgImg,            initialBG         )
+             , (IdBallImg,          ballImage         )
+             , (IdBlock1Img,        block1Image       )
+             , (IdBlock2Img,        block2Image       )
+             , (IdBlock3Img,        block3Image       )
+             , (IdBlockPuImg,       blockPuImage      )
+             , (IdPaddleImg,        paddleImage       )
+             , (IdPointsUpImg,      pointsUpImage     )
+             , (IdLivesUpImg,       livesUpImage      )
+             , (IdMockUpImg,        mockUpImage       )
+             , (IdDestroyBallUpImg, destroyBallUpImage) ]
+  , fonts  = [ (IdGameFont,         gameFontSpec      ) ]
+  , sounds = [ (IdBlockHitFX,       blockHitSFX       ) ]
+  , music  = [ (IdBgMusic,          backgroundMusic   ) ]
+  , colors = [ (IdGameFontColor,    fontColor         )
+             , (IdBlack,            black             ) ]
   }
 
 #if defined(sdl) || defined (sdl2)
@@ -63,7 +67,7 @@ gameResourceSpec = ResourceSpec
 type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
 #endif
 
--- * Resource management
+-- Resource management
 -- loadNewResources :: ResourceMgr ->  GameState -> IO Resources
 -- loadNewResources mgr state = do
 --   manager <- readIORef (unResMgr mgr)
