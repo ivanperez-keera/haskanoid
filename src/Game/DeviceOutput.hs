@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeSynonymInstances #-}
+-- | The device output handles the rendering of the game state.
 module Game.DeviceOutput
   ( module Game.DeviceOutput
   , module Resource.Manager
@@ -33,6 +34,8 @@ import Resource.Manager
 import Game.Render.Monad.SDL ()
 #endif
 
+-- * Rendering Settings
+
 adjustSDLsettings :: IO ()
 #ifdef sdl
 adjustSDLsettings = void $ do
@@ -46,15 +49,27 @@ adjustSDLsettings = void $ do
 adjustSDLsettings = return ()
 #endif
 
--- * Rendering and Sound
+-- * Rendering of the game state
 
--- | Loads new resources, renders the game state using SDL, and adjusts music.
+-- | Render the game state.
 render :: GameState -> RenderEnv -> IO ()
 render shownState env = do
   audio   shownState env
   display shownState env
 
--- ** Audio
+-- ** Visual
+
+-- | Display the game state.
+display :: GameState -> RenderEnv -> IO ()
+display shownState env = do
+  let (cCol, mBgImg, clg) = game shownState
+  -- TODO dAlignToAbsPos' ignores the rendering context
+  clg' <- collageMapM (dAlignToAbsPos' env) clg
+  displayWithBGColorImage' (cCol, mBgImg, clg') env True
+
+-- * Game specific elements
+
+-- ** Audible
 
 audio :: GameState -> RenderEnv -> IO ()
 audio shownState (resourceManager, _, _) = do
@@ -74,13 +89,7 @@ audioObject resourceManager object = when (objectHit object) $
                 awhen bhit playSoundFX
     _     -> return ()
 
--- ** Visual rendering
-display :: GameState -> RenderEnv -> IO ()
-display shownState env = do
-  let (cCol, mBgImg, clg) = game shownState
-  -- TODO dAlignToAbsPos' ignores the rendering context
-  clg' <- collageMapM (dAlignToAbsPos' env) clg
-  displayWithBGColorImage' (cCol, mBgImg, clg') env True
+-- ** Visual
 
 game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) ((Int, Int), Align))
 game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
