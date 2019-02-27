@@ -110,7 +110,8 @@ maxVNorm = 300
 
 -- * Debugging
 
--- | Initial level. Change this in the code to start
--- from a different level.
+-- | Initial level.
+--
+-- Note: Change this in the code to start from a different level.
 initialLevel :: Int
 initialLevel = 0

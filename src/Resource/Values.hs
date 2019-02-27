@@ -7,6 +7,8 @@ import           Data.Char       (toLower)
 import qualified Paths_haskanoid as Paths (getDataFileName)
 import           Playground      (Settings (..))
 
+-- * Application Settings
+
 -- | General settings of the application.
 settings :: (Num a) => Settings a
 settings = Settings

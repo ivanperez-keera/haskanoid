@@ -117,12 +117,12 @@ objectTopLevelCorner object = case objectKind object of
 
 -- | Physical object definition of an 'Object'. We use AABB for shapes.
 instance P.PhysicalObject Object (String, ObjectKind) Shape where
+  physObjectId x           = (objectName x, objectKind x)
   physObjectPosition       = objectPos
   physObjectVelocity       = objectVel
-  physObjectElasticity     = collisionEnergy
   physObjectShape          = objShape
   physObjectCollides       = canCauseCollisions
-  physObjectId x           = (objectName x, objectKind x)
+  physObjectElasticity     = collisionEnergy
   physObjectUpdatePosition = \o p -> o { objectPos = p }
   physObjectUpdateVelocity = \o v -> o { objectVel = v }
   physDetectCollision      = detectCollision

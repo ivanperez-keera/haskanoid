@@ -23,13 +23,6 @@ data GameState = GameState
   , gameInfo    :: GameInfo
   }
 
--- | Initial (default) game state.
-neutralGameState :: GameState
-neutralGameState = GameState
-  { gameObjects = []
-  , gameInfo    = neutralGameInfo
-  }
-
 -- | The gameinfo tells us the current game state (running, paused, etc.)
 -- and general information, in this case, the number of lives, the level
 -- and the points.
@@ -43,15 +36,6 @@ data GameInfo = GameInfo
   , gamePoints :: Int
   }
 
--- | Initial (default) game info (no points, no lives, no level).
-neutralGameInfo :: GameInfo
-neutralGameInfo = GameInfo
-  { gameStatus = GameStarted
-  , gameLevel  = 0
-  , gameLives  = 0
-  , gamePoints = 0
-  }
-
 -- | Possible actual game statuses. The game is always in one of these.
 -- Interaction and presentation depend on this. Yampa switches are
 -- used to jump from one to another, and the display module
@@ -63,3 +47,19 @@ data GameStatus = GamePlaying
                 | GameFinished
                 | GameStarted
  deriving Eq
+
+-- | Initial (default) game state.
+neutralGameState :: GameState
+neutralGameState = GameState
+  { gameObjects = []
+  , gameInfo    = neutralGameInfo
+  }
+
+-- | Initial (default) game info (no points, no lives, no level).
+neutralGameInfo :: GameInfo
+neutralGameInfo = GameInfo
+  { gameStatus = GameStarted
+  , gameLevel  = 0
+  , gameLives  = 0
+  , gamePoints = 0
+  }

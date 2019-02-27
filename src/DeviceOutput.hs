@@ -1,6 +1,10 @@
 {-# LANGUAGE CPP                  #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeSynonymInstances #-}
+-- | This module provides the RenderEnv type which is a shorter reference for
+-- the 'GRenderingEnv' with the app specific resource manager, runtime context,
+-- and rendering context. Besides, it imports and provides rendering related
+-- instances.
 module DeviceOutput where
 
 -- External imports

@@ -33,6 +33,7 @@ module UserInput where
 -- External imports
 import Data.IORef
 import Control.Monad.Extra
+import Physics.TwoDimensions.Dimensions (Pos2D)
 
 -- External imports (SDL)
 #if defined(sdl) || defined(sdl2)
@@ -100,10 +101,14 @@ import Resource.Values
 
 -- | Controller info at any given point.
 data Controller = Controller
-  { controllerPos   :: (Double, Double)
+  { controllerPos   :: Pos2D
   , controllerClick :: Bool
   , controllerPause :: Bool
   }
+
+-- | Default controller position.
+defCtrlPos :: Pos2D
+defCtrlPos = (0,0)
 
 -- | Controller info at any given point, plus a pointer
 -- to poll the main device again. This is safe,
@@ -147,7 +152,7 @@ initInputDevices = do
 
   nr <- newIORef defaultInfo
   return $ ControllerRef (nr, dev')
- where defaultInfo = Controller (0,0) False False
+ where defaultInfo = Controller defCtrlPos False False
 
 -- | The controller device.
 type ControllerDev = IO (Maybe (Controller -> IO Controller))
