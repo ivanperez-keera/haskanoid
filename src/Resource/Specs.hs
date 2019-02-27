@@ -54,10 +54,10 @@ livesUpImage :: ImageSpec
 livesUpImage = (gameSpecificPath ++ "heart-alpha.png", Nothing)
 
 mockUpImage :: ImageSpec
-mockUpImage = (gameSpecificPath ++ "spike-y.png", Nothing)
+mockUpImage = (gameSpecificPath ++ "spike-y-alpha.png", Nothing)
 
 destroyBallUpImage :: ImageSpec
-destroyBallUpImage = (gameSpecificPath ++ "spike-y.png", Nothing)
+destroyBallUpImage = (gameSpecificPath ++ "spike-b-alpha.png", Nothing)
 
 -- * Audio
 
