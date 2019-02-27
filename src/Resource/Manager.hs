@@ -15,6 +15,32 @@ import Game.Resource.Manager.SDL as SDLResourceMgr (ResourceManager)
 -- Internal imports
 import Resource.Specs -- Complete import
 
+#if defined(sdl) || defined (sdl2)
+-- | A stateful collector that maps 'ResourceId' to SDL/SDL2 resources.
+type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
+#endif
+
+-- | Specifications of the used game resources.
+gameResourceSpec :: ResourceSpec ResourceId
+gameResourceSpec = ResourceSpec
+  { images = [ (IdBgImg,            initialBG         )
+             , (IdBallImg,          ballImage         )
+             , (IdBlock1Img,        block1Image       )
+             , (IdBlock2Img,        block2Image       )
+             , (IdBlock3Img,        block3Image       )
+             , (IdBlockPuImg,       blockPuImage      )
+             , (IdPaddleImg,        paddleImage       )
+             , (IdPointsUpImg,      pointsUpImage     )
+             , (IdLivesUpImg,       livesUpImage      )
+             , (IdMockUpImg,        mockUpImage       )
+             , (IdDestroyBallUpImg, destroyBallUpImage) ]
+  , fonts  = [ (IdGameFont,         gameFontSpec      ) ]
+  , sounds = [ (IdBlockHitFX,       blockHitSFX       ) ]
+  , music  = [ (IdBgMusic,          backgroundMusic   ) ]
+  , colors = [ (IdGameFontColor,    fontColor         )
+             , (IdBlack,            black             ) ]
+  }
+
 -- | Resource ids.
 data ResourceId
   -- Background and Screens
@@ -40,32 +66,6 @@ data ResourceId
   | IdBlack
   | IdGameFontColor
   deriving (Show, Ord, Eq)
-
--- | Specifications of the used game resources.
-gameResourceSpec :: ResourceSpec ResourceId
-gameResourceSpec = ResourceSpec
-  { images = [ (IdBgImg,            initialBG         )
-             , (IdBallImg,          ballImage         )
-             , (IdBlock1Img,        block1Image       )
-             , (IdBlock2Img,        block2Image       )
-             , (IdBlock3Img,        block3Image       )
-             , (IdBlockPuImg,       blockPuImage      )
-             , (IdPaddleImg,        paddleImage       )
-             , (IdPointsUpImg,      pointsUpImage     )
-             , (IdLivesUpImg,       livesUpImage      )
-             , (IdMockUpImg,        mockUpImage       )
-             , (IdDestroyBallUpImg, destroyBallUpImage) ]
-  , fonts  = [ (IdGameFont,         gameFontSpec      ) ]
-  , sounds = [ (IdBlockHitFX,       blockHitSFX       ) ]
-  , music  = [ (IdBgMusic,          backgroundMusic   ) ]
-  , colors = [ (IdGameFontColor,    fontColor         )
-             , (IdBlack,            black             ) ]
-  }
-
-#if defined(sdl) || defined (sdl2)
--- | A stateful collector that maps 'ResourceId' to SDL/SDL2 resources.
-type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
-#endif
 
 -- Resource management
 -- loadNewResources :: ResourceMgr ->  GameState -> IO Resources
