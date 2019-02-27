@@ -7,13 +7,13 @@ import Game.Resource.Spec (ColorSpec, FontSpec, ImageSpec, MusicSpec, SoundSpec)
 
 -- * Source path
 
-srcPath :: FilePath
-srcPath = "data/"
+basePath :: FilePath
+basePath = "data/"
 
 -- * Images
 
 imgPath :: FilePath
-imgPath = srcPath ++ "images/"
+imgPath = basePath ++ "images/"
 
 -- ** Screens
 
@@ -62,7 +62,7 @@ destroyBallUpImage = (gameSpecificPath ++ "spike-y.png", Nothing)
 -- * Audio
 
 audioPath :: FilePath
-audioPath = srcPath ++ "audio/"
+audioPath = basePath ++ "audio/"
 
 -- ** Music
 
@@ -83,7 +83,7 @@ blockHitSFX = (soundsPath ++ "196106_aiwha_ding-cc-by.wav", 2000)
 -- * Fonts
 
 fontsPath :: FilePath
-fontsPath = srcPath ++ "fonts/"
+fontsPath = basePath ++ "fonts/"
 
 fontPath :: FilePath
 fontPath = fontsPath ++ "lacuna.ttf"
