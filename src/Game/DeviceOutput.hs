@@ -20,7 +20,7 @@ import Game.VisualElem
 import Graphics.UI.Align
 import Graphics.UI.Collage
 import Graphics.UI.SDL           as SDL
-import Playground                (displayWithBGColorImage')
+import Playground                (DAlign, displayWithBGColorImage')
 import Playground.SDL            (dAlignToAbsPos')
 
 -- Internal imports
@@ -91,7 +91,7 @@ audioObject resourceManager object = when (objectHit object) $
 
 -- ** Visual
 
-game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) ((Int, Int), Align))
+game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) DAlign)
 game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
   where
     -- HUD
