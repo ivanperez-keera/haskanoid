@@ -5,7 +5,7 @@ module Resource.Specs where
 -- External imports
 import Game.Resource.Spec (ColorSpec, FontSpec, ImageSpec, MusicSpec, SoundSpec)
 
--- * Source path
+-- * Base path
 
 basePath :: FilePath
 basePath = "data/"
