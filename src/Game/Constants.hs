@@ -30,10 +30,10 @@ gameAreaMinLeftMargin :: Num a => a
 gameAreaMinLeftMargin = 25
 
 -- * Time \/ Delays
-loadingDelay :: DTime
+loadingDelay :: (Fractional a) => a
 loadingDelay = 2 -- seconds
 
-levelFinishedDelay :: DTime
+levelFinishedDelay :: (Fractional a) => a
 levelFinishedDelay = 4 -- seconds
 
 -- restartDelay :: Time
