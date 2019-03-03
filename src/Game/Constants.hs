@@ -2,7 +2,6 @@
 module Game.Constants where
 
 -- External imports
-import FRP.Yampa                        (DTime)
 import Physics.TwoDimensions.Dimensions (Pos2D)
 import Playground                       (Settings (height, width))
 
