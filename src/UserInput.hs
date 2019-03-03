@@ -34,6 +34,7 @@ module UserInput where
 import Data.IORef
 import Control.Monad.Extra
 import Physics.TwoDimensions.Dimensions (Pos2D)
+import Game.Input.Controller.Empty      (ControllerEmpty, emptyController)
 
 -- External imports (SDL)
 #if defined(sdl) || defined(sdl2)
@@ -110,6 +111,12 @@ data Controller = Controller
 defCtrlPos :: Pos2D
 defCtrlPos = (0,0)
 
+-- The instances are useful to handle standard input.
+
+-- | Instance of the empty controller.
+instance ControllerEmpty Controller where
+  emptyController = Controller defCtrlPos False False
+
 -- | Controller info at any given point, plus a pointer
 -- to poll the main device again. This is safe,
 -- since there is only one writer at a time (the device itself).
@@ -150,9 +157,8 @@ initInputDevices = do
   let dev' = dev
 #endif
 
-  nr <- newIORef defaultInfo
+  nr <- newIORef emptyController
   return $ ControllerRef (nr, dev')
- where defaultInfo = Controller defCtrlPos False False
 
 -- | The controller device.
 type ControllerDev = IO (Maybe (Controller -> IO Controller))
