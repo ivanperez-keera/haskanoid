@@ -49,7 +49,7 @@ my_main_main =
     -- Initialize and prepare clock.
     timeRef <- initializeTimeRef
 
-    -- Initiand prepare input, resources and output subsystems.
+    -- Initialize and prepare input, resources and output subsystems.
     ctrlRef <- initInputDevices
     resSpec <- localizeResourceSpec getDataFileName gameResourceSpec
     rMgr    <- loadResources resSpec
