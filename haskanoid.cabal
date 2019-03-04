@@ -86,9 +86,14 @@ executable haskanoid
                  Game.Logic
                  Game.Objects
                  Game.ObjectSF
+                 Game.ObjectSF.Ball
+                 Game.ObjectSF.Block
+                 Game.ObjectSF.Paddle
+                 Game.ObjectSF.PowerUp
+                 Game.ObjectSF.Wall
                  Game.State
-                 UserInput
                  Resource.Values
+                 UserInput
 
   -- Other library packages from which modules are imported.
   build-depends: base         >= 4.6 && < 5,
