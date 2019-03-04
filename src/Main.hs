@@ -21,7 +21,8 @@ import Playground.SDL (createRuntimeContext, initDeviceOutput, initGraphs,
                        loadAllResources)
 
 -- Internal imports
-import Game.DeviceOutput
+import Game.DeviceOutput (adjustSDLsettings, render)
+import Resource.Manager  (gameResourceSpec)
 #endif
 
 #ifdef ghcjs

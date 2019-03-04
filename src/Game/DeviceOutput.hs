@@ -5,11 +5,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 -- | The device output handles the rendering of the game state.
-module Game.DeviceOutput
-  ( module Game.DeviceOutput
-  , module Resource.Manager
-  )
-  where
+module Game.DeviceOutput where
 
 -- External imports
 import Control.Monad
