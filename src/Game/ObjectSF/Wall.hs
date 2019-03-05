@@ -14,8 +14,6 @@ import Game.Objects   (Object (..), ObjectKind (Side), ObjectName,
 import Game.ObjectSF  (ObjectInput (ObjectInput), ObjectOutput (ObjectOutput),
                        ObjectSF)
 
--- *** Walls
-
 -- | Walls. Each wall has a side and a position.
 --
 -- NOTE: They are considered game objects instead of having special treatment.
