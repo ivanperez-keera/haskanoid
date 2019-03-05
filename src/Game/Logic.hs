@@ -39,9 +39,8 @@
 module Game.Logic where -- (wholeGame) where
 
 -- External imports
--- import Control.Applicative                  ((<$>))
 import Data.IdentityList                    (IL, assocsIL, deleteIL, elemsIL,
-                                             insertIL_, listToIL)
+                                             insertIL_)
 import FRP.Yampa                            (DTime, Event (NoEvent), SF, after,
                                              arr, dSwitch, delay, dpSwitchB,
                                              edge, lMerge, loopPre, mergeBy,
@@ -52,9 +51,9 @@ import Physics.CollisionEngine              (detectCollisions)
 import Physics.TwoDimensions.PhysicalObject (Collision (..))
 
 -- Internal imports
-import Game.Constants        (blockHeight, blockWidth, initialLevel,
-                              levelFinishedDelay, loadingDelay, stdLives)
-import Game.Levels           (blockCfgs, levelName, levels, numLevels)
+import Game.Constants        (initialLevel, levelFinishedDelay, loadingDelay,
+                              stdLives)
+import Game.Levels           (initialState, levelName, levels, numLevels)
 import Game.Objects          (Collisions, ObjectKind (Block, PowerUp),
                               PowerUpKind (..), collisionObjectKind,
                               collisionObjectName, isBlock)
@@ -63,13 +62,8 @@ import Game.ObjectSF         (ObjectInput (ObjectInput),
                               ObjectSF, ObjectSFs, PowerUpDef (PowerUpDef),
                               extractObjects, outputObject)
 import Game.ObjectSF.Ball    (collisionDestroyBallUpPaddle,
-                              collisionLivesUpsPaddle, collisionWithBottom,
-                              objBall)
-import Game.ObjectSF.Block   (objBlock)
-import Game.ObjectSF.Paddle  (objPaddle)
+                              collisionLivesUpsPaddle, collisionWithBottom)
 import Game.ObjectSF.PowerUp (powerUp)
-import Game.ObjectSF.Wall    (objSideBottom, objSideLeft, objSideRight,
-                              objSideTop)
 import Game.State            (GameInfo (..), GameState (..), GameStatus (..),
                               neutralGameInfo, neutralGameState)
 import UserInput             (Controller)
@@ -223,7 +217,9 @@ gamePlayOrPause lives level pts = gamePlay lives level pts
 -- points.
 gamePlay :: Int -> Int -> Int -> SF Controller GameState
 gamePlay lives level pts =
-  gamePlay' (initialObjects level) >>> composeGameState lives level pts
+  gamePlay' (initialState levelSpec) >>> composeGameState lives level pts
+  where
+    levelSpec = levels !! level
 
 -- | Based on the internal gameplay info, compose the main game state and
 -- detect when a live is lost. When that happens, restart this SF
@@ -343,17 +339,3 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
        createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
-
--- * Game objects
---
--- | Objects initially present: the walls, the ball, the paddle and the blocks.
-initialObjects :: Int -> ObjectSFs
-initialObjects level = listToIL $
-    [ objSideRight
-    , objSideTop
-    , objSideLeft
-    , objSideBottom
-    , objPaddle
-    , objBall
-    ]
-    ++ map (\p -> objBlock p (blockWidth, blockHeight)) (blockCfgs $ levels!!level)

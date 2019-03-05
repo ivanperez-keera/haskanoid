@@ -13,28 +13,30 @@ module Game.Levels where
 
 -- External imports
 import Control.Arrow                    ((***))
+import Data.IdentityList                (listToIL)
 import Data.List                        (nub, zip4)
 import Game.Resource.Spec               (ImageSpec, MusicSpec)
-import Physics.TwoDimensions.Dimensions
+import Physics.TwoDimensions.Dimensions (Pos2D)
 
 -- Internal imports
-import Game.Constants
-import Game.Objects
+import Game.Constants       (blockHeight, blockSeparation, blockWidth,
+                             gameAreaMinLeftMargin, gameAreaTopMargin,
+                             gameWidth, maxBlockLife, minBlockLife)
+import Game.Objects         (AlwaysPowerUp, PowerUpKind (..), SignalPowerUp)
+import Game.ObjectSF        (ObjectSFs)
+import Game.ObjectSF.Ball   (objBall)
+import Game.ObjectSF.Block  (objBlock)
+import Game.ObjectSF.Paddle (objPaddle)
+import Game.ObjectSF.Wall   (objSideBottom, objSideLeft, objSideRight,
+                             objSideTop)
 
 -- * Levels
 -- ** Level specification
 data LevelSpec = LevelSpec
- { blockCfgs  :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-                -- ^ Block positions, block lives, kind of powerups,
-                -- and whether the block signals that it contains a powerup.
-                -- Note: SignalPowerUp is not logically related to the kind
-               -- of powerups and can be used to irritate the player.
-                -- For example, signalling that it contains a powerup, but
-                -- the powerup kind is Nothing. Or containing a powerup, but
-                -- not signaling it.
- , levelBg    :: ImageSpec  -- ^ Background image
+ { levelBg    :: ImageSpec  -- ^ Background image
  , levelMusic :: MusicSpec  -- ^ Background music
  , levelName  :: String
+ , initialState :: ObjectSFs
  }
 
 -- | Number of levels. Change this in the code to finish
@@ -44,7 +46,7 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m,t) -> LevelSpec d b m t)
+levels = map (\(d,b,m,t) -> LevelSpec b m t (initialObjects d) )
   [ (blockDescS 0,  ("data/level0.png", Nothing), "data/level0.mp3", "0")
   , (blockDescS 1,  ("data/level1.png", Nothing), "data/level1.mp3", "1")
   , (blockDescS 2,  ("data/level2.png", Nothing), "data/level2.mp3", "2")
@@ -63,8 +65,27 @@ levels = map (\(d,b,m,t) -> LevelSpec d b m t)
   , (blockDescS 15, ("data/level0.png", Nothing), "data/level0.mp3", "15")
   , (blockDescS 16, ("data/level1.png", Nothing), "data/level1.mp3", "16")
   ]
+  where
+    -- | Objects initially present: the walls, the ball, the paddle and the blocks.
+    initialObjects :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
+                   -> ObjectSFs
+    initialObjects blocksSpec = listToIL $
+        [ objSideRight
+        , objSideTop
+        , objSideLeft
+        , objSideBottom
+        , objPaddle
+        , objBall
+        ]
+        ++ map (\p -> objBlock p (blockWidth, blockHeight)) blocksSpec
 
 -- | Level block specification (positions,lives of block, maybe powerup)
+--
+-- Block positions, block lives, kind of powerups, and whether the block
+-- signals that it contains a powerup.  Note: SignalPowerUp is not logically
+-- related to the kind of powerups and can be used to irritate the player.  For
+-- example, signalling that it contains a powerup, but the powerup kind is
+-- Nothing. Or containing a powerup, but not signaling it.
 
 -- Level 0
 --
