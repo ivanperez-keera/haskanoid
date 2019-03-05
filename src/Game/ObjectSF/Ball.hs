@@ -26,6 +26,7 @@ import Game.ObjectSF  (ObjectInput (..), ObjectOutput (ObjectOutput), ObjectSF,
                        livingObject, outputObject)
 import UserInput      (Controller (controllerClick))
 
+
 -- | Ball
 --
 -- A ball that follows the paddle until the user fires it
@@ -52,6 +53,66 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
 
             let hbod = lMerge miss hitDestroyBallUp
             returnA -< (o, hbod)
+
+-- | Position of the ball, starting from p0 with velicity v0, since the time of
+-- last switching (that is, collision, or the beginning of time --being fired
+-- from the paddle-- if never switched before), provided that no obstacles are
+-- encountered.
+freeBall :: Pos2D -> Vel2D -> ObjectSF
+freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
+
+  -- Detect collisions
+  let name = "ball"
+  let kind = Ball
+  let isHit = isInCollision (name, kind) cs
+
+  -- Cap speed
+  let v = limitNorm v0 maxVNorm
+
+  -- Any free moving object behaves like this (but with
+  -- acceleration. This should be in some FRP.NewtonianPhysics
+  -- module)
+  p <- (p0 ^+^) ^<< integral -< v
+
+  let obj = Object { objectName           = name
+                   , objectKind           = Ball
+                   , objectProperties     = BallProps ballWidth
+                   , objectPos            = p
+                   , objectVel            = v0
+                   , objectAcc            = (0, 0)
+                   , objectDead           = False
+                   , objectHit            = isHit
+                   , canCauseCollisions   = True
+                   , collisionEnergy      = 1
+                   }
+
+  returnA -< livingObject obj
+
+-- | Ball follows the paddle if there is one, and it's out of the screen
+-- otherwise). To avoid reacting to collisions, this ball is non-interactive.
+followPaddle :: ObjectSF
+followPaddle = arr $ \oi ->
+  -- Calculate ball position, midway on top of the the paddle
+  --
+  -- This code allows for the paddle not to exist (Maybe), although that should
+  -- never happen in practice.
+  let mbPaddlePos = objectPos <$> find isPaddle (knownObjects oi)
+      ballPos     = maybe (outOfScreen, outOfScreen)
+                          ((paddleWidth/2, - ballHeight) ^+^)
+                          mbPaddlePos
+  in ObjectOutput (inertBallAt ballPos) noEvent noEvent
+  where outOfScreen = -10
+        inertBallAt p = Object { objectName           = "ball"
+                               , objectKind           = Ball
+                               , objectProperties     = BallProps ballWidth
+                               , objectPos            = p
+                               , objectVel            = (0, 0)
+                               , objectAcc            = (0, 0)
+                               , objectDead           = False
+                               , objectHit            = False
+                               , canCauseCollisions   = False
+                               , collisionEnergy      = 0
+                               }
 
 -- | Fires an event when the ball *enters in* a collision with the
 -- bottom wall.
@@ -102,32 +163,6 @@ collisionLivesUpsPaddle = proc cs -> do
 
   dead <- edge -< isHit
   returnA -< length (concatMap collisionData paddleHits)
-
--- | Ball follows the paddle if there is one, and it's out of the screen
--- otherwise). To avoid reacting to collisions, this ball is non-interactive.
-followPaddle :: ObjectSF
-followPaddle = arr $ \oi ->
-  -- Calculate ball position, midway on top of the the paddle
-  --
-  -- This code allows for the paddle not to exist (Maybe), although that should
-  -- never happen in practice.
-  let mbPaddlePos = objectPos <$> find isPaddle (knownObjects oi)
-      ballPos     = maybe (outOfScreen, outOfScreen)
-                          ((paddleWidth/2, - ballHeight) ^+^)
-                          mbPaddlePos
-  in ObjectOutput (inertBallAt ballPos) noEvent noEvent
-  where outOfScreen = -10
-        inertBallAt p = Object { objectName           = "ball"
-                               , objectKind           = Ball
-                               , objectProperties     = BallProps ballWidth
-                               , objectPos            = p
-                               , objectVel            = (0, 0)
-                               , objectAcc            = (0, 0)
-                               , objectDead           = False
-                               , objectHit            = False
-                               , canCauseCollisions   = False
-                               , collisionEnergy      = 0
-                               }
 
 -- A bouncing ball moves freely until there is a collision, then bounces and
 -- goes on and on.
@@ -182,36 +217,3 @@ ballBounce' = proc (ObjectInput ci cs os, o) -> do
   let ev = maybe noEvent Event (changedVelocity ("ball", Ball) cs)
   returnA -< fmap (\v -> (objectPos (outputObject o), v)) ev
 
--- | Position of the ball, starting from p0 with velicity v0, since the time of
--- last switching (that is, collision, or the beginning of time --being fired
--- from the paddle-- if never switched before), provided that no obstacles are
--- encountered.
-freeBall :: Pos2D -> Vel2D -> ObjectSF
-freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
-
-  -- Detect collisions
-  let name = "ball"
-  let kind = Ball
-  let isHit = isInCollision (name, kind) cs
-
-  -- Cap speed
-  let v = limitNorm v0 maxVNorm
-
-  -- Any free moving object behaves like this (but with
-  -- acceleration. This should be in some FRP.NewtonianPhysics
-  -- module)
-  p <- (p0 ^+^) ^<< integral -< v
-
-  let obj = Object { objectName           = name
-                   , objectKind           = Ball
-                   , objectProperties     = BallProps ballWidth
-                   , objectPos            = p
-                   , objectVel            = v0
-                   , objectAcc            = (0, 0)
-                   , objectDead           = False
-                   , objectHit            = isHit
-                   , canCauseCollisions   = True
-                   , collisionEnergy      = 1
-                   }
-
-  returnA -< livingObject obj

@@ -24,6 +24,13 @@ import UserInput
 -- return 'ObjectOutput' signals.
 type ObjectSF = SF ObjectInput ObjectOutput
 
+-- | List of identifiable objects. Used to work with dynamic object
+-- collections.
+type ObjectSFs = IL ObjectSF
+
+-- | A list of object outputs
+type ObjectOutputs = [ObjectOutput]
+
 -- | In order to determine its new output, an object needs to know the user's
 -- desires ('userInput'), whether there have been any collisions
 -- ('collisions'), and the presence of any pre-existing objects
@@ -61,13 +68,5 @@ data PowerUpDef = PowerUpDef String PowerUpKind Pos2D Size2D
 livingObject :: Object -> ObjectOutput
 livingObject o = ObjectOutput o noEvent noEvent
 
--- | List of identifiable objects. Used to work with dynamic object
--- collections.
-type ObjectSFs = IL ObjectSF
-
 extractObjects :: Functor f => SF (f ObjectOutput) (f Object)
 extractObjects = arr (fmap outputObject)
-
--- | A list of object outputs
-type ObjectOutputs = [ObjectOutput]
-
