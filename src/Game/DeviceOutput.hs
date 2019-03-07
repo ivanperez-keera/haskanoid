@@ -25,6 +25,7 @@ import Game.Constants
 import Game.Objects
 import Game.State
 import Resource.Manager
+import Game.Levels (bgMusic, levels, bgImage, bgColor)
 
 #ifdef sdl2
 import Game.Render.Monad.SDL ()
@@ -72,11 +73,16 @@ audio shownState (resourceManager, _, _) = do
   -- Start bg music if necessary
   playing <- musicIsPlaying
   unless playing $ do
-    m <- tryGetResourceMusic resourceManager IdBgMusic undefined
+    m <- m' mBgMusic -- tryGetResourceMusic resourceManager IdBgMusic undefined
     awhen m playMusic
 
   -- Play object hits
   mapM_ (audioObject resourceManager) $ gameObjects shownState
+  where
+    mBgMusic = bgMusic $ levels !! (gameLevel $ gameInfo shownState)
+
+    m' (Just bgM) = tryGetResourceMusic resourceManager bgM undefined
+    m' Nothing    = return Nothing
 
 audioObject :: ResourceMgr -> Object -> IO ()
 audioObject resourceManager object = when (objectHit object) $
@@ -88,7 +94,7 @@ audioObject resourceManager object = when (objectHit object) $
 -- ** Visual
 
 game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) DAlign)
-game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
+game shownState = (bgColor lvlSpec, bgImage lvlSpec, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
   where
     -- HUD
     levelTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Level: "  ++ show (gameLevel over)))
@@ -110,8 +116,10 @@ game shownState = (IdBlack, Just IdBgImg, mconcat [levelTxt, pointsTxt, livesTxt
         pos      = (round (ox + gameLeft), round (oy + gameTop))
         (ox, oy) = objectTopLevelCorner object
 
-    over   = gameInfo shownState
-    status = gameStatus over
+    over    = gameInfo shownState
+    status  = gameStatus over
+    lvl     = gameLevel over
+    lvlSpec = levels !! lvl
 
 statusMsg :: GameStatus -> Maybe String
 statusMsg GamePlaying               = Nothing

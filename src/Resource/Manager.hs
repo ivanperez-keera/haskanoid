@@ -23,7 +23,9 @@ type ResourceMgr = SDLResourceMgr.ResourceManager IORef ResourceId
 -- | Specifications of the used game resources.
 gameResourceSpec :: ResourceSpec ResourceId
 gameResourceSpec = ResourceSpec
-  { images = [ (IdBgImg,            initialBG         )
+  { images = [ (IdBg0Img,           bg0Img            )
+             , (IdBg1Img,           bg1Img            )
+             , (IdBg2Img,           bg2Img            )
              , (IdBallImg,          ballImage         )
              , (IdBlock1Img,        block1Image       )
              , (IdBlock2Img,        block2Image       )
@@ -36,15 +38,20 @@ gameResourceSpec = ResourceSpec
              , (IdDestroyBallUpImg, destroyBallUpImage) ]
   , fonts  = [ (IdGameFont,         gameFontSpec      ) ]
   , sounds = [ (IdBlockHitFX,       blockHitSFX       ) ]
-  , music  = [ (IdBgMusic,          backgroundMusic   ) ]
+  , music  = [ (IdBg0Music,         bg0Music          )
+             , (IdBg1Music,         bg1Music          )
+             , (IdBg2Music,         bg2Music          )
+             ]
   , colors = [ (IdGameFontColor,    fontColor         )
-             , (IdBlack,            black             ) ]
+             , (IdBgColor,          bgColor           ) ]
   }
 
 -- | Resource ids.
 data ResourceId
   -- Background and Screens
-  = IdBgImg
+  = IdBg0Img
+  | IdBg1Img
+  | IdBg2Img
   -- Icons
   | IdBallImg
   | IdBlock1Img
@@ -61,9 +68,11 @@ data ResourceId
   -- Sounds
   | IdBlockHitFX
   -- Music
-  | IdBgMusic
+  | IdBg0Music
+  | IdBg1Music
+  | IdBg2Music
   -- Colors
-  | IdBlack
+  | IdBgColor
   | IdGameFontColor
   deriving (Show, Ord, Eq)
 

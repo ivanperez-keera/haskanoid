@@ -53,7 +53,7 @@ import Physics.TwoDimensions.PhysicalObject (Collision (..))
 -- Internal imports
 import Game.Constants        (initialLevel, levelFinishedDelay, loadingDelay,
                               stdLives)
-import Game.Levels           (initialState, levelName, levels, numLevels)
+import Game.Levels           (levelInfo, levels, numLevels, objectSFs, levelName)
 import Game.Objects          (Collisions, ObjectKind (Block, PowerUp),
                               PowerUpKind (..), collisionObjectKind,
                               collisionObjectName, isBlock)
@@ -150,7 +150,7 @@ loadLevel lives level pts time next = switch
 -- forever.
 levelLoading :: Int -> Int -> Int -> SF a GameState
 levelLoading lvs lvl pts = arr $ const $
-  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl (levelName (levels !! lvl))
+  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl (levelName $ levelInfo (levels !! lvl))
                                          , gameLevel  = lvl
                                          , gameLives  = lvs
                                          , gamePoints = pts
@@ -217,7 +217,7 @@ gamePlayOrPause lives level pts = gamePlay lives level pts
 -- points.
 gamePlay :: Int -> Int -> Int -> SF Controller GameState
 gamePlay lives level pts =
-  gamePlay' (initialState levelSpec) >>> composeGameState lives level pts
+  gamePlay' (objectSFs $ levelInfo levelSpec) >>> composeGameState lives level pts
   where
     levelSpec = levels !! level
 

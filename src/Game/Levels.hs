@@ -15,7 +15,6 @@ module Game.Levels where
 import Control.Arrow                    ((***))
 import Data.IdentityList                (listToIL)
 import Data.List                        (nub, zip4)
-import Game.Resource.Spec               (ImageSpec, MusicSpec)
 import Physics.TwoDimensions.Dimensions (Pos2D)
 
 -- Internal imports
@@ -29,15 +28,21 @@ import Game.ObjectSF.Block  (objBlock)
 import Game.ObjectSF.Paddle (objPaddle)
 import Game.ObjectSF.Wall   (objSideBottom, objSideLeft, objSideRight,
                              objSideTop)
+import Resource.Manager     (ResourceId (..))
 
 -- * Levels
 -- ** Level specification
 data LevelSpec = LevelSpec
- { levelBg    :: ImageSpec  -- ^ Background image
- , levelMusic :: MusicSpec  -- ^ Background music
- , levelName  :: String
- , initialState :: ObjectSFs
+ { bgColor   :: ResourceId       -- ^ The background color (to clear the screen).
+ , bgImage   :: Maybe ResourceId -- ^ Background image.
+ , bgMusic   :: Maybe ResourceId -- ^ Background music.
+ , levelInfo :: LevelInfo        -- ^ Level information.
  }
+
+data LevelInfo = LevelInfo
+  { objectSFs :: ObjectSFs
+  , levelName :: String
+  }
 
 -- | Number of levels. Change this in the code to finish
 -- in a different level.
@@ -46,24 +51,24 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m,t) -> LevelSpec b m t (initialObjects d) )
-  [ (blockDescS 0,  ("data/level0.png", Nothing), "data/level0.mp3", "0")
-  , (blockDescS 1,  ("data/level1.png", Nothing), "data/level1.mp3", "1")
-  , (blockDescS 2,  ("data/level2.png", Nothing), "data/level2.mp3", "2")
-  , (blockDescS 3,  ("data/level0.png", Nothing), "data/level0.mp3", "3")
-  , (blockDescS 4,  ("data/level1.png", Nothing), "data/level1.mp3", "4")
-  , (blockDescS 5,  ("data/level2.png", Nothing), "data/level2.mp3", "5")
-  , (blockDescS 6,  ("data/level0.png", Nothing), "data/level0.mp3", "6")
-  , (blockDescS 7,  ("data/level1.png", Nothing), "data/level1.mp3", "7")
-  , (blockDescS 8,  ("data/level2.png", Nothing), "data/level2.mp3", "8")
-  , (blockDescS 9,  ("data/level0.png", Nothing), "data/level1.mp3", "9")
-  , (blockDescS 10, ("data/level1.png", Nothing), "data/level1.mp3", "10")
-  , (blockDescS 11, ("data/level2.png", Nothing), "data/level2.mp3", "11")
-  , (blockDescS 12, ("data/level0.png", Nothing), "data/level1.mp3", "12")
-  , (blockDescS 13, ("data/level1.png", Nothing), "data/level1.mp3", "13")
-  , (blockDescS 14, ("data/level2.png", Nothing), "data/level2.mp3", "14")
-  , (blockDescS 15, ("data/level0.png", Nothing), "data/level0.mp3", "15")
-  , (blockDescS 16, ("data/level1.png", Nothing), "data/level1.mp3", "16")
+levels = map (\(d,b,m,t) -> LevelSpec IdBgColor b m (LevelInfo (initialObjects d) t))
+  [ (blockDescS 0,  Just IdBg0Img, Just IdBg0Music, "0")
+  , (blockDescS 1,  Just IdBg1Img, Just IdBg1Music, "1")
+  , (blockDescS 2,  Just IdBg2Img, Just IdBg2Music, "2")
+  , (blockDescS 3,  Just IdBg0Img, Just IdBg0Music, "3")
+  , (blockDescS 4,  Just IdBg1Img, Just IdBg1Music, "4")
+  , (blockDescS 5,  Just IdBg2Img, Just IdBg2Music, "5")
+  , (blockDescS 6,  Just IdBg0Img, Just IdBg0Music, "6")
+  , (blockDescS 7,  Just IdBg1Img, Just IdBg1Music, "7")
+  , (blockDescS 8,  Just IdBg2Img, Just IdBg2Music, "8")
+  , (blockDescS 9,  Just IdBg0Img, Just IdBg0Music, "9")
+  , (blockDescS 10, Just IdBg1Img, Just IdBg1Music, "10")
+  , (blockDescS 11, Just IdBg2Img, Just IdBg2Music, "11")
+  , (blockDescS 12, Just IdBg0Img, Just IdBg0Music, "12")
+  , (blockDescS 13, Just IdBg1Img, Just IdBg1Music, "13")
+  , (blockDescS 14, Just IdBg2Img, Just IdBg2Music, "14")
+  , (blockDescS 15, Just IdBg0Img, Just IdBg0Music, "15")
+  , (blockDescS 16, Just IdBg1Img, Just IdBg1Music, "16")
   ]
   where
     -- | Objects initially present: the walls, the ball, the paddle and the blocks.
