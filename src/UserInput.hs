@@ -31,14 +31,13 @@
 module UserInput where
 
 -- External imports
-import Data.IORef
-import Control.Monad.Extra
-import Physics.TwoDimensions.Dimensions (Pos2D)
+import Control.Monad.Extra              (foldWhileM)
+import Data.IORef                       (IORef, newIORef, readIORef, writeIORef)
 import Game.Input.Controller.Empty      (ControllerEmpty, emptyController)
+import Physics.TwoDimensions.Dimensions (Pos2D)
 
 -- External imports (SDL)
 #if defined(sdl) || defined(sdl2)
-import Game.Clock
 import Graphics.UI.SDL       as SDL
 import Graphics.UI.SDL.Extra (isEmptyEvent)
 #endif

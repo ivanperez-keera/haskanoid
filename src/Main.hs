@@ -1,7 +1,6 @@
 {-# LANGUAGE CPP #-}
 module Main where
 -- External imports
--- import Control.Applicative       ((<$>))
 import Control.Exception.Extra   (catchAny)
 import Control.Monad.IfElse      (awhen)
 import FRP.Yampa                 as Yampa (arr, reactimate, (&&&))

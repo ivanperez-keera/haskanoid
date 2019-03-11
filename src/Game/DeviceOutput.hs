@@ -8,24 +8,34 @@
 module Game.DeviceOutput where
 
 -- External imports
-import Control.Monad
+import Control.Monad             (unless, void, when)
 import Control.Monad.IfElse      (awhen)
-import Game.Audio
+import Game.Audio                (musicIsPlaying, playMusic, playSoundFX)
 import Game.Resource.Manager.Ref (tryGetResourceMusic, tryGetResourceSound)
-import Game.VisualElem
-import Graphics.UI.Align
-import Graphics.UI.Collage
-import Graphics.UI.SDL           as SDL
+import Game.VisualElem           (VisualElem (VisualImage, VisualText))
+import Graphics.UI.Align         (Align (Align),
+                                  HAlign (HCenter, HLeft, HRight),
+                                  VAlign (VCenter, VTop))
+import Graphics.UI.Collage       (Collage (CollageItem), collageMapM)
 import Playground                (DAlign, displayWithBGColorImage')
 import Playground.SDL            (dAlignToAbsPos')
 
 -- Internal imports
 import DeviceOutput     (RenderEnv)
-import Game.Constants
+import Game.Constants   (gameLeft, gameTop)
 import Game.Levels      (bgColor, bgImage, bgMusic, levels)
-import Game.Objects
-import Game.State
-import Resource.Manager
+import Game.Objects     (Object, ObjectKind (Ball, Block, Paddle, PowerUp),
+                         ObjectProperties (BlockProps), PowerUpKind (..),
+                         isSide, objectHit, objectKind, objectProperties,
+                         objectTopLevelCorner)
+import Game.State       (GameState, GameStatus (..), gameInfo, gameLevel,
+                         gameLevel, gameLevel, gameLives, gameObjects,
+                         gamePoints, gameStatus)
+import Resource.Manager (ResourceId (..))
+
+#ifdef sdl
+import Graphics.UI.SDL as SDL (enableUnicode, showCursor)
+#endif
 
 #ifdef sdl2
 import Game.Render.Monad.SDL ()

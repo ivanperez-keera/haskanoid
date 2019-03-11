@@ -8,10 +8,10 @@
 module DeviceOutput where
 
 -- External imports
-import App.Context      (RuntimeContext)
-import Control.DeepSeq  (NFData, rnf)
-import Playground.SDL   (RenderingCtx)
-import Graphics.UI.SDL  -- (Surface, Texture)
+import App.Context     (RuntimeContext)
+import Control.DeepSeq (NFData, rnf)
+import Graphics.UI.SDL
+import Playground.SDL  (RenderingCtx)
 
 -- Internal imports
 import Resource.Manager (ResourceMgr)

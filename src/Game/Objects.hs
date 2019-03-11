@@ -5,15 +5,19 @@
 module Game.Objects where
 
 -- External imports
-import           Data.VectorSpace
-import           Physics.TwoDimensions.Shapes.BasicAABB
-import           Physics.TwoDimensions.Shapes.BasicAABBCollisions
-import           Physics.TwoDimensions.Side
-import           Physics.TwoDimensions.Dimensions
-import qualified Physics.TwoDimensions.PhysicalObject as P
+import           Data.VectorSpace                                 ((*^), (^-^))
+import           Physics.TwoDimensions.Dimensions                 (Acc2D, Pos2D,
+                                                                   Size2D,
+                                                                   Vel2D)
+import qualified Physics.TwoDimensions.PhysicalObject             as P (Collision,
+                                                                        Collisions,
+                                                                        PhysicalObject (..))
+import           Physics.TwoDimensions.Shapes.BasicAABB           (Shape (Rectangle))
+import           Physics.TwoDimensions.Shapes.BasicAABBCollisions (detectCollision)
+import           Physics.TwoDimensions.Side                       (Side (BottomSide, LeftSide, RightSide, TopSide))
 
 -- Internal imports
-import Game.Constants
+import Game.Constants (collisionErrorMargin, gameWidth, gameHeight)
 
 -- * Objects
 

@@ -9,7 +9,7 @@
 module Game.State where
 
 -- Internal imports
-import Game.Objects
+import Game.Objects (Objects)
 
 -- | The running state is given by a bunch of 'Objects' and the current general
 -- 'GameInfo'. The latter contains info regarding the current level, the number
