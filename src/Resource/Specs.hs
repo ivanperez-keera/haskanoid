@@ -20,8 +20,14 @@ imgPath = basePath ++ "images/"
 screensPath :: FilePath
 screensPath = imgPath ++ "screens/"
 
-initialBG           :: ImageSpec
-initialBG           = (screensPath ++ "level0.png", Nothing)
+bg0Img :: ImageSpec
+bg0Img = (screensPath ++ "level0.png", Nothing)
+
+bg1Img :: ImageSpec
+bg1Img = (screensPath ++ "level1.png", Nothing)
+
+bg2Img :: ImageSpec
+bg2Img = (screensPath ++ "level2.png", Nothing)
 
 -- ** Icons
 -- *** Game specific resources
@@ -69,8 +75,14 @@ audioPath = basePath ++ "audio/"
 musicPath :: FilePath
 musicPath = audioPath ++ "music/"
 
-backgroundMusic :: MusicSpec
-backgroundMusic = musicPath ++ "level0.mp3"
+bg0Music ::MusicSpec
+bg0Music = musicPath ++ "level0.mp3"
+
+bg1Music ::MusicSpec
+bg1Music = musicPath ++ "level1.mp3"
+
+bg2Music ::MusicSpec
+bg2Music = musicPath ++ "level2.mp3"
 
 -- ** Sounds
 
@@ -94,6 +106,9 @@ gameFontSpec = (fontPath, 32)
 -- * Colors
 fontColor :: ColorSpec
 fontColor = (228, 228, 228, 255)
+
+bgColor :: ColorSpec
+bgColor = black
 
 black :: ColorSpec
 black = (0, 0, 0, 255)
