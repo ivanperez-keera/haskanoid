@@ -31,7 +31,9 @@ import Game.ObjectSF.Wall   (objSideBottom, objSideLeft, objSideRight,
 import Resource.Manager     (ResourceId (..))
 
 -- * Levels
+
 -- ** Level specification
+
 data LevelSpec = LevelSpec
  { bgColor   :: ResourceId       -- ^ The background color (to clear the screen).
  , bgImage   :: Maybe ResourceId -- ^ Background image.
@@ -51,38 +53,37 @@ numLevels = length levels
 
 -- * Concrete levels
 levels :: [LevelSpec]
-levels = map (\(d,b,m,t) -> LevelSpec IdBgColor b m (LevelInfo (initialObjects d) t))
-  [ (blockDescS 0,  Just IdBg0Img, Just IdBg0Music, "0")
-  , (blockDescS 1,  Just IdBg1Img, Just IdBg1Music, "1")
-  , (blockDescS 2,  Just IdBg2Img, Just IdBg2Music, "2")
-  , (blockDescS 3,  Just IdBg0Img, Just IdBg0Music, "3")
-  , (blockDescS 4,  Just IdBg1Img, Just IdBg1Music, "4")
-  , (blockDescS 5,  Just IdBg2Img, Just IdBg2Music, "5")
-  , (blockDescS 6,  Just IdBg0Img, Just IdBg0Music, "6")
-  , (blockDescS 7,  Just IdBg1Img, Just IdBg1Music, "7")
-  , (blockDescS 8,  Just IdBg2Img, Just IdBg2Music, "8")
-  , (blockDescS 9,  Just IdBg0Img, Just IdBg0Music, "9")
-  , (blockDescS 10, Just IdBg1Img, Just IdBg1Music, "10")
-  , (blockDescS 11, Just IdBg2Img, Just IdBg2Music, "11")
-  , (blockDescS 12, Just IdBg0Img, Just IdBg0Music, "12")
-  , (blockDescS 13, Just IdBg1Img, Just IdBg1Music, "13")
-  , (blockDescS 14, Just IdBg2Img, Just IdBg2Music, "14")
-  , (blockDescS 15, Just IdBg0Img, Just IdBg0Music, "15")
-  , (blockDescS 16, Just IdBg1Img, Just IdBg1Music, "16")
-  ]
+levels = map mkLevels [0..16]
   where
-    -- | Objects initially present: the walls, the ball, the paddle and the blocks.
-    initialObjects :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)]
-                   -> ObjectSFs
-    initialObjects blocksSpec = listToIL $
-        [ objSideRight
-        , objSideTop
-        , objSideLeft
-        , objSideBottom
-        , objPaddle
-        , objBall
-        ]
-        ++ map (\p -> objBlock p (blockWidth, blockHeight)) blocksSpec
+    mkLevels i = LevelSpec IdBgColor bgImg bgMus lvlInfo
+      where
+        bgImg | i `mod` 3 == 0
+              = Just IdBg0Img
+              | i `mod` 3 == 1
+              = Just IdBg1Img
+              | i `mod` 3 == 2
+              = Just IdBg2Img
+
+        bgMus | i `mod` 3 == 0
+              = Just IdBg0Music
+              | i `mod` 3 == 1
+              = Just IdBg1Music
+              | i `mod` 3 == 2
+              = Just IdBg2Music
+
+        lvlInfo = LevelInfo (initialObjects (blockDescS i)) (show i)
+
+        -- | Objects initially present: the walls, the ball, the paddle and the blocks.
+        initialObjects :: [(Pos2D, Int, Maybe (PowerUpKind, AlwaysPowerUp), SignalPowerUp)] -> ObjectSFs
+        initialObjects blocksSpec = listToIL $
+            [ objSideRight
+            , objSideTop
+            , objSideLeft
+            , objSideBottom
+            , objPaddle
+            , objBall
+            ]
+            ++ map (\p -> objBlock p (blockWidth, blockHeight)) blocksSpec
 
 -- | Level block specification (positions,lives of block, maybe powerup)
 --

@@ -22,10 +22,10 @@ import Playground.SDL            (dAlignToAbsPos')
 -- Internal imports
 import DeviceOutput     (RenderEnv)
 import Game.Constants
+import Game.Levels      (bgColor, bgImage, bgMusic, levels)
 import Game.Objects
 import Game.State
 import Resource.Manager
-import Game.Levels (bgMusic, levels, bgImage, bgColor)
 
 #ifdef sdl2
 import Game.Render.Monad.SDL ()
@@ -54,6 +54,14 @@ render shownState env = do
   audio   shownState env
   display shownState env
 
+-- ** Audible
+
+audio :: GameState -> RenderEnv -> IO ()
+audio shownState env = do
+
+  audioMusic  shownState env
+  audioSounds shownState env
+
 -- ** Visual
 
 -- | Display the game state.
@@ -68,26 +76,31 @@ display shownState env = do
 
 -- ** Audible
 
-audio :: GameState -> RenderEnv -> IO ()
-audio shownState (resourceManager, _, _) = do
+-- *** Music
+audioMusic :: GameState -> RenderEnv -> IO ()
+audioMusic shownState env@(resourceManager, rtCtx, _) = do
   -- Start bg music if necessary
   playing <- musicIsPlaying
   unless playing $ do
-    m <- m' mBgMusic -- tryGetResourceMusic resourceManager IdBgMusic undefined
+    m <- tryGetMusic
     awhen m playMusic
-
-  -- Play object hits
-  mapM_ (audioObject resourceManager) $ gameObjects shownState
   where
-    mBgMusic = bgMusic $ levels !! (gameLevel $ gameInfo shownState)
+    tryGetMusic | (Just bgM) <- bgMusic $ levels !! (gameLevel $ gameInfo shownState)
+                = tryGetResourceMusic resourceManager bgM rtCtx
+                | otherwise
+                = return Nothing
 
-    m' (Just bgM) = tryGetResourceMusic resourceManager bgM undefined
-    m' Nothing    = return Nothing
+-- *** Sounds
 
-audioObject :: ResourceMgr -> Object -> IO ()
-audioObject resourceManager object = when (objectHit object) $
+audioSounds :: GameState -> RenderEnv -> IO ()
+audioSounds shownState env = do
+  -- Play object hits
+  mapM_ (audioObject env) $ gameObjects shownState
+
+audioObject :: RenderEnv -> Object -> IO ()
+audioObject (resourceManager, rtCtx, _) object = when (objectHit object) $
   case objectKind object of
-    Block -> do bhit <- tryGetResourceSound resourceManager IdBlockHitFX undefined
+    Block -> do bhit <- tryGetResourceSound resourceManager IdBlockHitFX rtCtx
                 awhen bhit playSoundFX
     _     -> return ()
 
