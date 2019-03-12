@@ -28,6 +28,24 @@ gameAreaTopMargin = 10
 gameAreaMinLeftMargin :: Num a => a
 gameAreaMinLeftMargin = 25
 
+-- * Initial values
+
+type Lives  = Int
+type Level  = Int
+type Points = Int
+
+-- | Initial level.
+--
+-- Note: Change this in the code to start from a different level.
+initialLevel :: Int
+initialLevel = 0
+
+stdLives :: Int
+stdLives = 3
+
+initialPoints :: Points
+initialPoints = 0
+
 -- * Time \/ Delays
 loadingDelay :: (Fractional a) => a
 loadingDelay = 2 -- seconds
@@ -35,16 +53,17 @@ loadingDelay = 2 -- seconds
 levelFinishedDelay :: (Fractional a) => a
 levelFinishedDelay = 4 -- seconds
 
--- restartDelay :: Time
--- restartDelay = 3
+restartDelay :: (Fractional a) => a
+restartDelay = 3
+
+gameFinishedDelay :: (Fractional a) => a
+gameFinishedDelay = 4
+
 --
 -- wonDelay :: Time
 -- wonDelay = 3
 
 -- * Lives
-
-stdLives :: Int
-stdLives = 3
 
 maxBlockLife :: Int
 maxBlockLife = 3
@@ -106,11 +125,3 @@ velTrans = 0.2
 -- | Max speed
 maxVNorm :: Double
 maxVNorm = 300
-
--- * Debugging
-
--- | Initial level.
---
--- Note: Change this in the code to start from a different level.
-initialLevel :: Int
-initialLevel = 0

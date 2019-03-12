@@ -9,7 +9,9 @@
 module Game.State where
 
 -- Internal imports
-import Game.Objects (Objects)
+import Game.Constants (Level, Lives, Points, initialLevel, initialPoints,
+                       stdLives)
+import Game.Objects   (Objects)
 
 -- | The running state is given by a bunch of 'Objects' and the current general
 -- 'GameInfo'. The latter contains info regarding the current level, the number
@@ -31,9 +33,15 @@ data GameState = GameState
 -- is convenient to give this product of values a proper name.
 data GameInfo = GameInfo
   { gameStatus :: GameStatus
-  , gameLives  :: Int
-  , gameLevel  :: Int
-  , gamePoints :: Int
+  , gameLives  :: Lives
+  , gameLevel  :: Level
+  , gamePoints :: Points
+  }
+
+data GameInfoMini = GameInfoMini
+  { lives  :: Lives
+  , level  :: Level
+  , points :: Points
   }
 
 -- | Possible actual game statuses. The game is always in one of these.
@@ -42,7 +50,7 @@ data GameInfo = GameInfo
 -- changes presentation depending on the status.
 data GameStatus = GamePlaying
                 | GamePaused
-                | GameLoading Int String
+                | GameLoading Level String
                 | GameOver
                 | GameFinished
                 | GameStarted
@@ -62,4 +70,11 @@ neutralGameInfo = GameInfo
   , gameLevel  = 0
   , gameLives  = 0
   , gamePoints = 0
+  }
+
+neutralGameInfoMini :: GameInfoMini
+neutralGameInfoMini = GameInfoMini
+  { lives  = stdLives
+  , level  = initialLevel
+  , points = initialPoints
   }

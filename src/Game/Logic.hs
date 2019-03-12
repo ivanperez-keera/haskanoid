@@ -41,19 +41,21 @@ module Game.Logic where -- (wholeGame) where
 -- External imports
 import Data.IdentityList                    (IL, assocsIL, deleteIL, elemsIL,
                                              insertIL_)
-import FRP.Yampa                            (DTime, Event (NoEvent), SF, after,
+import FRP.Yampa                            (DTime, Event (NoEvent), SF, after, constant,
                                              arr, dSwitch, delay, dpSwitchB,
                                              edge, lMerge, loopPre, mergeBy,
                                              noEvent, returnA, switch, tag,
                                              (&&&), (-->), (>>>), (^>>))
-import FRP.Yampa.Extra                      (futureDSwitch)
+import FRP.Yampa.Extra                      (futureDSwitch, (>?), (||>))
 import Physics.CollisionEngine              (detectCollisions)
 import Physics.TwoDimensions.PhysicalObject (Collision (..))
 
 -- Internal imports
-import Game.Constants        (initialLevel, levelFinishedDelay, loadingDelay,
+import Game.Constants        (gameFinishedDelay, initialLevel,
+                              levelFinishedDelay, loadingDelay, restartDelay,
                               stdLives)
-import Game.Levels           (levelInfo, levels, numLevels, objectSFs, levelName)
+import Game.Levels           (levelInfo, levelName, levels, numLevels,
+                              objectSFs)
 import Game.Objects          (Collisions, ObjectKind (Block, PowerUp),
                               PowerUpKind (..), collisionObjectKind,
                               collisionObjectName, isBlock)
@@ -64,8 +66,9 @@ import Game.ObjectSF         (ObjectInput (ObjectInput),
 import Game.ObjectSF.Ball    (collisionDestroyBallUpPaddle,
                               collisionLivesUpsPaddle, collisionWithBottom)
 import Game.ObjectSF.PowerUp (powerUp)
-import Game.State            (GameInfo (..), GameState (..), GameStatus (..),
-                              neutralGameInfo, neutralGameState)
+import Game.State            (GameInfo (..), GameInfoMini (..), GameState (..),
+                              GameStatus (..), neutralGameInfo,
+                              neutralGameInfoMini, neutralGameState)
 import UserInput             (Controller)
 
 -- * General state transitions
@@ -74,88 +77,40 @@ import UserInput             (Controller)
 -- there are no more levels ('outOfLevels'), in which case the player has won
 -- ('wonGame').
 wholeGame :: SF Controller GameState
-wholeGame = switch
-   -- restart normal behaviour every time I'm out of lives
-   (canLose >>> (arr id &&& outOfLevels))
-   (\_ -> wonGame)
-
--- | Detect when the last level is finished.
-outOfLevels :: SF GameState (Event ())
-outOfLevels = arr ((>= numLevels) . gameLevel . gameInfo) >>> edge
+wholeGame =
+   -- restart normal behaviour every time I'm out of levels
+   (canLose >? outOfLevels)
+   ||>  wonGame
 
 -- | Run the game in which the player is alive, until she runs out of lives
 -- ('outOfLives'), in which case the game must be restarted ('restartGame').
 canLose :: SF Controller GameState
-canLose = switch
+canLose =
    -- retart normal behaviour every time I'm out of lives
-   (gameAlive >>> (arr id &&& outOfLives))
-   (\_ -> restartGame)
-
--- | Detect when the last life is lost.
-outOfLives :: SF GameState (Event ())
-outOfLives = arr ((< 0) . gameLives . gameInfo) >>> edge
+   (runLevel neutralGameInfoMini >? outOfLives)
+   ||> restartGame
 
 -- | The game state is over for 3 seconds, then the game is run again
 -- ('wholeGame').
 restartGame :: SF Controller GameState
-restartGame = switch
-  (gameOver &&& after 3 ()) (\_ -> wholeGame)
-
--- | Produces a neutral 'GameOver' 'GameState'.
-gameOver :: SF a GameState
-gameOver = arr $ const $
- neutralGameState { gameInfo = neutralGameInfo { gameStatus = GameOver } }
+restartGame =
+  gameOver
+  ||> wholeGame
 
 -- | The game state is finished for 4 seconds, then the game is run again
 -- ('wholeGame').
 wonGame :: SF Controller GameState
-wonGame = switch
-  (gameFinished &&& after 4 ()) (\_ -> wholeGame)
-
--- | Produces a neutral 'GameFinished' 'GameState'.
-gameFinished :: SF a GameState
-gameFinished = arr $ const $
- neutralGameState { gameInfo = neutralGameInfo { gameStatus = GameFinished } }
-
--- | Run the game from the beginning (no points, max lives, etc.).
---
--- Load the first level.
---
-gameAlive :: SF Controller GameState
-gameAlive = runLevel stdLives initialLevel 0
-  -- loadLevel stdLives initialLevel loadingDelay
-  -- (gameWithLives stdLives initialLevel)
-
--- ** Level loading
+wonGame =
+  gameFinished
+  ||> wholeGame
 
 -- | Set the game state as loading for a few seconds, then start the actual
 -- game. Uses 'loadLevel', passing the game SF ('gameWithLives') as
 -- continuation.
-runLevel :: Int -> Int -> Int -> SF Controller GameState
-runLevel lives level pts = loadLevel lives level pts loadingDelay
- (gameWithLives lives level pts)
-
--- | Unconditionally output the game in loading state ('levelLoading') for some
--- time, and then ('after') switch over to the given continuation.
---
--- The given arguments are the lives, the level, the points, the time to stay
--- loading the game and the continuation.
-loadLevel :: Int -> Int -> Int -> DTime -> SF a GameState -> SF a GameState
-loadLevel lives level pts time next = switch
-  --
-  (levelLoading lives level pts &&& after time ())
-  (\_ -> next)
-
--- | Unconditionally output a neutral game state with the 'GameLoading' status,
--- forever.
-levelLoading :: Int -> Int -> Int -> SF a GameState
-levelLoading lvs lvl pts = arr $ const $
-  neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading lvl (levelName $ levelInfo (levels !! lvl))
-                                         , gameLevel  = lvl
-                                         , gameLives  = lvs
-                                         , gamePoints = pts
-                                         }
-                   }
+runLevel :: GameInfoMini -> SF Controller GameState
+runLevel gim =
+  levelLoading gim
+  ||> gameWithLives gim
 
 -- | Start the game at a given level, with a given number of lives.
 --
@@ -166,8 +121,8 @@ levelLoading lvs lvl pts = arr $ const $
 -- Conditions like finishing the game or running out of lives are
 -- detected in 'wholeGame' and 'canLose', respectively.
 --
-gameWithLives :: Int -> Int -> Int -> SF Controller GameState
-gameWithLives numLives level pts = dSwitch
+gameWithLives :: GameInfoMini -> SF Controller GameState
+gameWithLives (GameInfoMini numLives level pts) = dSwitch
   -- Run normal game until level is completed
   (proc ctrl -> do
      gState     <- gamePlayOrPause numLives level pts -< ctrl
@@ -179,13 +134,47 @@ gameWithLives numLives level pts = dSwitch
   (\g -> let level' = level + 1
              lives' = gameLives  $ gameInfo g
              pts    = gamePoints $ gameInfo g
-         in runLevel lives' level' pts)
+         in runLevel (GameInfoMini lives' level' pts))
   where
     isLevelCompleted' = isLevelCompleted >>> delay levelFinishedDelay NoEvent
 
--- | Detect if the level is completed (ie. if there are no more blocks).
-isLevelCompleted :: SF GameState (Event ())
-isLevelCompleted = (not . any isBlock . gameObjects) ^>> edge
+-- * States
+
+-- ** Game Finished
+
+-- | Produces a neutral 'GameFinished' 'GameState'.
+gameFinished :: SF a (GameState, Event ())
+gameFinished = (gameFinished' &&& after gameFinishedDelay ())
+  where
+    gameFinished' :: SF a GameState
+    gameFinished' = constant $
+     neutralGameState { gameInfo = neutralGameInfo { gameStatus = GameFinished } }
+
+-- ** Game Over
+
+-- | Produces a neutral 'GameOver' 'GameState'.
+gameOver :: SF a (GameState, Event ())
+gameOver = (gameOver' &&& after restartDelay ())
+  where
+    gameOver' :: SF a GameState
+    gameOver' = constant $
+     neutralGameState { gameInfo = neutralGameInfo { gameStatus = GameOver } }
+
+-- ** Level loading
+
+-- | Unconditionally output the game in loading state ('levelLoading') for some
+-- time, and then ('after') switch over to unconditionally output a neutral
+-- game state with the 'GameLoading' status, forever.
+levelLoading :: GameInfoMini -> SF a (GameState, Event ())
+levelLoading gim = levelLoading' &&& after loadingDelay ()
+  where
+    levelLoading' = constant $
+     neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading (level gim) (levelName $ levelInfo (levels !! (level gim)))
+                                            , gameLevel  = level  gim
+                                            , gameLives  = lives  gim
+                                            , gamePoints = points gim
+                                            }
+                      }
 
 -- ** Pausing
 
@@ -210,7 +199,7 @@ gamePlayOrPause lives level pts = gamePlay lives level pts
 --                 then g { gameInfo = o { gameStatus = GamePaused } }
 --                 else g
 
--- * Gameplay
+-- ** Level playing
 
 -- | Run the game, obtain the internal game's running state, and compose it
 -- with the more general 'GameState' using the known number of lives and
@@ -254,9 +243,6 @@ composeGameState' lives level pts = proc (oos, lives', dead, points) -> do
   let lastGeneral = dead `tag` general
 
   returnA -< (general, lastGeneral)
-
-
--- ** Game with partial state information
 
 -- | Given an initial list of objects, it runs the game, presenting the output
 -- from those objects at all times, notifying any time the ball hits the floor,
@@ -339,3 +325,20 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
        createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
+
+
+
+
+-- * Termination criteria
+
+-- | Detect when the last level is finished.
+outOfLevels :: SF GameState (Event ())
+outOfLevels = arr ((>= numLevels) . gameLevel . gameInfo) >>> edge
+
+-- | Detect when the last life is lost.
+outOfLives :: SF GameState (Event ())
+outOfLives = arr ((< 0) . gameLives . gameInfo) >>> edge
+
+-- | Detect if the level is completed (ie. if there are no more blocks).
+isLevelCompleted :: SF GameState (Event ())
+isLevelCompleted = (not . any isBlock . gameObjects) ^>> edge
