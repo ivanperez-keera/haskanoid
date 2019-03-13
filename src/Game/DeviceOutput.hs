@@ -23,7 +23,7 @@ import Playground.SDL            (dAlignToAbsPos')
 -- Internal imports
 import DeviceOutput     (RenderEnv)
 import Game.Constants   (gameLeft, gameTop)
-import Game.Levels      (bgColor, bgImage, bgMusic, levels)
+import Game.Levels      (bgColor, levels, mBgImage, mBgMusic)
 import Game.Objects     (Object, ObjectKind (Ball, Block, Paddle, PowerUp),
                          ObjectProperties (BlockProps), PowerUpKind (..),
                          isSide, objectHit, objectKind, objectProperties,
@@ -95,7 +95,7 @@ audioMusic shownState env@(resourceManager, rtCtx, _) = do
     m <- tryGetMusic
     awhen m playMusic
   where
-    tryGetMusic | (Just bgM) <- bgMusic $ levels !! (gameLevel $ gameInfo shownState)
+    tryGetMusic | (Just bgM) <- mBgMusic $ levels !! (gameLevel $ gameInfo shownState)
                 = tryGetResourceMusic resourceManager bgM rtCtx
                 | otherwise
                 = return Nothing
@@ -117,7 +117,7 @@ audioObject (resourceManager, rtCtx, _) object = when (objectHit object) $
 -- ** Visual
 
 game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) DAlign)
-game shownState = (bgColor lvlSpec, bgImage lvlSpec, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
+game shownState = (bgColor lvlSpec, mBgImage lvlSpec, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
   where
     -- HUD
     levelTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Level: "  ++ show (gameLevel over)))
