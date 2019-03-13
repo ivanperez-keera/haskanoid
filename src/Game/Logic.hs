@@ -45,7 +45,7 @@ import FRP.Yampa                            (DTime, Event (NoEvent), SF, after, 
                                              arr, dSwitch, delay, dpSwitchB,
                                              edge, lMerge, loopPre, mergeBy,
                                              noEvent, returnA, switch, tag,
-                                             (&&&), (-->), (>>>), (^>>))
+                                             (-->), (>>>), (^>>))
 import FRP.Yampa.Extra                      (futureDSwitch, (>?), (||>))
 import Physics.CollisionEngine              (detectCollisions)
 import Physics.TwoDimensions.PhysicalObject (Collision (..))
@@ -144,7 +144,7 @@ gameWithLives (GameInfoMini numLives level pts) = dSwitch
 
 -- | Produces a neutral 'GameFinished' 'GameState'.
 gameFinished :: SF a (GameState, Event ())
-gameFinished = (gameFinished' &&& after gameFinishedDelay ())
+gameFinished = (gameFinished' >? after gameFinishedDelay ())
   where
     gameFinished' :: SF a GameState
     gameFinished' = constant $
@@ -154,7 +154,7 @@ gameFinished = (gameFinished' &&& after gameFinishedDelay ())
 
 -- | Produces a neutral 'GameOver' 'GameState'.
 gameOver :: SF a (GameState, Event ())
-gameOver = (gameOver' &&& after restartDelay ())
+gameOver = (gameOver' >? after restartDelay ())
   where
     gameOver' :: SF a GameState
     gameOver' = constant $
@@ -166,7 +166,7 @@ gameOver = (gameOver' &&& after restartDelay ())
 -- time, and then ('after') switch over to unconditionally output a neutral
 -- game state with the 'GameLoading' status, forever.
 levelLoading :: GameInfoMini -> SF a (GameState, Event ())
-levelLoading gim = levelLoading' &&& after loadingDelay ()
+levelLoading gim = levelLoading' >? after loadingDelay ()
   where
     levelLoading' = constant $
      neutralGameState { gameInfo = GameInfo { gameStatus = GameLoading (level gim) (levelName $ levelInfo (levels !! (level gim)))
@@ -325,9 +325,6 @@ gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
        -- Create powerup
        createPowerUp :: PowerUpDef -> ObjectSF
        createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
-
-
-
 
 -- * Termination criteria
 
