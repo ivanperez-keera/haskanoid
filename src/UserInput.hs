@@ -38,6 +38,9 @@ import Physics.TwoDimensions.Dimensions (Pos2D)
 
 -- External imports (SDL)
 #if defined(sdl) || defined(sdl2)
+#if defined(sdl)
+import Control.Monad (void)
+#endif
 import Graphics.UI.SDL       as SDL
 import Graphics.UI.SDL.Extra (isEmptyEvent)
 #endif
@@ -133,6 +136,8 @@ initInputDevices = do
 
 #if defined(sdl) || defined(sdl2)
   let baseDev = sdlGetController
+
+
 #elif defined(ghcjs)
   baseDev <- ghcjsController
 #endif
@@ -163,6 +168,16 @@ initInputDevices = do
 type ControllerDev = IO (Maybe (Controller -> IO Controller))
 
 #if defined(sdl) || defined(sdl2)
+
+adjustInputSettings :: IO ()
+#if defined(sdl)
+adjustInputSettings = void $ do
+  -- Important if we want the keyboard to work right (I don't know
+  -- how to make it work otherwise)
+  SDL.enableUnicode True
+#elif defined(sdl2)
+adjustInputSettings = return ()
+#endif
 
 -- | Dummy initialization. No device is actually initialized.
 sdlMouseKB :: ControllerDev

@@ -11,7 +11,7 @@ import Playground                (Settings)
 -- Internal imports
 import Game.Logic      (wholeGame)
 import Resource.Values (getDataFileName, settings)
-import UserInput       (Controller, initInputDevices, senseInput)
+import UserInput       (Controller, initInputDevices, senseInput, adjustInputSettings)
 
 #if defined(sdl) || defined(sdl2)
 -- External imports
@@ -20,7 +20,7 @@ import Playground.SDL (createRuntimeContext, initDeviceOutput, initGraphs,
                        loadAllResources)
 
 -- Internal imports
-import Game.DeviceOutput (adjustSDLsettings, render)
+import Game.DeviceOutput (render)
 import Resource.Manager  (gameResourceSpec)
 #endif
 
@@ -44,13 +44,14 @@ my_main_main =
     -- Initialize output subsystems (video, audio).
     initDeviceOutput
     rCtx    <- initGraphs (settings :: Settings Int)
-    adjustSDLsettings
 
     -- Initialize and prepare clock.
     timeRef <- initializeTimeRef
 
     -- Initialize and prepare input, resources and output subsystems.
     ctrlRef <- initInputDevices
+    adjustInputSettings
+
     resSpec <- localizeResourceSpec getDataFileName gameResourceSpec
     rMgr    <- loadResources resSpec
     rtCtx   <- createRuntimeContext rCtx
