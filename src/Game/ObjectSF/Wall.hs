@@ -21,7 +21,7 @@ import Game.ObjectSF  (ObjectInput (ObjectInput), ObjectOutput (ObjectOutput),
 -- determines how big they really are. In particular, this has implications in
 -- ball-through-paper effects (ball going through objects, potentially never
 -- coming back), which can be seen if the FPS suddently drops due to CPU load
--- (for instance, if a really major Garbage Collection kicks in.  One potential
+-- (for instance, if a really major Garbage Collection kicks in. One potential
 -- optimisation is to trigger these with every SF iteration or every rendering,
 -- to decrease the workload and thus the likelyhood of BTP effects.
 objSideRight  :: ObjectSF
