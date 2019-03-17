@@ -32,16 +32,16 @@ type Objects = [Object]
 --
 -- The properties need to agree with the kind. The kind is necessary to
 -- avoid using string matching on the name to determine the object kind.
-data Object = Object { objectName           :: ObjectName
-                     , objectKind           :: ObjectKind
-                     , objectProperties     :: ObjectProperties
-                     , objectPos            :: Pos2D
-                     , objectVel            :: Vel2D
-                     , objectAcc            :: Acc2D
-                     , objectDead           :: Bool
-                     , objectHit            :: Bool
-                     , canCauseCollisions   :: Bool
-                     , collisionEnergy      :: Double
+data Object = Object { objectName           :: !ObjectName
+                     , objectKind           :: !ObjectKind
+                     , objectProperties     :: !ObjectProperties
+                     , objectPos            :: !Pos2D
+                     , objectVel            :: !Vel2D
+                     , objectAcc            :: !Acc2D
+                     , objectDead           :: !Bool
+                     , objectHit            :: !Bool
+                     , canCauseCollisions   :: !Bool
+                     , collisionEnergy      :: !Double
                      }
  deriving (Show)
 
