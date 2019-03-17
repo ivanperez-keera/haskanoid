@@ -77,27 +77,40 @@ import           Data.Semigroup
 import           Linear
 #endif
 
--- External imports (Wiimote)
 #ifdef wiimote
-import Control.Monad(void)
+-- External imports (Wiimote)
+import Control.Monad        (void)
 import Control.Monad.IfElse (awhen)
-import Data.Maybe (fromMaybe)
-import System.CWiid
+import Data.Maybe           (fromMaybe)
+import Playground           (Settings (height, width))
+import System.CWiid         (CWiidWiimote, cwiidBtnA, cwiidGetBtnState,
+                             cwiidGetIR, cwiidIRSrcPosX, cwiidIRSrcPosY,
+                             cwiidIsBtnPushed, cwiidOpen, cwiidSetRptMode)
+
+-- Internal imports (Wiimote)
+import Resource.Values (settings)
 #endif
 
--- External imports (Kinect)
 #ifdef kinect
-import Control.Concurrent
-import Control.Monad
-import Data.Maybe (fromJust)
-import Data.Vector.Storable (Vector,(!))
-import Data.Word
-import Freenect
-import qualified Data.Vector.Storable as V
+-- External imports (Kinect)
+import           Control.Concurrent   (ThreadId, forkIO)
+import           Control.Monad        (forever)
+import           Data.Maybe           (fromJust)
+import           Data.Vector.Storable (Vector, (!))
+import qualified Data.Vector.Storable as V (findIndex, generate)
+import           Data.Word            (Word16)
+import           Freenect             (DepthFormat (ElevenBit),
+                                       LogLevel (LogFatal), Resolution (Medium),
+                                       Subdevice (Camera), processEvents,
+                                       selectSubdevices, setDepthCallback,
+                                       setDepthMode, setLogLevel, startDepth,
+                                       withContext, withDevice)
+
+-- Internal imports (Wiimote)
+import Game.Constants (gameHeight, gameWidth)
 #endif
 
 -- Internal imports
-
 import Resource.Values
 
 -- * Controller with its instances
@@ -299,8 +312,8 @@ senseWiimote wmdev controller = do
       propY = fromIntegral (max 0 (posY - 384)) / 384.0
 
   -- Calculate game area coordinates
-  let finX  = width  * propX
-      finY  = height * propY
+  let finX  = (width settings)  * propX
+      finY  = (height settings) * propY
 
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
