@@ -24,6 +24,8 @@ import Game.Constants (collisionErrorMargin, gameWidth, gameHeight)
 -- | Object collection.
 type Objects = [Object]
 
+-- ** Object with its properties
+
 -- | Objects have logical properties (ID, kind, dead, hit), shape properties
 -- (kind), physical properties (kind, pos, vel, acc) and collision properties
 -- (hit, 'canCauseCollisions', energy, displaced).
@@ -45,14 +47,6 @@ data Object = Object { objectName           :: ObjectName
 
 -- | Type for object id.
 type ObjectName = String
-
--- | The kind of object.
-data ObjectKind = Ball
-                | Paddle
-                | Block
-                | Side
-                | PowerUp PowerUpKind
-  deriving (Show,Eq)
 
 -- | Properties associated to each kind of object.
 data ObjectProperties  = BallProps     Double -- radius?
@@ -84,22 +78,27 @@ type AlwaysPowerUp = Bool
 data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
   deriving (Show,Eq)
 
--- ** Distinguish objects by kind.
+-- *** Physical properties
 
-isBlock :: Object -> Bool
-isBlock o = case objectKind o of
-  (Block) -> True
-  _       -> False
+-- | The kind of object.
+data ObjectKind = Ball
+                | Paddle
+                | Block
+                | Side
+                | PowerUp PowerUpKind
+  deriving (Show,Eq)
 
-isPaddle :: Object -> Bool
-isPaddle o = case objectKind o of
-  (Paddle) -> True
-  _        -> False
-
-isSide :: Object -> Bool
-isSide o = case objectKind o of
-  Side -> True
-  _    -> False
+-- | Physical object definition of an 'Object'. We use AABB for shapes.
+instance P.PhysicalObject Object (String, ObjectKind) Shape where
+  physObjectId x           = (objectName x, objectKind x)
+  physObjectPosition       = objectPos
+  physObjectVelocity       = objectVel
+  physObjectShape          = objShape
+  physObjectCollides       = canCauseCollisions
+  physObjectElasticity     = collisionEnergy
+  physObjectUpdatePosition = \o p -> o { objectPos = p }
+  physObjectUpdateVelocity = \o v -> o { objectVel = v }
+  physDetectCollision      = detectCollision
 
 -- Partial function!
 objectSize :: Object -> Size2D
@@ -116,20 +115,6 @@ objectTopLevelCorner object = case objectKind object of
   Block      -> objectPos object
   PowerUp {} -> objectPos object
   _other     -> objectPos object ^-^ (0.5 *^ objectSize object)
-
--- * Physical properties
-
--- | Physical object definition of an 'Object'. We use AABB for shapes.
-instance P.PhysicalObject Object (String, ObjectKind) Shape where
-  physObjectId x           = (objectName x, objectKind x)
-  physObjectPosition       = objectPos
-  physObjectVelocity       = objectVel
-  physObjectShape          = objShape
-  physObjectCollides       = canCauseCollisions
-  physObjectElasticity     = collisionEnergy
-  physObjectUpdatePosition = \o p -> o { objectPos = p }
-  physObjectUpdateVelocity = \o v -> o { objectVel = v }
-  physDetectCollision      = detectCollision
 
 -- | Collision shape of an object.
 objShape :: Object -> Shape
@@ -149,7 +134,7 @@ objShape obj = case objectProperties obj of
        gameW = gameWidth
        gameH = gameHeight
 
--- ** Collisions
+-- **** Collisions
 type Collision  = P.Collision  (ObjectName, ObjectKind)
 type Collisions = P.Collisions (ObjectName, ObjectKind)
 
@@ -160,3 +145,22 @@ collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
 -- | Check if collision is with a given id.
 collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectName on1 ((on2, _),_) = on1 == on2
+
+
+-- *** Identification of objects
+
+isBlock :: Object -> Bool
+isBlock o = case objectKind o of
+  (Block) -> True
+  _       -> False
+
+isPaddle :: Object -> Bool
+isPaddle o = case objectKind o of
+  (Paddle) -> True
+  _        -> False
+
+isSide :: Object -> Bool
+isSide o = case objectKind o of
+  Side -> True
+  _    -> False
+
