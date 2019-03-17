@@ -36,8 +36,8 @@ import Resource.Manager     (ResourceId (..))
 
 data LevelSpec = LevelSpec
  { bgColor   :: ResourceId       -- ^ The background color (to clear the screen).
- , bgImage   :: Maybe ResourceId -- ^ Background image.
- , bgMusic   :: Maybe ResourceId -- ^ Background music.
+ , mBgImage  :: Maybe ResourceId -- ^ Background image.
+ , mBgMusic  :: Maybe ResourceId -- ^ Background music.
  , levelInfo :: LevelInfo        -- ^ Level information.
  }
 

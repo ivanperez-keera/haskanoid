@@ -8,7 +8,7 @@
 module Game.DeviceOutput where
 
 -- External imports
-import Control.Monad             (unless, void, when)
+import Control.Monad             (unless, when)
 import Control.Monad.IfElse      (awhen)
 import Game.Audio                (musicIsPlaying, playMusic, playSoundFX)
 import Game.Resource.Manager.Ref (tryGetResourceMusic, tryGetResourceSound)
@@ -23,7 +23,7 @@ import Playground.SDL            (dAlignToAbsPos')
 -- Internal imports
 import DeviceOutput     (RenderEnv)
 import Game.Constants   (gameLeft, gameTop)
-import Game.Levels      (bgColor, bgImage, bgMusic, levels)
+import Game.Levels      (bgColor, levels, mBgImage, mBgMusic)
 import Game.Objects     (Object, ObjectKind (Ball, Block, Paddle, PowerUp),
                          ObjectProperties (BlockProps), PowerUpKind (..),
                          isSide, objectHit, objectKind, objectProperties,
@@ -38,22 +38,8 @@ import Graphics.UI.SDL as SDL (enableUnicode, showCursor)
 #endif
 
 #ifdef sdl2
+import Graphics.UI.SDL.Mouse as SDL (showCursor, CursorToggle (Hide))
 import Game.Render.Monad.SDL ()
-#endif
-
--- * Rendering Settings
-
-adjustSDLsettings :: IO ()
-#ifdef sdl
-adjustSDLsettings = void $ do
-  -- Important if we want the keyboard to work right (I don't know
-  -- how to make it work otherwise)
-  SDL.enableUnicode True
-
-  -- Hide mouse
-  SDL.showCursor False
-#elif sdl2
-adjustSDLsettings = return ()
 #endif
 
 -- * Rendering of the game state
@@ -77,6 +63,13 @@ audio shownState env = do
 -- | Display the game state.
 display :: GameState -> RenderEnv -> IO ()
 display shownState env = do
+  -- Hide mouse
+#ifdef sdl
+  SDL.showCursor False
+#elif sdl2
+  SDL.showCursor Hide
+#endif
+
   let (cCol, mBgImg, clg) = game shownState
   -- TODO dAlignToAbsPos' ignores the rendering context
   clg' <- collageMapM (dAlignToAbsPos' env) clg
@@ -95,7 +88,7 @@ audioMusic shownState env@(resourceManager, rtCtx, _) = do
     m <- tryGetMusic
     awhen m playMusic
   where
-    tryGetMusic | (Just bgM) <- bgMusic $ levels !! (gameLevel $ gameInfo shownState)
+    tryGetMusic | (Just bgM) <- mBgMusic $ levels !! (gameLevel $ gameInfo shownState)
                 = tryGetResourceMusic resourceManager bgM rtCtx
                 | otherwise
                 = return Nothing
@@ -117,7 +110,7 @@ audioObject (resourceManager, rtCtx, _) object = when (objectHit object) $
 -- ** Visual
 
 game :: GameState -> (ResourceId, Maybe ResourceId, Collage (VisualElem ResourceId) DAlign)
-game shownState = (bgColor lvlSpec, bgImage lvlSpec, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
+game shownState = (bgColor lvlSpec, mBgImage lvlSpec, mconcat [levelTxt, pointsTxt, livesTxt, mconcat mStatusTxt, mconcat objItems] )
   where
     -- HUD
     levelTxt   = CollageItem (VisualText IdGameFont IdGameFontColor ("Level: "  ++ show (gameLevel over)))
