@@ -17,7 +17,7 @@ import Physics.TwoDimensions.PhysicalObject (Collision (..))
 -- Internal imports
 import Game.Constants (ballHeight, ballWidth, initialBallVel, maxVNorm,
                        paddleWidth)
-import Game.Objects   (Collisions, Object (..),
+import Game.Object    (Collisions, Object (..),
                        ObjectKind (Ball, Paddle, PowerUp, Side),
                        ObjectProperties (BallProps),
                        PowerUpKind (DestroyBallUp, LivesUp),

@@ -24,7 +24,7 @@ import Playground.SDL            (dAlignToAbsPos')
 import DeviceOutput     (RenderEnv)
 import Game.Constants   (gameLeft, gameTop)
 import Game.Levels      (bgColor, levels, mBgImage, mBgMusic)
-import Game.Objects     (Object, ObjectKind (Ball, Block, Paddle, PowerUp),
+import Game.Object      (Object, ObjectKind (Ball, Block, Paddle, PowerUp),
                          ObjectProperties (BlockProps), PowerUpKind (..),
                          isSide, objectHit, objectKind, objectProperties,
                          objectTopLevelCorner)

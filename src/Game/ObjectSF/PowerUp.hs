@@ -8,7 +8,7 @@ import Physics.TwoDimensions.Dimensions     (Pos2D, Size2D)
 import Physics.TwoDimensions.PhysicalObject (Collision (..))
 
 -- Internal imports
-import Game.Objects  (Collisions, Object (..), ObjectKind (Paddle, PowerUp),
+import Game.Object   (Collisions, Object (..), ObjectKind (Paddle, PowerUp),
                       ObjectProperties (PowerUpProps), PowerUpKind,
                       collisionObjectKind, collisionObjectName)
 import Game.ObjectSF (ObjectInput (ObjectInput), ObjectOutput (ObjectOutput),

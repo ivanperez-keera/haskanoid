@@ -84,7 +84,7 @@ executable haskanoid
   other-modules: Game.Constants
                  Game.Levels
                  Game.Logic
-                 Game.Objects
+                 Game.Object
                  Game.ObjectSF
                  Game.ObjectSF.Ball
                  Game.ObjectSF.Block

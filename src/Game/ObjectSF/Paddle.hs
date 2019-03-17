@@ -11,7 +11,7 @@ import Physics.TwoDimensions.Dimensions (Pos2D)
 -- Internal imports
 import Game.Constants (gameHeight, gameWidth, paddleHeight, paddleMargin,
                        paddleWidth)
-import Game.Objects   (Object (..), ObjectKind (Paddle),
+import Game.Object    (Object (..), ObjectKind (Paddle),
                        ObjectProperties (PaddleProps))
 import Game.ObjectSF  (ObjectInput (ObjectInput), ObjectSF, livingObject)
 import UserInput      (Controller (controllerPos))

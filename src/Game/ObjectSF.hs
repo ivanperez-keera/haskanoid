@@ -17,8 +17,8 @@ import FRP.Yampa                        (Event, SF, arr, noEvent)
 import Physics.TwoDimensions.Dimensions (Pos2D, Size2D)
 
 -- Internal imports
-import Game.Objects (Collisions, Object, Objects, PowerUpKind)
-import UserInput    (Controller)
+import Game.Object (Collisions, Object, Objects, PowerUpKind)
+import UserInput   (Controller)
 
 -- | Objects are defined as transformations that take 'ObjectInput' signals and
 -- return 'ObjectOutput' signals.

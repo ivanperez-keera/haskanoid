@@ -56,7 +56,7 @@ import Game.Constants        (gameFinishedDelay, initialLevel,
                               stdLives)
 import Game.Levels           (levelInfo, levelName, levels, numLevels,
                               objectSFs)
-import Game.Objects          (Collisions, ObjectKind (Block, PowerUp),
+import Game.Object           (Collisions, ObjectKind (Block, PowerUp),
                               PowerUpKind (..), collisionObjectKind,
                               collisionObjectName, isBlock)
 import Game.ObjectSF         (ObjectInput (ObjectInput),

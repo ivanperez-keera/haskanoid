@@ -21,7 +21,7 @@ import Physics.TwoDimensions.Dimensions (Pos2D)
 import Game.Constants       (blockHeight, blockSeparation, blockWidth,
                              gameAreaMinLeftMargin, gameAreaTopMargin,
                              gameWidth, maxBlockLife, minBlockLife)
-import Game.Objects         (AlwaysPowerUp, PowerUpKind (..), SignalPowerUp)
+import Game.Object          (AlwaysPowerUp, PowerUpKind (..), SignalPowerUp)
 import Game.ObjectSF        (ObjectSFs)
 import Game.ObjectSF.Ball   (objBall)
 import Game.ObjectSF.Block  (objBlock)

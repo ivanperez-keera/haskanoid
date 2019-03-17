@@ -11,7 +11,7 @@ import Physics.TwoDimensions.Dimensions (Pos2D, Size2D)
 import Game.Constants (destroyBallUpHeight, destroyBallUpWidth, livesUpHeight,
                        livesUpWidth, mockUpHeight, mockUpWidth, pointsUpHeight,
                        pointsUpWidth)
-import Game.Objects   (AlwaysPowerUp, Object (..), ObjectKind (Block),
+import Game.Object    (AlwaysPowerUp, Object (..), ObjectKind (Block),
                        ObjectProperties (BlockProps), PowerUpKind (..),
                        SignalPowerUp)
 import Game.ObjectSF  (ObjectInput (ObjectInput), ObjectOutput (ObjectOutput),

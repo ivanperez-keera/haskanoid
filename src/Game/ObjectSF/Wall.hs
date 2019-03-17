@@ -9,7 +9,7 @@ import Physics.TwoDimensions.Side       (Side (BottomSide, LeftSide, RightSide, 
 
 -- Internal imports
 import Game.Constants (gameHeight, gameWidth)
-import Game.Objects   (Object (..), ObjectKind (Side), ObjectName,
+import Game.Object    (Object (..), ObjectKind (Side), ObjectName,
                        ObjectProperties (SideProps))
 import Game.ObjectSF  (ObjectInput (ObjectInput), ObjectOutput (ObjectOutput),
                        ObjectSF)
