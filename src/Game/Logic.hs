@@ -51,7 +51,7 @@ import Physics.CollisionEngine              (detectCollisions)
 import Physics.TwoDimensions.PhysicalObject (Collision (..))
 
 -- Internal imports
-import Game.Constants        (gameFinishedDelay, initialLevel,
+import Game.Constants        (gameFinishedDelay, initialLevel, Lives, Points,
                               levelFinishedDelay, loadingDelay, restartDelay,
                               stdLives)
 import Game.Levels           (levelInfo, levelName, levels, numLevels,
@@ -117,7 +117,7 @@ runLevel gim =
   where
     runLevelLoop = dSwitch
        -- Run level until it is completed
-      (gamePlayOrPause gim >? isLevelCompleted)
+      (playLevelOrPause gim >? isLevelCompleted)
       (\gs ->  switch
                  -- then finish level
                  (levelFinished gs )
@@ -192,8 +192,8 @@ levelLoading gim = levelLoading' >? after loadingDelay ()
 -- NOTE: The code includes a commented piece that detects
 -- a request to pause the game. Check out the code to learn how to
 -- implement pausing.
-gamePlayOrPause :: GameInfoMini -> SF Controller GameState
-gamePlayOrPause gim = gamePlay gim
+playLevelOrPause :: GameInfoMini -> SF Controller GameState
+playLevelOrPause gim = playLevel gim
 --  ((arr id) &&& (pause undefined (False --> isPaused) (mainLoop lives level)))
 --  >>> pauseGeneral
 --
@@ -208,130 +208,6 @@ gamePlayOrPause gim = gamePlay gim
 --                 then g { gameInfo = o { gameStatus = GamePaused } }
 --                 else g
 
--- | Run the game, obtain the internal game's running state, and compose it
--- with the more general 'GameState' using the known number of lives and
--- points.
-gamePlay :: GameInfoMini -> SF Controller GameState
-gamePlay (GameInfoMini lives level pts) =
-  gamePlay' (objectSFs $ levelInfo levelSpec) >>> composeGameState lives level pts
-  where
-    levelSpec = levels !! level
-
-    -- | Based on the internal gameplay info, compose the main game state and
-    -- detect when a live is lost. When that happens, restart this SF
-    -- with one less life available.
-    --
-    -- NOTE: it will be some other SF's responsibility to determine if the player's
-    -- run out of lives.
-
-    -- NOTE (about the code): We need to delay the initial event (if it happened to
-    -- occur) because, at the moment of switching, it will definitely occur and we
-    -- will fall in an infinite loop.  Therefore, this dswitch only switches for
-    -- non-start events.
-    composeGameState :: Int -> Int -> Int
-                     -> SF (ObjectOutputs, Int, Event (), Int) GameState
-    composeGameState lives level pts = futureDSwitch
-      (composeGameState' lives level pts)
-      (\_ -> composeGameState (lives-1) level pts)
-
-    -- | Based on the internal gameplay info, compose the main game state and
-    -- detect when a live is lost. When that happens, keep the last known game
-    -- state.
-    composeGameState' :: Int -> Int -> Int
-                      -> SF (ObjectOutputs, Int, Event (), Int) (GameState, Event GameState)
-    composeGameState' lives level pts = proc (oos, lives', dead, points) -> do
-      -- Compose game state
-      objects <- extractObjects -< oos
-      let lives'' = lives + lives'
-      let general = GameState objects
-                              (GameInfo GamePlaying lives'' level (pts+points))
-
-      -- Detect death
-      let lastGeneral = dead `tag` general
-
-      returnA -< (general, lastGeneral)
-
-    -- | Given an initial list of objects, it runs the game, presenting the output
-    -- from those objects at all times, notifying any time the ball hits the floor,
-    -- and and of any additional points made.
-    --
-    -- This works as a game loop with a post-processing step. It uses
-    -- a well-defined initial accumulator and a traditional feedback
-    -- loop.
-    --
-    -- The internal accumulator holds:
-    --
-    --    - The last known object outputs (discarded at every iteration).
-    --
-    --    - The last known collisions (discarded at every iteration).
-    --
-    --    - The last known points (added to the new ones in every loop iteration).
-    --
-    gamePlay' :: ObjectSFs -> SF Controller (ObjectOutputs, Int, Event (), Int)
-    gamePlay' objs = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
-
-       let inputs = ObjectInput userInput cols (map outputObject objs)
-
-       outputs           <- processMovement objs         -< inputs
-       cols'             <- detectObjectCollisions       -< outputs
-
-       hitBottom         <- collisionWithBottom          -< cols'
-       hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols'
-       let hbod = lMerge hitBottom hitDestroyBallUp
-
-       hitLivesUps       <- collisionLivesUpsPaddle      -< cols'
-       lvs'              <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
-
-       let objs' = elemsIL outputs
-           pts'  = pts + countPoints cols'
-
-       returnA -< ((objs', lvs', hbod, pts'), (objs', cols', pts'))
-
-     where
-
-           -- Parallely apply all object functions
-           processMovement :: ObjectSFs -> SF ObjectInput (IL ObjectOutput)
-           processMovement objs = dpSwitchB
-             objs                                  -- Signal functions
-             (noEvent --> arr suicidalSect)        -- When necessary, remove all elements that must be removed
-             (\sfs' f -> processMovement (f sfs')) -- Move along! Move along! (with new state, aka. sfs)
-
-           suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
-           suicidalSect (_,oos) =
-             -- Turn every event carrying a function that transforms the
-             -- object signal function list into one function that performs
-             -- all the efects in sequence
-             foldl (mergeBy (.)) noEvent (es ++ is)
-
-             -- Turn every object that wants to kill itself into
-             -- a function that removes it from the list
-             where es :: [Event (IL ObjectSF -> IL ObjectSF)]
-                   es = [ harakiri oo `tag` deleteIL k
-                        | (k,oo) <- assocsIL oos ]
-
-                   is :: [Event (IL ObjectSF -> IL ObjectSF)]
-                   is = [fmap (insertIL_ . createPowerUp) (births oo)
-                        | (k,oo) <- assocsIL oos]
-
-           -- From the actual objects, detect which ones collide
-           detectObjectCollisions :: SF (IL ObjectOutput) Collisions
-           detectObjectCollisions = extractObjects >>> arr detectCollisions
-
-           -- Count-points
-           countPoints :: Collisions -> Int
-           countPoints = sum . map numPoints
-             where numPoints (Collision cd)
-                      | hasBall cd    = countBlocks cd
-                      | hasPaddle cd  = 100 * countPointsUp cd
-                      | otherwise     = 0
-                   hasBall       = any (collisionObjectName "ball")
-                   countBlocks   = length . filter (collisionObjectKind Block)
-                   hasPaddle     = any (collisionObjectName "paddle")
-                   countPointsUp = length . filter (collisionObjectKind (PowerUp PointsUp))
-
-           -- Create powerup
-           createPowerUp :: PowerUpDef -> ObjectSF
-           createPowerUp (PowerUpDef string puk pos sz) = powerUp string puk pos sz
 
 -- * Termination criteria
 
@@ -349,3 +225,142 @@ isLevelCompleted = proc gs -> do
   over <- edge -< (not . any isBlock . gameObjects ) gs
   let snapshot = over `tag` gs
   returnA -< snapshot
+
+-- * Level playing
+
+-- | Run the game, obtain the internal game's running state, and compose it
+-- with the more general 'GameState' using the known number of lives and
+-- points.
+playLevel :: GameInfoMini -> SF Controller GameState
+playLevel gim  =
+  play >>> (composeGameState gim)
+  where
+    lvl      = level gim
+    lvlSpec  = levels !! lvl
+    lvlIobjs = objectSFs $ levelInfo lvlSpec
+
+    -- | Given an initial list of objects, it runs the game, presenting the output
+    -- from those objects at all times, notifying any time the ball hits the floor,
+    -- and and of any additional points made.
+    --
+    -- This works as a game loop with a post-processing step. It uses
+    -- a well-defined initial accumulator and a traditional feedback
+    -- loop.
+    --
+    -- The internal accumulator holds:
+    --
+    --    - The last known object outputs (discarded at every iteration).
+    --
+    --    - The last known collisions (discarded at every iteration).
+    --
+    --    - The last known points (added to the new ones in every loop iteration).
+    play :: SF Controller (ObjectOutputs, Int, Int, Event ())
+    play = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
+
+       let inputs = ObjectInput userInput cols (map outputObject objs)
+
+       outputs      <- processMovement lvlIobjs -< inputs
+       cols'        <- detectObjectCollisions   -< outputs
+
+       dead         <- deadThroughCollision     -< cols'
+       (lvsA, ptsA) <- bonusThroughCollisions   -< (cols', pts)
+
+       let objs' = elemsIL outputs
+
+       returnA -< ((objs', lvsA, ptsA, dead), (objs', cols', ptsA))
+
+     where
+       deadThroughCollision :: SF Collisions (Event ())
+       deadThroughCollision = proc cols -> do
+         hitBottom         <- collisionWithBottom          -< cols
+         hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols
+         returnA -< (lMerge hitBottom hitDestroyBallUp)
+
+       -- Returns (additional lives, additional points)
+       bonusThroughCollisions :: SF (Collisions, Int) (Int, Int)
+       bonusThroughCollisions = proc (cols, pts) -> do
+         -- Lives
+         hitLivesUps <- collisionLivesUpsPaddle  -< cols
+         lvs'        <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
+         -- Points
+         let pts' = pts + countPoints cols
+
+         returnA -< (lvs', pts')
+
+       -- Parallely apply all object functions
+       processMovement :: ObjectSFs -> SF ObjectInput (IL ObjectOutput)
+       processMovement objs = dpSwitchB
+         objs                                  -- Signal functions
+         (noEvent --> arr updateObjectSFs)     -- When necessary, add and remove elements
+         (\sfs' f -> processMovement (f sfs')) -- Move along! Move along! (with new state, aka. sfs)
+         where
+           -- Turn every event carrying a function that transforms the
+           -- object signal function list into one function that performs
+           -- all the efects in sequence
+           updateObjectSFs :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
+           updateObjectSFs (_,oos) =
+             foldl (mergeBy (.)) noEvent (es ++ is)
+             where
+               -- Turn every object that wants to kill itself into
+               -- a function that removes it from the list
+               es :: [Event (IL ObjectSF -> IL ObjectSF)]
+               es = [ harakiri oo `tag` deleteIL k
+                    | (k,oo) <- assocsIL oos ]
+
+               -- Turn every object that wants to add itself into
+               -- a function that adds it to the list
+               is :: [Event (IL ObjectSF -> IL ObjectSF)]
+               is = [fmap (insertIL_ . createPowerUp) (births oo)
+                    | (k,oo) <- assocsIL oos]
+
+
+-- | Based on the internal gameplay info, compose the main game state and
+-- detect when a live is lost. When that happens, restart this SF
+-- with one less life available.
+--
+-- NOTE: it will be some other SF's responsibility to determine if the player's
+-- run out of lives.
+
+-- NOTE (about the code): We need to delay the initial event (if it happened to
+-- occur) because, at the moment of switching, it will definitely occur and we
+-- will fall in an infinite loop.  Therefore, this dswitch only switches for
+-- non-start events.
+composeGameState :: GameInfoMini
+                 -> SF (ObjectOutputs, Int, Int, Event ()) GameState
+composeGameState gim@(GameInfoMini lives level pts) = futureDSwitch
+  (composeGameState' gim)
+  (\_ -> composeGameState (GameInfoMini (lives-1) level pts))
+  where
+    -- | Based on the internal gameplay info, compose the main game state and
+    -- detect when a live is lost. When that happens, keep the last known game
+    -- state.
+    composeGameState' :: GameInfoMini
+                      -> SF (ObjectOutputs, Int, Int, Event ()) (GameState, Event ())
+    composeGameState' (GameInfoMini lives level pts) = proc (oos, lives', points, dead) -> do
+      -- Compose game state
+      objects <- extractObjects -< oos
+      let lives'' = lives + lives'
+      let general = GameState objects
+                              (GameInfo GamePlaying lives'' level (pts+points))
+      returnA -< (general, dead)
+
+-- * Auxiliary functions
+
+-- From the actual objects, detect which ones collide
+detectObjectCollisions :: SF (IL ObjectOutput) Collisions
+detectObjectCollisions = extractObjects >>> arr detectCollisions
+
+countPoints :: Collisions -> Int
+countPoints = sum . map numPoints
+  where
+    numPoints (Collision cd)
+      | hasBall cd    = countBlocks cd
+      | hasPaddle cd  = 100 * countPointsUp cd
+      | otherwise     = 0
+    hasBall       = any (collisionObjectName "ball")
+    countBlocks   = length . filter (collisionObjectKind Block)
+    hasPaddle     = any (collisionObjectName "paddle")
+    countPointsUp = length . filter (collisionObjectKind (PowerUp PointsUp))
+
+createPowerUp :: PowerUpDef -> ObjectSF
+createPowerUp (PowerUpDef name puk pos sz) = powerUp name puk pos sz
