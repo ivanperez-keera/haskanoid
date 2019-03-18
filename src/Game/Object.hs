@@ -32,51 +32,21 @@ type Objects = [Object]
 --
 -- The properties need to agree with the kind. The kind is necessary to
 -- avoid using string matching on the name to determine the object kind.
-data Object = Object { objectName           :: !ObjectName
-                     , objectKind           :: !ObjectKind
-                     , objectProperties     :: !ObjectProperties
-                     , objectPos            :: !Pos2D
-                     , objectVel            :: !Vel2D
-                     , objectAcc            :: !Acc2D
-                     , objectDead           :: !Bool
-                     , objectHit            :: !Bool
-                     , canCauseCollisions   :: !Bool
-                     , collisionEnergy      :: !Double
+data Object = Object { objectName         :: !ObjectName
+                     , objectKind         :: !ObjectKind
+                     , objectProperties   :: !ObjectProperties
+                     , objectPos          :: !Pos2D
+                     , objectVel          :: !Vel2D
+                     , objectAcc          :: !Acc2D
+                     , objectDead         :: !Bool
+                     , objectHit          :: !Bool
+                     , canCauseCollisions :: !Bool
+                     , collisionEnergy    :: !Double
                      }
  deriving (Show)
 
 -- | Type for object id.
 type ObjectName = String
-
--- | Properties associated to each kind of object.
-data ObjectProperties  = BallProps     Double -- radius?
-                       | PaddleProps   Size2D
-                       | BlockProps    BlockEnergy SignalPowerUp Size2D
-                       | SideProps     Side
-                       | PowerUpProps  Size2D
-  deriving (Show,Eq)
-
--- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
---   means "dead".
-type BlockEnergy = Int
-
--- | Indicates whether a block signals that it contains a powerup (True)
---   or not (False).
---
---   Note: The signal is independent from the actual creating of powerups.
-type SignalPowerUp = Bool
-
-
--- | Indicates whether a powerup is created everytime if the ball hits
---   the block (True) or only when the block is "dead" (False).
-type AlwaysPowerUp = Bool
-
--- | The kind of powerup:
---   PointsUp and LivesUp add points and lives, respectively.
---   MockUp does not add anything.
---   DestroyBallUp destroys the ball (and therefore takes one life).
-data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
-  deriving (Show,Eq)
 
 -- *** Physical properties
 
@@ -86,6 +56,21 @@ data ObjectKind = Ball
                 | Block
                 | Side
                 | PowerUp PowerUpKind
+  deriving (Show,Eq)
+
+-- | The kind of powerup:
+--   PointsUp and LivesUp add points and lives, respectively.
+--   MockUp does not add anything.
+--   DestroyBallUp destroys the ball (and therefore takes one life).
+data PowerUpKind = PointsUp | LivesUp | MockUp | DestroyBallUp
+  deriving (Show,Eq)
+
+-- | Properties associated to each kind of object.
+data ObjectProperties  = BallProps    Double -- radius?
+                       | PaddleProps  Size2D
+                       | BlockProps   BlockEnergy SignalPowerUp Size2D
+                       | SideProps    Side
+                       | PowerUpProps Size2D
   deriving (Show,Eq)
 
 -- | Physical object definition of an 'Object'. We use AABB for shapes.
@@ -135,6 +120,7 @@ objShape obj = case objectProperties obj of
        gameH = gameHeight
 
 -- **** Collisions
+
 type Collision  = P.Collision  (ObjectName, ObjectKind)
 type Collisions = P.Collisions (ObjectName, ObjectKind)
 
@@ -145,7 +131,6 @@ collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
 -- | Check if collision is with a given id.
 collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
 collisionObjectName on1 ((on2, _),_) = on1 == on2
-
 
 -- *** Identification of objects
 
@@ -164,3 +149,18 @@ isSide o = case objectKind o of
   Side -> True
   _    -> False
 
+-- *** Some types
+
+-- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
+--   means "dead".
+type BlockEnergy = Int
+
+-- | Indicates whether a block signals that it contains a powerup (True)
+--   or not (False).
+--
+--   Note: The signal is independent from the actual creating of powerups.
+type SignalPowerUp = Bool
+
+-- | Indicates whether a powerup is created everytime if the ball hits
+--   the block (True) or only when the block is "dead" (False).
+type AlwaysPowerUp = Bool
