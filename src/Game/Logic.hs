@@ -260,25 +260,25 @@ playLevel gim  = play >>> (composeGameState gim)
        outputs      <- processMovement lvlIobjs -< inputs
        cols'        <- detectObjectCollisions   -< outputs
 
-       dead         <- deadThroughCollision     -< cols'
-       (lvsA, ptsA) <- bonusThroughCollisions   -< (cols', pts)
+       dead         <- checkForDead             -< cols'
+       (lvsB, ptsB) <- checkForBonus            -< (cols', pts)
 
        let objs' = elemsIL outputs
 
-       returnA -< ((objs', (lvsA, ptsA), dead), (objs', cols', ptsA))
+       returnA -< ((objs', (lvsB, ptsB), dead), (objs', cols', ptsB))
 
      where
        lvlSpec  = levels !! (level gim)
        lvlIobjs = objectSFs $ levelInfo lvlSpec
 
-       deadThroughCollision :: SF Collisions Dead
-       deadThroughCollision = proc cols -> do
+       checkForDead :: SF Collisions Dead
+       checkForDead = proc cols -> do
          hitBottom         <- collisionWithBottom          -< cols
          hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols
          returnA -< (lMerge hitBottom hitDestroyBallUp)
 
-       bonusThroughCollisions :: SF (Collisions, Int) Bonus
-       bonusThroughCollisions = proc (cols, pts) -> do
+       checkForBonus :: SF (Collisions, Int) Bonus
+       checkForBonus = proc (cols, pts) -> do
          -- Lives
          hitLivesUps <- collisionLivesUpsPaddle  -< cols
          lvs'        <- loopPre 0 (arr (\(x,y)-> (x + y, x + y) )) -< hitLivesUps
