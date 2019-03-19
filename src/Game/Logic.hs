@@ -228,33 +228,31 @@ isLevelCompleted = proc gs -> do
 
 -- * Level playing
 
+-- | Bonus are additional lives and additional points.
+type Bonus       = (Int, Int)
+-- | Indicates the loss of a live.
+type Dead        = Event ()
+
 -- | Run the game, obtain the internal game's running state, and compose it
 -- with the more general 'GameState' using the known number of lives and
 -- points.
 playLevel :: GameInfoMini -> SF Controller GameState
-playLevel gim  =
-  play >>> (composeGameState gim)
+playLevel gim  = play >>> (composeGameState gim)
   where
-    lvl      = level gim
-    lvlSpec  = levels !! lvl
-    lvlIobjs = objectSFs $ levelInfo lvlSpec
-
-    -- | Given an initial list of objects, it runs the game, presenting the output
-    -- from those objects at all times, notifying any time the ball hits the floor,
-    -- and and of any additional points made.
+    -- | Given an initial list of objects, it runs the game, presenting the
+    -- output from those objects at all times, notifying any time the ball hits
+    -- the floor or catches a power up that destroyes the ball, and of any
+    -- additional points and lives gained.
     --
     -- This works as a game loop with a post-processing step. It uses
     -- a well-defined initial accumulator and a traditional feedback
     -- loop.
     --
     -- The internal accumulator holds:
-    --
     --    - The last known object outputs (discarded at every iteration).
-    --
     --    - The last known collisions (discarded at every iteration).
-    --
     --    - The last known points (added to the new ones in every loop iteration).
-    play :: SF Controller (ObjectOutputs, Int, Int, Event ())
+    play :: SF Controller (ObjectOutputs, Bonus, Dead)
     play = loopPre ([], [], 0) $ proc (userInput, (objs, cols, pts)) -> do
 
        let inputs = ObjectInput userInput cols (map outputObject objs)
@@ -267,17 +265,19 @@ playLevel gim  =
 
        let objs' = elemsIL outputs
 
-       returnA -< ((objs', lvsA, ptsA, dead), (objs', cols', ptsA))
+       returnA -< ((objs', (lvsA, ptsA), dead), (objs', cols', ptsA))
 
      where
-       deadThroughCollision :: SF Collisions (Event ())
+       lvlSpec  = levels !! (level gim)
+       lvlIobjs = objectSFs $ levelInfo lvlSpec
+
+       deadThroughCollision :: SF Collisions Dead
        deadThroughCollision = proc cols -> do
          hitBottom         <- collisionWithBottom          -< cols
          hitDestroyBallUp  <- collisionDestroyBallUpPaddle -< cols
          returnA -< (lMerge hitBottom hitDestroyBallUp)
 
-       -- Returns (additional lives, additional points)
-       bonusThroughCollisions :: SF (Collisions, Int) (Int, Int)
+       bonusThroughCollisions :: SF (Collisions, Int) Bonus
        bonusThroughCollisions = proc (cols, pts) -> do
          -- Lives
          hitLivesUps <- collisionLivesUpsPaddle  -< cols
@@ -313,10 +313,9 @@ playLevel gim  =
                is = [fmap (insertIL_ . createPowerUp) (births oo)
                     | (k,oo) <- assocsIL oos]
 
-
--- | Based on the internal gameplay info, compose the main game state and
--- detect when a live is lost. When that happens, restart this SF
--- with one less life available.
+-- | Based on the internal play info, compose the main game state and detect
+-- when a live is lost. When that happens, restart this SF with one less life
+-- available.
 --
 -- NOTE: it will be some other SF's responsibility to determine if the player's
 -- run out of lives.
@@ -326,29 +325,31 @@ playLevel gim  =
 -- will fall in an infinite loop.  Therefore, this dswitch only switches for
 -- non-start events.
 composeGameState :: GameInfoMini
-                 -> SF (ObjectOutputs, Int, Int, Event ()) GameState
-composeGameState gim@(GameInfoMini lives level pts) = futureDSwitch
+                 -> SF (ObjectOutputs, Bonus, Dead) GameState
+composeGameState gim@(GameInfoMini lvs lvl pts) = futureDSwitch
   (composeGameState' gim)
-  (\_ -> composeGameState (GameInfoMini (lives-1) level pts))
+  (\_ -> composeGameState (GameInfoMini (lvs-1) lvl pts))
   where
-    -- | Based on the internal gameplay info, compose the main game state and
-    -- detect when a live is lost. When that happens, keep the last known game
-    -- state.
+    -- | Based on the internal play info, compose the main game state and
+    -- propagate whether a live is lost.
     composeGameState' :: GameInfoMini
-                      -> SF (ObjectOutputs, Int, Int, Event ()) (GameState, Event ())
-    composeGameState' (GameInfoMini lives level pts) = proc (oos, lives', points, dead) -> do
+                      -> SF (ObjectOutputs, Bonus, Dead) (GameState, Dead)
+    composeGameState' (GameInfoMini lvs lvl pts) = proc (oos, (lvsB, ptsB), dead) -> do
       -- Compose game state
       objects <- extractObjects -< oos
-      let lives'' = lives + lives'
-      let general = GameState objects
-                              (GameInfo GamePlaying lives'' level (pts+points))
-      returnA -< (general, dead)
+      let gs = GameState objects (GameInfo GamePlaying (lvs+lvsB) lvl (pts+ptsB))
+      returnA -< (gs, dead)
 
--- * Auxiliary functions
+-- ** Put in other modules?
 
 -- From the actual objects, detect which ones collide
 detectObjectCollisions :: SF (IL ObjectOutput) Collisions
 detectObjectCollisions = extractObjects >>> arr detectCollisions
+
+createPowerUp :: PowerUpDef -> ObjectSF
+createPowerUp (PowerUpDef name puk pos sz) = powerUp name puk pos sz
+
+-- * Auxiliary functions
 
 countPoints :: Collisions -> Int
 countPoints = sum . map numPoints
@@ -361,6 +362,3 @@ countPoints = sum . map numPoints
     countBlocks   = length . filter (collisionObjectKind Block)
     hasPaddle     = any (collisionObjectName "paddle")
     countPointsUp = length . filter (collisionObjectKind (PowerUp PointsUp))
-
-createPowerUp :: PowerUpDef -> ObjectSF
-createPowerUp (PowerUpDef name puk pos sz) = powerUp name puk pos sz
