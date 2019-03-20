@@ -19,12 +19,7 @@ import           Physics.TwoDimensions.Side                       (Side (BottomS
 -- Internal imports
 import Game.Constants (collisionErrorMargin, gameWidth, gameHeight)
 
--- * Objects
-
--- | Object collection.
-type Objects = [Object]
-
--- ** Object with its properties
+-- * Object
 
 -- | Objects have logical properties (ID, kind, dead, hit), shape properties
 -- (kind), physical properties (kind, pos, vel, acc) and collision properties
@@ -48,7 +43,7 @@ data Object = Object { objectName         :: !ObjectName
 -- | Type for object id.
 type ObjectName = String
 
--- *** Physical properties
+-- ** Game specific object properties
 
 -- | The kind of object.
 data ObjectKind = Ball
@@ -72,6 +67,37 @@ data ObjectProperties  = BallProps    Double -- radius?
                        | SideProps    Side
                        | PowerUpProps Size2D
   deriving (Show,Eq)
+
+-- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
+--   means "dead".
+type BlockEnergy = Int
+
+-- | Indicates whether a block signals that it contains a powerup (True)
+--   or not (False).
+--
+--   Note: The signal is independent from the actual creating of powerups.
+type SignalPowerUp = Bool
+
+-- | Indicates whether a powerup is created everytime if the ball hits
+--   the block (True) or only when the block is "dead" (False).
+type AlwaysPowerUp = Bool
+
+isBlock :: Object -> Bool
+isBlock o = case objectKind o of
+  (Block) -> True
+  _       -> False
+
+isPaddle :: Object -> Bool
+isPaddle o = case objectKind o of
+  (Paddle) -> True
+  _        -> False
+
+isSide :: Object -> Bool
+isSide o = case objectKind o of
+  Side -> True
+  _    -> False
+
+-- ** Physical properties
 
 -- | Physical object definition of an 'Object'. We use AABB for shapes.
 instance P.PhysicalObject Object (String, ObjectKind) Shape where
@@ -101,6 +127,19 @@ objectTopLevelCorner object = case objectKind object of
   PowerUp {} -> objectPos object
   _other     -> objectPos object ^-^ (0.5 *^ objectSize object)
 
+-- *** Collisions
+
+type Collision  = P.Collision  (ObjectName, ObjectKind)
+type Collisions = P.Collisions (ObjectName, ObjectKind)
+
+-- | Check if collision is with a given kind.
+collisionObjectKind :: ObjectKind -> ((ObjectName, ObjectKind), Vel2D) -> Bool
+collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
+
+-- | Check if collision is with a given id.
+collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
+collisionObjectName on1 ((on2, _),_) = on1 == on2
+
 -- | Collision shape of an object.
 objShape :: Object -> Shape
 objShape obj = case objectProperties obj of
@@ -119,48 +158,8 @@ objShape obj = case objectProperties obj of
        gameW = gameWidth
        gameH = gameHeight
 
--- **** Collisions
+-- * Object collections
 
-type Collision  = P.Collision  (ObjectName, ObjectKind)
-type Collisions = P.Collisions (ObjectName, ObjectKind)
+-- | Object collection.
+type Objects = [Object]
 
--- | Check if collision is with a given kind.
-collisionObjectKind :: ObjectKind -> ((ObjectName, ObjectKind), Vel2D) -> Bool
-collisionObjectKind ok1 ((_, ok2),_) = ok1 == ok2
-
--- | Check if collision is with a given id.
-collisionObjectName :: ObjectName -> ((ObjectName, ObjectKind), Vel2D) -> Bool
-collisionObjectName on1 ((on2, _),_) = on1 == on2
-
--- *** Identification of objects
-
-isBlock :: Object -> Bool
-isBlock o = case objectKind o of
-  (Block) -> True
-  _       -> False
-
-isPaddle :: Object -> Bool
-isPaddle o = case objectKind o of
-  (Paddle) -> True
-  _        -> False
-
-isSide :: Object -> Bool
-isSide o = case objectKind o of
-  Side -> True
-  _    -> False
-
--- *** Some types
-
--- | Block energy level: From minBlockEnergy - 1 to maxBlockEnergy. The former
---   means "dead".
-type BlockEnergy = Int
-
--- | Indicates whether a block signals that it contains a powerup (True)
---   or not (False).
---
---   Note: The signal is independent from the actual creating of powerups.
-type SignalPowerUp = Bool
-
--- | Indicates whether a powerup is created everytime if the ball hits
---   the block (True) or only when the block is "dead" (False).
-type AlwaysPowerUp = Bool
