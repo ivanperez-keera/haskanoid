@@ -43,7 +43,7 @@ data Object = Object { objectName         :: !ObjectName
 -- | Type for object id.
 type ObjectName = String
 
--- ** Game specific object properties
+-- ** Game specific objects
 
 -- | The kind of object.
 data ObjectKind = Ball
