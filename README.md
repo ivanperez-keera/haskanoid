@@ -40,7 +40,7 @@ details). Slides are linked from that website.
 
 # Installation
 
-The game is available on [hackage](https://hackage.haskell.org/package/SpaceInvaders). All the media resources are included with the distribution (see LICENCE for redistribution terms).  You can install it with*:
+The game is available on [hackage](https://hackage.haskell.org/package/haskanoid). All the media resources are included with the distribution (see LICENCE for redistribution terms).  You can install it with*:
 
 ```
 $ cabal update
