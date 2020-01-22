@@ -1,6 +1,6 @@
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
-import FRP.Yampa.Record
+import FRP.Titan.Record.Yampa
 
 import Game
 import Display
@@ -37,4 +37,3 @@ main = do
                )
                (\_ e -> render res' (fst e) >> return (snd e))
                (wholeGame &&& arr controllerQuit)
- 

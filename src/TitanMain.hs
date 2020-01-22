@@ -14,8 +14,8 @@ import Input
 import Graphics.UI.Extra.SDL
 import FRP.Yampa       as Yampa
 import Data.IORef
-import FRP.Titan.Debug.Core
 import FRP.Titan.Debug.CommTCP
+import FRP.Titan.Debug.Yampa
 
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()

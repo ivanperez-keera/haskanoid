@@ -120,10 +120,10 @@ executable haskanoid
 
   if flag(titanrecord)
     main-is: Record.hs
-    build-depends: titan-yampa-recorder
+    build-depends: titan-record-yampa
   if flag(titandebug)
     main-is: TitanMain.hs
-    build-depends: titan-yampa-debugger
+    build-depends: titan-debug-yampa
   if !flag(titanrecord) && !flag(titandebug)
     main-is: Main.hs
 
