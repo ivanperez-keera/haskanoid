@@ -1,7 +1,7 @@
 -- | Game objects and collisions.
 module Objects where
 
-import FRP.Yampa.VectorSpace
+import Data.VectorSpace
 
 import Data.Extra.Num
 import Physics.TwoDimensions.Dimensions

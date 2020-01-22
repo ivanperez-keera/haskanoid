@@ -107,7 +107,8 @@ executable haskanoid
                        transformers >= 0.3 && < 0.6,
                        mtl,
                        MissingH,
-                       Yampa >= 0.9.6 && < 0.11,
+                       Yampa >= 0.13 && < 0.14,
+                       simple-affine-space,
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
                        IfElse
 
