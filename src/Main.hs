@@ -1,6 +1,7 @@
 import Control.Applicative ((<$>))
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
+import Control.DeepSeq
 
 import Game
 import Display
@@ -25,6 +26,6 @@ main = do
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ (e, c) -> render res' e >> return (controllerQuit c))
+               (\_ (e, c) -> e `deepseq` (render res' e) >> return (controllerQuit c))
                (wholeGame &&& arr id)
 

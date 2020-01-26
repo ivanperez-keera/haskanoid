@@ -72,7 +72,7 @@ executable haskanoid
   if flag(kinect)
     cpp-options: -Dkinect
 
-  ghc-options: -Wall -threaded
+  ghc-options: -Wall -threaded -O2
 
   hs-source-dirs: src/
 
@@ -103,6 +103,7 @@ executable haskanoid
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
+                       deepseq,
                        IfElse,
                        MissingH,
                        mtl,

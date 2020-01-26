@@ -1,9 +1,12 @@
+{-# LANGUAGE DeriveGeneric #-}
 -- | A trivial collision subsystem.
 --
 -- Based on the physics module, it determines the side of collision
 -- between shapes.
 module Physics.TwoDimensions.Collisions where
 
+import GHC.Generics (Generic)
+import Control.DeepSeq
 import Data.VectorSpace
 import Physics.TwoDimensions.Physics
 
@@ -11,7 +14,9 @@ import Physics.TwoDimensions.Physics
 
 -- | Collision side of a rectangle
 data Side = TopSide | BottomSide | LeftSide | RightSide
-  deriving (Eq,Show)
+  deriving (Eq,Show, Generic)
+
+instance NFData Side
 
 -- | Opposite side during a collision.
 --

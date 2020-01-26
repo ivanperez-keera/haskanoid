@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 -- | The state of the game during execution. It has two
 -- parts: general info (level, points, etc.) and
 -- the actual gameplay info (objects).
@@ -8,7 +9,8 @@
 -- empty.
 module GameState where
 
--- import FRP.Yampa as Yampa
+import Control.DeepSeq
+import GHC.Generics    (Generic, Generic1)
 
 import Objects
 
@@ -20,9 +22,12 @@ import Objects
 -- therefore convenient to group them in subtrees, even if there's no
 -- substantial difference betweem them.
 data GameState = GameState
-  { gameObjects :: Objects
-  , gameInfo    :: GameInfo
+  { gameObjects :: !Objects
+  , gameInfo    :: !GameInfo
   }
+  deriving (Generic)
+
+instance NFData GameState
 
 -- | Initial (default) game state.
 neutralGameState :: GameState
@@ -38,11 +43,14 @@ neutralGameState = GameState
 -- Since this info is then presented together to the users in a top panel, it
 -- is convenient to give this product of values a proper name.
 data GameInfo = GameInfo
-  { gameStatus :: GameStatus
-  , gameLives  :: Int
-  , gameLevel  :: Int
-  , gamePoints :: Int
+  { gameStatus :: !GameStatus
+  , gameLives  :: !Int
+  , gameLevel  :: !Int
+  , gamePoints :: !Int
   }
+ deriving (Generic)
+
+instance NFData GameInfo
 
 -- | Initial (default) game info (no points, no lives, no level).
 neutralGameInfo :: GameInfo
@@ -59,8 +67,10 @@ neutralGameInfo = GameInfo
 -- changes presentation depending on the status.
 data GameStatus = GamePlaying
                 | GamePaused
-                | GameLoading Int
+                | GameLoading !Int
                 | GameOver
                 | GameFinished
                 | GameStarted
- deriving Eq
+ deriving (Eq, Generic)
+
+instance NFData GameStatus
