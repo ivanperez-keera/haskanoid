@@ -25,6 +25,6 @@ main = do
                   mInput <- senseInput controllerRef
                   return (dtSecs, Just mInput)
                )
-               (\_ e -> render res' e >> return False)
-               wholeGame
- 
+               (\_ (e, c) -> render res' e >> return (controllerQuit c))
+               (wholeGame &&& arr id)
+

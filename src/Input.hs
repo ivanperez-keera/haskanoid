@@ -66,6 +66,7 @@ data Controller = Controller
   { controllerPos   :: (Double, Double)
   , controllerClick :: Bool
   , controllerPause :: Bool
+  , controllerQuit  :: Bool
   }
 
 -- | Controller info at any given point, plus a pointer
@@ -105,7 +106,7 @@ initializeInputDevices = do
 
   nr <- newIORef defaultInfo
   return $ ControllerRef (nr, dev')
- where defaultInfo = Controller (0,0) False False
+ where defaultInfo = Controller (0,0) False False False
 
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
@@ -229,6 +230,7 @@ handleEvent c e =
     KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
     KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
     KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
+    KeyDown Keysym { symKey = SDLK_q }       -> c { controllerQuit  = True  }
     _                                        -> c
 
 
