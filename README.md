@@ -44,9 +44,7 @@ The game is available on [hackage](https://hackage.haskell.org/package/SpaceInva
 
 ```
 $ cabal update
-$ cabal sandbox init
-$ cabal install haskanoid
-$ ./.cabal-sandbox/bin/haskanoid
+$ cabal run
 ```
 
 If you want to explore the code and possibly make changes, do the following:
@@ -55,9 +53,7 @@ If you want to explore the code and possibly make changes, do the following:
 $ cabal update
 $ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
 $ cd haskanoid-*                    # Game resources are here
-$ cabal sandbox init
-$ cabal install
-$ ./dist/build/haskanoid/haskanoid
+$ cabal run
 ```
 
 To play it with the wiimote, you need to run the program with the special
