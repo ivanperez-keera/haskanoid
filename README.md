@@ -112,6 +112,11 @@ commands above to install without wiimote and kinect support.
 * Yampa (http://github.com/ivanperez-keera/Yampa), the Arrowized Functional
 Reactive Programming implementation created by Antony Courtney and Henrik Nilsson.
 
+* Dunai (http://github.com/ivanperez-keera/dunai), an extremely powerful
+reactive programming implementation capable of doing Classic and Arrowized
+Functional Reactive Programming, Reactive Programming, Stream Programming, and
+others. It contains a Yampa replacement that is capable of running Haskanoid.
+
 * hcwiid (http://github.com/ivanperez-keera/hcwiid), a wrapper around
 the cwiid library to communicate with Wiimotes.
 
