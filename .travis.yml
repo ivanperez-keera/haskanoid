@@ -30,7 +30,9 @@ script:
 branches:
     only:
           - master
-          - develop
+          - /^develop.*/
+          - /^hotfix.*/
+          - /^release.*/
 
 deploy:
   provider: hackage
