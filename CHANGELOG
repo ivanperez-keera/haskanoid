@@ -1,3 +1,6 @@
+2023-03-31 Ivan Perez <ivan.perez@keera.co.uk>:
+        * Bump version bounds of Yampa/bearriver (#104).
+
 2017-11-02 Ivan Perez <ivan.perez@keera.co.uk>:
         * Version bump (0.1.5.4).
         * Adds new levels.
