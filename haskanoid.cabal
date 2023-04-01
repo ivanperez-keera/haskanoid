@@ -111,9 +111,9 @@ executable haskanoid
                        transformers >= 0.3 && < 0.6
 
   if flag(bearriver)
-    build-depends:     bearriver >= 0.9.6 && < 0.14
+    build-depends:     bearriver >= 0.9.6 && < 0.15
   else
-    build-depends:     Yampa >= 0.13 && < 0.14
+    build-depends:     Yampa >= 0.13 && < 0.15
 
   if flag(wiimote)
     build-depends: hcwiid
