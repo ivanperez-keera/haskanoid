@@ -33,7 +33,9 @@ stepFPSCounter (clock, fpsRef, every) = do
   if left' < 0
     then do newTime <- clock
             let
-                msf = fromIntegral (newTime - lastTime) / (fromIntegral every :: Double)
+                msf = fromIntegral (newTime - lastTime)
+                    / (fromIntegral every :: Double)
+
                 fps = 1000 / msf
             do -- when (msf > 0) $
               putStrLn $ "Performance report :: Time per frame: " ++ show msf
