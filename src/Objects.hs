@@ -1,4 +1,9 @@
--- | Game objects and collisions.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Game objects and collisions.
 module Objects where
 
 import Data.VectorSpace
