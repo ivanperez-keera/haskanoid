@@ -1,4 +1,9 @@
--- | Auxiliary functions related to FRP.Yampa.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Auxiliary functions related to FRP.Yampa.
 module FRP.Extra.Yampa where
 
 import Control.Arrow
