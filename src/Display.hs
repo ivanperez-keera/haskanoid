@@ -173,29 +173,29 @@ paintGeneralHUD screen resources over = void $ do
 paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
     case objectKind object of
-      (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
-                                   t <- mapRGB
-                                          (surfaceGetPixelFormat bI) 0 255 0
-                                   setColorKey bI [SrcColorKey, RLEAccel] t
-                                   SDL.blitSurface bI Nothing screen $
-                                     Just (SDL.Rect x y (round w) (round h))
-      (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
-                                   SDL.blitSurface bI Nothing screen $
-                                     Just (SDL.Rect x y (round w) (round h))
-      (Ball r)        -> void $ do let x' = x - round r
-                                       y' = y - round r
-                                       sz = round (2*r)
-                                   -- b <- convertSurface
-                                   --        (imgSurface $ ballImg resources)
-                                   --        (format)
-                                   --        []
-                                   let bI = imgSurface $ ballImg resources
-                                   t <- mapRGB
-                                          (surfaceGetPixelFormat bI) 0 255 0
-                                   setColorKey bI [SrcColorKey, RLEAccel] t
-                                   SDL.blitSurface bI Nothing screen $
-                                     Just (SDL.Rect x' y' sz sz)
-      _              -> return ()
+      (Paddle (w, h))  -> void $ do let bI = imgSurface $ paddleImg resources
+                                    t <- mapRGB
+                                           (surfaceGetPixelFormat bI) 0 255 0
+                                    setColorKey bI [SrcColorKey, RLEAccel] t
+                                    SDL.blitSurface bI Nothing screen $
+                                      Just (SDL.Rect x y (round w) (round h))
+      (Block e (w, h)) -> void $ do let bI = imgSurface $ blockImage e
+                                    SDL.blitSurface bI Nothing screen $
+                                      Just (SDL.Rect x y (round w) (round h))
+      (Ball r)         -> void $ do let x' = x - round r
+                                        y' = y - round r
+                                        sz = round (2*r)
+                                    -- b <- convertSurface
+                                    --        (imgSurface $ ballImg resources)
+                                    --        (format)
+                                    --        []
+                                    let bI = imgSurface $ ballImg resources
+                                    t <- mapRGB
+                                           (surfaceGetPixelFormat bI) 0 255 0
+                                    setColorKey bI [SrcColorKey, RLEAccel] t
+                                    SDL.blitSurface bI Nothing screen $
+                                      Just (SDL.Rect x' y' sz sz)
+      _               -> return ()
   where format = surfaceGetPixelFormat screen
         p      = objectPos object
         x      = round (fst p)
