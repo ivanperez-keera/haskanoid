@@ -18,7 +18,7 @@ module Levels where
 
 -- External imports
 import Control.Arrow (first, (***))
-import Data.List (nub)
+import Data.List     (nub)
 
 -- Internal imports
 import Constants
