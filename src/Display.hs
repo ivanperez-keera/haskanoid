@@ -1,3 +1,4 @@
+-- | Audio and video renderer.
 module Display where
 
 import Control.Applicative ((<$>))
