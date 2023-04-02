@@ -50,7 +50,7 @@ import System.CWiid
 -- External imports (Kinect)
 #ifdef kinect
 import Control.Concurrent
-import Data.Vector.Storable (Vector,(!))
+import Data.Vector.Storable (Vector, (!))
 import qualified Data.Vector.Storable as V
 import Data.Word
 import Freenect
@@ -107,7 +107,7 @@ initializeInputDevices = do
 
     nr <- newIORef defaultInfo
     return $ ControllerRef (nr, dev')
-  where defaultInfo = Controller (0,0) False False False
+  where defaultInfo = Controller (0, 0) False False False
 
 -- | Sense from the controller, providing its current state. This should return
 -- a new Controller state if available, or the last one there was.
@@ -182,7 +182,7 @@ senseWiimote wmdev controller = do
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
   --     isRight = cwiidIsBtnPushed flags cwiidBtnRight 
-  --     (x,y)   = controllerPos controller
+  --     (x, y)  = controllerPos controller
   --     x'      | isLeft    = x - wiiXDiff
   --             | isRight   = x + wiiXDiff
   --             | otherwise = x
@@ -289,11 +289,11 @@ getDepthThread screenSize lastPos = forkIO $ do
         index = 0 :: Integer
 
 updatePos :: IORef (Maybe (Double, Double)) -> (Double, Double) -> IO ()
-updatePos lastPosRef newPos@(nx,ny) = do
+updatePos lastPosRef newPos@(nx, ny) = do
   lastPosM <- readIORef lastPosRef
   let (mx, my) = case lastPosM of
-                   Nothing        -> newPos
-                   (Just (lx,ly)) -> (adjust 50 lx nx, adjust 50 ly ny)
+                   Nothing         -> newPos
+                   (Just (lx, ly)) -> (adjust 50 lx nx, adjust 50 ly ny)
   writeIORef lastPosRef (Just (mx, my))
   mx `seq` my `seq` return ()
 
@@ -302,7 +302,7 @@ calculateMousePos :: (Double, Double)
                   -> Maybe (Double, Double)
 calculateMousePos (width, height) payload =
     fmap g (findFirst payload)
-  where g (px,py) = (mousex, mousey)
+  where g (px, py) = (mousex, mousey)
           where
             pointerx = fromIntegral (640 - px)
             pointery = fromIntegral py
@@ -333,7 +333,7 @@ processPayload ps = [(pval, tx, ty) | i <- [0..640*480-1]
 avg :: [(Float, Int, Int)] -> (Int, Int)
 avg ls = (sumx `div` l, sumy `div` l)
   where l = length ls
-        (sumx, sumy) = foldr (\(_,x,y) (rx,ry) -> (x+rx,y+ry)) (0,0) ls
+        (sumx, sumy) = foldr (\(_, x, y) (rx, ry) -> (x+rx, y+ry)) (0, 0) ls
 
 -- Update a value, with a max cap
 adjust :: (Num a, Ord a) => a -> a -> a -> a
