@@ -1,4 +1,9 @@
--- | A very simple physics subsytem. It currently detects shape
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- A very simple physics subsytem. It currently detects shape
 -- overlaps only, the actual physics movement is carried out
 -- in Yampa itself, as it is very simple using integrals and
 -- derivatives.
