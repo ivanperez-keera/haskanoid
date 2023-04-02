@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to Data.List.
 module Data.Extra.List where
 
 mapFilter :: (a -> b) -> (a -> Bool) -> [a] -> [b]
