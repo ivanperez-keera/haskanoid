@@ -226,9 +226,9 @@ data Resources = Resources
   , bgMusic     :: Maybe Music
   }
 
-data Image = Image { imgName  :: String, imgSurface :: Surface }
+data Image = Image { imgName :: String, imgSurface :: Surface }
 
-data Font  = Font  { fontName :: String, unFont :: TTF.Font }
+data Font = Font { fontName :: String, unFont :: TTF.Font }
 
 -- | Ad-hoc resource loading
 --
@@ -242,7 +242,7 @@ loadResources = runMaybeT $ do
 
   gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
   -- Load the fonts we need
-  font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
+  font <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
   let myFont = fmap (Font gameFont) font
 
   blockHit <-
