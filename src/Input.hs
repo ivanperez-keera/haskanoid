@@ -85,30 +85,30 @@ newtype ControllerRef =
 -- not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
-  let baseDev = sdlGetController
+    let baseDev = sdlGetController
 
 -- Fall back to mouse/kb is no kinect is present
 #ifdef kinect
-  print "Kinecting"
-  dev <- do kn <- kinectController
-            case kn of
-              Nothing  -> return baseDev
-              Just kn' -> return kn'
+    print "Kinecting"
+    dev <- do kn <- kinectController
+              case kn of
+                Nothing  -> return baseDev
+                Just kn' -> return kn'
 #else
-  let dev = baseDev
+    let dev = baseDev
 #endif
 
 -- Fall back to kinect or mouse/kb is no wiimote is present
 #ifdef wiimote
-  dev' <- do wm <- wiimoteDev
-             return $ fromMaybe dev wm
+    dev' <- do wm <- wiimoteDev
+               return $ fromMaybe dev wm
 #else
-  let dev' = dev
+    let dev' = dev
 #endif
 
-  nr <- newIORef defaultInfo
-  return $ ControllerRef (nr, dev')
- where defaultInfo = Controller (0,0) False False False
+    nr <- newIORef defaultInfo
+    return $ ControllerRef (nr, dev')
+  where defaultInfo = Controller (0,0) False False False
 
 -- | Sense from the controller, providing its current
 -- state. This should return a new Controller state
@@ -145,8 +145,8 @@ initializeWiimote = do
   wm <- cwiidOpen
   awhen wm (void . (`cwiidSetRptMode` 15)) -- Enable button reception, acc and IR
   case wm of
-   Nothing -> return Nothing
-   Just wm' -> return $ Just $ senseWiimote wm'
+    Nothing -> return Nothing
+    Just wm' -> return $ Just $ senseWiimote wm'
 
 -- ** Sensing
 
@@ -267,18 +267,18 @@ initializeKinect screenSize = do
 
 getDepthThread :: (Double, Double) -> KinectPosRef -> IO ThreadId
 getDepthThread screenSize lastPos = forkIO $ do
-  withContext $ \context -> do
-    setLogLevel LogFatal context
-    selectSubdevices context devices
-    withDevice context index $ \device -> do
-      setDepthMode device Medium ElevenBit
-      setDepthCallback device $ \payload _timestamp -> do
-        maybe (print ".") -- Too far or too close
-              (updatePos lastPos)
-              (calculateMousePos screenSize payload)
-        return ()
-      startDepth device
-      forever $ processEvents context
+    withContext $ \context -> do
+      setLogLevel LogFatal context
+      selectSubdevices context devices
+      withDevice context index $ \device -> do
+        setDepthMode device Medium ElevenBit
+        setDepthCallback device $ \payload _timestamp -> do
+          maybe (print ".") -- Too far or too close
+                (updatePos lastPos)
+                (calculateMousePos screenSize payload)
+          return ()
+        startDepth device
+        forever $ processEvents context
 
   where devices = [Camera]
         index = 0 :: Integer
@@ -294,15 +294,15 @@ updatePos lastPosRef newPos@(nx,ny) = do
 
 calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double) 
 calculateMousePos (width, height) payload =
-  fmap g (findFirst payload)
+    fmap g (findFirst payload)
   where g (px,py) = (mousex, mousey)
-         where
-           pointerx = fromIntegral (640 - px)
-           pointery = fromIntegral py
-           mousex   = pointerx -- pointerx * adjx
-           mousey   = pointery -- pointery * adjy
-           adjx     = width  / 630.0
-           adjy     = height / 470.0
+          where
+            pointerx = fromIntegral (640 - px)
+            pointery = fromIntegral py
+            mousex   = pointerx -- pointerx * adjx
+            mousey   = pointery -- pointery * adjy
+            adjx     = width  / 630.0
+            adjy     = height / 470.0
 
 mat :: Vector Float
 mat = V.generate 2048 (\i -> let v :: Float
@@ -310,7 +310,7 @@ mat = V.generate 2048 (\i -> let v :: Float
 
 findFirst :: Vector Word16 -> Maybe (Int, Int)
 findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
- where i  = V.findIndex (\x -> mat!(fromIntegral x) < 512) vs
+  where i  = V.findIndex (\x -> mat!(fromIntegral x) < 512) vs
 
 processPayload :: Vector Word16 -> [(Float, Int, Int)]
 processPayload ps = [(pval, tx, ty) | i <- [0..640*480-1]
