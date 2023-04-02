@@ -1,5 +1,10 @@
 {-# LANGUAGE Arrows #-}
--- | This module defines the game as a big Signal Function that transforms a
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- This module defines the game as a big Signal Function that transforms a
 -- Signal carrying a Input 'Controller' information into a Signal carrying
 -- 'GameState'.
 --
