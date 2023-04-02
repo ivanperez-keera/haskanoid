@@ -56,7 +56,6 @@ data ObjectOutput = ObjectOutput
   , harakiri     :: Event () -- ^ Whether the object has died (killed itself).
   } 
 
-
 -- | Handy function to create an object that is currently alive.
 livingObject :: Object -> ObjectOutput
 livingObject o = ObjectOutput o noEvent
