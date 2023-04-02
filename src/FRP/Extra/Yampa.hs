@@ -16,7 +16,7 @@ import FRP.Yampa
 -- is false, and it holds the last known value when the value is True. 
 holdWhen :: b -> SF a (b,Bool) -> SF a b
 holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
- where holdOutput = arr (\(b,discard) -> if discard then noEvent else Event b)
+  where holdOutput = arr (\(b,discard) -> if discard then noEvent else Event b)
 
 -- Given an occasional producer of functions
 -- and a source of info, apply the functions when they
