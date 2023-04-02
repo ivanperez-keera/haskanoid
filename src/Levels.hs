@@ -170,7 +170,7 @@ blockDescS 0 = map (first adjustPos) allBlocks
 -- Level 1
 --   %%%%%%%%
 -- %    XXXX
--- %   XXXXX 
+-- %   XXXXX
 -- %  XXXXXX
 -- % XXXXXX
 -- % XXXXX
@@ -183,7 +183,7 @@ blockDescS 1 = map (first adjustPos) allBlocks
                                        , y <- [0..blockRows - 1]
                                        , (x + y > 2) && (x + y < 10)
                 ]
-               
+
     blockRows :: Num a => a
     blockRows = 6
 
@@ -198,7 +198,7 @@ blockDescS 2  = map (first adjustPos) allBlocks
 
     blockRows :: Num a => a
     blockRows = 4
-               
+
 
 -- Level 3
 --   %%%%%%%%
@@ -277,8 +277,8 @@ blockDescS 6 = map (first adjustPos) allBlocks
 --   %%%%%%%%
 -- %  XXXXXX
 -- % X      X
--- %    XX  
--- %    XX 
+-- %    XX
+-- %    XX
 -- % X      X
 -- %  XXXXXX
 blockDescS 7 = map (first adjustPos) allBlocks
@@ -298,7 +298,7 @@ blockDescS 7 = map (first adjustPos) allBlocks
 --   %%%%%%%%
 -- % XX XXXXX
 -- % XX XXXXX
--- % 
+-- %
 -- % XX XXXXX
 -- % XX XXXXX
 -- % XX XXXXX
@@ -333,7 +333,7 @@ blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
                     ++ [((x, y), maxBlockLife) | x <- [0..6], y <- [3]]
                     ++ [((x, y), maxBlockLife) | x <- [2, 4], y <- [1, 5]]
                     ++ [((x, y), maxBlockLife) | x <- [1, 5], y <- [2, 4]]
-                   
+
         adjustHPos :: Double -> Double
         adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
 
@@ -345,14 +345,14 @@ blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
 -- Level 10
 --   %%%%%%%%
 -- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
--- % XXXXXXX
--- %  X X X 
--- %  X X X 
 -- %  X X X
--- %  X X X 
+-- %  X X X
+-- %  X X X
+-- % XXXXXXX
+-- %  X X X
+-- %  X X X
+-- %  X X X
+-- %  X X X
 blockDescS 10 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a, a), Int)]
@@ -360,7 +360,7 @@ blockDescS 10 = map (first adjustPos) allBlocks
                                             , y <- [0..blockRows - 1], odd x]
                     ++ [((x, y), maxBlockLife) | x <- [0..blockColumns - 1]
                                                , y <- [midRow], even x]
-  
+
         blockRows :: Num a => a
         blockRows = 9
 
@@ -369,13 +369,13 @@ blockDescS 10 = map (first adjustPos) allBlocks
 
 -- Level 11
 --   %%%%%%%%
--- % XX     
--- % XXXX     
--- % XXXXXX  
+-- % XX
+-- % XXXX
+-- % XXXXXX
 -- % XXXXXXXX
--- % XXXXXX  
--- % XXXX     
--- % XX     
+-- % XXXXXX
+-- % XXXX
+-- % XX
 blockDescS 11 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a, a), Int)]
@@ -383,7 +383,7 @@ blockDescS 11 = map (first adjustPos) allBlocks
                                             , x <- [0 .. (blockColumns - 1)
                                                    - (2 * abs (y - midRow))]
                     ]
-                   
+
         blockRows :: Num a => a
         blockRows = 7
 
@@ -433,7 +433,7 @@ blockDescS 13 = map (first adjustPos) allBlocks
                                                   then maxBlockLife
                                                   else maxBlockLife - 1
                                         ]
-                    
+
         blockRows :: Num a => a
         blockRows = 4
 
@@ -468,7 +468,7 @@ blockDescS 14 = map (first adjustPos) allBlocks
                                               || (y == 2)
                                               || (x == blockColumns - 3)
                                               || (y == blockRows - 3)]
-                    
+
         blockRows :: Num a => a
         blockRows = 5
 
@@ -478,14 +478,14 @@ blockDescS 14 = map (first adjustPos) allBlocks
 -- blockLife == T
 --   %%%%%%%%
 -- %  X X X
--- %  X X X 
--- %  X X X 
--- %  X X X 
+-- %  X X X
+-- %  X X X
+-- %  X X X
 -- % OXOXOXO
--- % T T T 
--- % T T T 
 -- % T T T
--- % T T T 
+-- % T T T
+-- % T T T
+-- % T T T
 blockDescS 15 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a, a), Int)]
@@ -497,7 +497,7 @@ blockDescS 15 = map (first adjustPos) allBlocks
                                                    , y <- [midRow
                                                            + 1..blockColumns - 1]
                                                    , even x]
-  
+
         blockRows :: Num a => a
         blockRows = 9
 
@@ -511,10 +511,10 @@ blockDescS 15 = map (first adjustPos) allBlocks
 --   %%%%%%%%
 -- % XXXOOXXX
 -- % XXXOOXXX
--- % 
+-- %
 -- %  T T T T
 -- % T T T T
--- % 
+-- %
 -- % XXXOOXXX
 -- % XXXOOXXX
 
@@ -555,7 +555,7 @@ blockDescS 16 = map (first adjustPos) allBlocks
 -- % T T T T
 -- %  O O O O
 -- %  O O O O
--- % 
+-- %
 -- % XXX XXXX
 blockDescS 17 = map (first adjustPos) allBlocks
 
@@ -565,7 +565,7 @@ blockDescS 17 = map (first adjustPos) allBlocks
                                       , y <- [3, 4]
                                       , odd x]
           ++ [((x, y), minBlockLife) | x <- [0..blockColumns - 1]
-                                     , y <- [1, 2, 
+                                     , y <- [1, 2,
                                              blockRows - 4, blockRows - 3]
                                      , even x ]
           ++ [((x, y), maxBlockLife) | x <- [0..blockColumns - 1]
@@ -610,4 +610,4 @@ leftMargin = 25
 -- * Auxiliary functions
 
 fI2 :: Integral a => (a, a) -> (Double, Double)
-fI2 (x, y) = (fromIntegral x, fromIntegral y)       
+fI2 (x, y) = (fromIntegral x, fromIntegral y)
