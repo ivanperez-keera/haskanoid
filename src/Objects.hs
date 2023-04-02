@@ -50,7 +50,7 @@ data ObjectKind = Ball    Double -- radius?
                 | Paddle  Size2D
                 | Block   Energy Size2D
                 | Side    Side
-  deriving (Show,Eq)
+  deriving (Show, Eq)
 
 type Energy = Int
 
@@ -69,7 +69,7 @@ isPaddle o = case objectKind o of
 
 objShape :: Object -> Shape
 objShape obj = case objectKind obj of
-    (Ball r)    -> Rectangle (p ^-^ (r,r)) (2*r, 2*r)
+    (Ball r)    -> Rectangle (p ^-^ (r, r)) (2*r, 2*r)
     (Paddle s)  -> Rectangle p s
     (Block _ s) -> Rectangle p s
     (Side   s)  -> sideToShape p s
@@ -118,7 +118,7 @@ collisionResponseObj o1 o2 =
 
         objectReacts o = collisionEnergy o > 0 || displacedOnCollision o
 
-        objectToCollision (o,s,o') =
+        objectToCollision (o, s, o') =
           ( objectName o
           , correctVel
               (objectVel o ^+^ (velTrans *^ objectVel o'))
@@ -126,7 +126,7 @@ collisionResponseObj o1 o2 =
               s
           )
 
-        correctVel (vx,vy) e TopSide    = (vx, ensurePos (vy * (-e)))
-        correctVel (vx,vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
-        correctVel (vx,vy) e LeftSide   = (ensureNeg (vx * (-e)),vy)
-        correctVel (vx,vy) e RightSide  = (ensurePos (vx * (-e)),vy)
+        correctVel (vx, vy) e TopSide    = (vx, ensurePos (vy * (-e)))
+        correctVel (vx, vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
+        correctVel (vx, vy) e LeftSide   = (ensureNeg (vx * (-e)), vy)
+        correctVel (vx, vy) e RightSide  = (ensurePos (vx * (-e)), vy)
