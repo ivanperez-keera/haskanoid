@@ -30,6 +30,7 @@ import qualified Graphics.UI.SDL.Mixer.Samples as SDL.Mixer.Samples
 import qualified Graphics.UI.SDL.Mixer.Types as SDL.Mixer.Types
 
 data Music = Music { musicName :: String, unMusic :: SDL.Mixer.Types.Music }
+
 data Audio = Audio { audioName :: String, unAudio :: SDL.Mixer.Types.Chunk }
 
 -- | Initialize the audio subsystem.
