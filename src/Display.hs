@@ -1,4 +1,9 @@
--- | Audio and video renderer.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Audio and video renderer.
 module Display where
 
 import Control.Applicative ((<$>))
