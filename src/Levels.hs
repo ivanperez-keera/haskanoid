@@ -167,8 +167,6 @@ blockDescS 0 = map (first adjustPos) allBlocks
         blockRows :: Num a => a
         blockRows = 4
 
-
-
 -- Level 1
 --   %%%%%%%%
 -- %    XXXX
@@ -219,7 +217,6 @@ blockDescS 3 = map (first adjustPos) allBlocks
 
         blockRows :: Num a => a
         blockRows = 4
-
 
 -- Level 4
 --   %%%%%%%%
@@ -275,7 +272,6 @@ blockDescS 6 = map (first adjustPos) allBlocks
 
         blockRows :: Num a => a
         blockRows = 5
-
 
 -- Level 7
 --   %%%%%%%%
@@ -345,7 +341,6 @@ blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
         leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
           where round' = fromIntegral . floor
 
-
 -- Level 10
 --   %%%%%%%%
 -- %  X X X
@@ -371,8 +366,6 @@ blockDescS 10 = map (first adjustPos) allBlocks
         midRow :: Integral a => a
         midRow = blockRows `div` 2
 
-
-
 -- Level 11
 --   %%%%%%%%
 -- % XX     
@@ -390,7 +383,6 @@ blockDescS 11 = map (first adjustPos) allBlocks
                                                   - (2 * abs (y - midRow))]
                     ]
                    
-
         blockRows :: Num a => a
         blockRows = 7
 
@@ -479,7 +471,6 @@ blockDescS 14 = map (first adjustPos) allBlocks
         blockRows :: Num a => a
         blockRows = 5
 
-
 -- Level 15
 -- maxBlockLife == X
 -- minBlockLife == O
@@ -512,7 +503,6 @@ blockDescS 15 = map (first adjustPos) allBlocks
         midRow :: Integral a => a
         midRow = blockRows `div` 2
 
-
 -- Level 16
 -- maxBlockLife == X
 -- minBlockLife == O
@@ -542,7 +532,6 @@ blockDescS 16 = map (first adjustPos) allBlocks
                                     , y <- [0, 1,
                                             blockRows - 2, blockRows - 1]
                                     , x /= midColumn - 1, x /= midColumn]
-
 
         blockRows :: Num a => a
         blockRows = 8
@@ -587,8 +576,6 @@ blockDescS 17 = map (first adjustPos) allBlocks
 
         midColumn :: Integral a => a
         midColumn = blockColumns `div` 2
-
-
 
 blockDescS _ = error "No more levels"
 
