@@ -1,10 +1,13 @@
--- | A layer of abstraction on top of SDL audio.
+-- |
+-- Copyright  : (c) Keera Studios, 2010-2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- A layer of abstraction on top of SDL audio.
 --
 -- It plays audio soundfx asynchronously (in a new thread), which means that
 -- programs must be compiled with the threaded Runtime System (ghc flag is
 -- -threaded).
---
--- This module is 2010-2014 (c) Keera Studios, redistributed with permission.
 module Audio
     (Music(..),
      Audio(..),
