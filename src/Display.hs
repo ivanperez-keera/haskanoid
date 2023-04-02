@@ -52,7 +52,7 @@ initGraphs = do
 
 -- * Rendering and Sound
 
--- | Loads new resources, renders the game state using SDL, and adjusts music. 
+-- | Loads new resources, renders the game state using SDL, and adjusts music.
 render :: ResourceMgr -> GameState -> IO()
 render resourceManager shownState = do
   resources <- loadNewResources resourceManager shownState
@@ -65,7 +65,7 @@ audio :: Resources -> GameState -> IO()
 audio resources shownState = do
   -- Start bg music if necessary
   playing <- musicPlaying
-  unless playing $ awhen (bgMusic resources) playMusic 
+  unless playing $ awhen (bgMusic resources) playMusic
 
   -- Play object hits
   mapM_ (audioObject resources) $ gameObjects shownState
@@ -79,7 +79,7 @@ audioObject resources object = when (objectHit object) $
 -- ** Painting
 
 display :: Resources -> GameState -> IO()
-display resources shownState = do 
+display resources shownState = do
   -- Obtain surface
   screen <- getVideoSurface
 
@@ -108,7 +108,8 @@ display resources shownState = do
                32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintGeneralMsg surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
-  let rect = SDL.Rect (round gameLeft) (round gameTop) (round gameWidth) (round gameHeight)
+  let rect = SDL.Rect (round gameLeft)  (round gameTop)
+                      (round gameWidth) (round gameHeight)
   SDL.blitSurface surface Nothing screen $ Just rect
 
   -- Double buffering
@@ -123,11 +124,15 @@ paintGeneral screen resources over = void $ do
   paintGeneralHUD screen resources over
 
 paintGeneralMsg :: Surface -> Resources -> GameStatus -> IO ()
-paintGeneralMsg screen resources GamePlaying     = return ()
-paintGeneralMsg screen resources GamePaused      = paintGeneralMsg' screen resources "Paused"
-paintGeneralMsg screen resources (GameLoading n) = paintGeneralMsg' screen resources ("Level " ++ show n)
-paintGeneralMsg screen resources GameOver        = paintGeneralMsg' screen resources "GAME OVER!!!"
-paintGeneralMsg screen resources GameFinished    = paintGeneralMsg' screen resources "You won!!! Well done :)"
+paintGeneralMsg screen resources GamePlaying = return ()
+paintGeneralMsg screen resources GamePaused =
+  paintGeneralMsg' screen resources "Paused"
+paintGeneralMsg screen resources (GameLoading n) =
+  paintGeneralMsg' screen resources ("Level " ++ show n)
+paintGeneralMsg screen resources GameOver =
+  paintGeneralMsg' screen resources "GAME OVER!!!"
+paintGeneralMsg screen resources GameFinished =
+  paintGeneralMsg' screen resources "You won!!! Well done :)"
 
 paintGeneralMsg' :: Surface -> Resources -> String -> IO ()
 paintGeneralMsg' screen resources msg = void $ do
@@ -142,38 +147,54 @@ paintGeneralMsg' screen resources msg = void $ do
 paintGeneralHUD :: Surface -> Resources -> GameInfo -> IO ()
 paintGeneralHUD screen resources over = void $ do
   let font = unFont $ resFont resources
-  message1 <- TTF.renderTextSolid font ("Level: " ++ show (gameLevel over)) (SDL.Color 128 128 128)
+  message1 <- TTF.renderTextSolid font
+                                  ("Level: " ++ show (gameLevel over))
+                                  (SDL.Color 128 128 128)
   let w1 = SDL.surfaceGetWidth  message1
       h1 = SDL.surfaceGetHeight message1
   SDL.blitSurface message1 Nothing screen $ Just (SDL.Rect 10 10 w1 h1)
-  message2 <- TTF.renderTextSolid font ("Points: " ++ show (gamePoints over)) (SDL.Color 128 128 128)
+  message2 <- TTF.renderTextSolid font
+                                  ("Points: " ++ show (gamePoints over))
+                                  (SDL.Color 128 128 128)
   let w2 = SDL.surfaceGetWidth  message2
       h2 = SDL.surfaceGetHeight message2
-  SDL.blitSurface message2 Nothing screen $ Just (SDL.Rect 10 (10 + h2 + 5) w2 h2)
-  message3 <- TTF.renderTextSolid font ("Lives: " ++ show (gameLives over)) (SDL.Color 128 128 128)
+  SDL.blitSurface message2 Nothing screen $
+    Just (SDL.Rect 10 (10 + h2 + 5) w2 h2)
+  message3 <- TTF.renderTextSolid font
+                                  ("Lives: " ++ show (gameLives over))
+                                  (SDL.Color 128 128 128)
   let rightMargin = SDL.surfaceGetWidth screen
       w2 = SDL.surfaceGetWidth  message3
       h2 = SDL.surfaceGetHeight message3
-  SDL.blitSurface message3 Nothing screen $ Just (SDL.Rect (rightMargin - 10 - w2) 10 w2 h2)
+  SDL.blitSurface message3 Nothing screen $
+    Just (SDL.Rect (rightMargin - 10 - w2) 10 w2 h2)
 
 -- | Paints a game object on a surface.
 paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
     case objectKind object of
       (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
-                                   t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                   setColorKey bI [SrcColorKey, RLEAccel] t 
-                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
+                                   t <- mapRGB
+                                          (surfaceGetPixelFormat bI) 0 255 0
+                                   setColorKey bI [SrcColorKey, RLEAccel] t
+                                   SDL.blitSurface bI Nothing screen $
+                                     Just (SDL.Rect x y (round w) (round h))
       (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
-                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
+                                   SDL.blitSurface bI Nothing screen $
+                                     Just (SDL.Rect x y (round w) (round h))
       (Ball r)        -> void $ do let x' = x - round r
                                        y' = y - round r
                                        sz = round (2*r)
-                                   -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
+                                   -- b <- convertSurface
+                                   --        (imgSurface $ ballImg resources)
+                                   --        (format)
+                                   --        []
                                    let bI = imgSurface $ ballImg resources
-                                   t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                   setColorKey bI [SrcColorKey, RLEAccel] t 
-                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
+                                   t <- mapRGB
+                                          (surfaceGetPixelFormat bI) 0 255 0
+                                   setColorKey bI [SrcColorKey, RLEAccel] t
+                                   SDL.blitSurface bI Nothing screen $
+                                     Just (SDL.Rect x' y' sz sz)
       _              -> return ()
   where format = surfaceGetPixelFormat screen
         p      = objectPos object
@@ -212,19 +233,20 @@ data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 -- This function is ad-hoc in two senses: first, because it
 -- has the paths to the files hard-coded inside. And second,
 -- because it loads the specific resources that are needed,
--- not a general 
+-- not a general
 --
 loadResources :: IO (Maybe ResourceMgr)
 loadResources = runMaybeT $ do
   -- Font initialization
   ttfOk <- lift TTF.init
-  
+
   gameFont <- liftIO $ getDataFileName "data/lacuna.ttf"
   -- Load the fonts we need
   font  <- liftIO $ TTF.tryOpenFont gameFont 32 -- What does the 32 do?
   let myFont = fmap (Font gameFont) font
 
-  blockHit <- liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
+  blockHit <-
+    liftIO $ loadAudio =<< getDataFileName "data/196106_aiwha_ding-cc-by.wav"
 
   -- bgM <- liftIO $ loadMusic "Ckotty_-_Game_Loop_11.ogg"
   -- bgM <- liftIO $ loadMusic "data/level0.mp3"
@@ -252,10 +274,14 @@ loadResources = runMaybeT $ do
 
   -- Return Nothing or embed in Resources
   res <- case (myFont, blockHit) of
-           (Just f, Just b) -> let 
-                               in return (Resources f b Nothing ball b1 b2 b3 paddle Nothing)
-           _                        -> do liftIO $ putStrLn "Some resources could not be loaded"
-                                          mzero
+           (Just f, Just b) -> return $
+                                 Resources f    b      Nothing
+                                           ball b1     b2
+                                           b3   paddle Nothing
+           _                -> do liftIO $
+                                    putStrLn
+                                      "Some resources could not be loaded"
+                                  mzero
 
   liftIO $ ResourceMgr <$>
     newIORef (ResourceManager GameStarted res)
@@ -271,7 +297,7 @@ loadNewResources mgr state = do
   newResources <- case newState of
                     (GameLoading _) | newState /= oldState
                                     -> updateAllResources oldResources newState
-                    _               -> return oldResources 
+                    _               -> return oldResources
 
   let manager' = ResourceManager { lastKnownStatus = newState
                                  , resources       = newResources
@@ -295,7 +321,8 @@ updateAllResources res (GameLoading n) = do
                         -- with the old music
                         bgM <- loadMusic newMusicFP
                         if isNothing bgM
-                          then do putStrLn $ "Could not load resource " ++ newMusicFP
+                          then do putStrLn $
+                                    "Could not load resource " ++ newMusicFP
                                   return oldMusic
                           else do stopMusic
                                   return bgM
