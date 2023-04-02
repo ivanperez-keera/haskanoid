@@ -69,4 +69,3 @@ extractObjects = arr (fmap outputObject)
 
 -- | A list of object outputs
 type ObjectOutputs = [ObjectOutput]
-
