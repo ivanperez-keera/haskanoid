@@ -72,7 +72,8 @@ detectCollisions''' m o
 --   -- expected to work. Does it work well for non-linear equations?
 --   --
 --   -- Integral only for dt interval
---   actualVel <- iterFrom (\_ (v1,v2) dt _ -> (v1 * dt, v2 * dt)) (0,0) -< objectVel o
+--   actualVel <- iterFrom (\_ (v1,v2) dt _ -> (v1 * dt, v2 * dt)) (0,0)
+--                  -< objectVel o
 -- 
 --   -- Update position
 --   let newPos = objectPos o ^+^ actualVel
