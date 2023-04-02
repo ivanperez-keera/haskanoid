@@ -9,15 +9,15 @@
 -- programs must be compiled with the threaded Runtime System (ghc flag is
 -- -threaded).
 module Audio
-    (Music(..),
-     Audio(..),
-     initAudio,
-     loadAudio,
-     loadMusic,
-     playMusic,
-     playFile,
-     stopMusic,
-     musicPlaying) where
+    ( Music(..)
+    , Audio(..)
+    , initAudio
+    , loadAudio
+    , loadMusic
+    , playMusic
+    , playFile
+    , stopMusic
+    , musicPlaying) where
 
 -- External imports
 import Control.Applicative ((<$>))
