@@ -13,7 +13,7 @@ data ResourceSpec = ResourceSpec
   , audio  :: [AudioResource]
   }
 
-type FontResource  = Resource
+type FontResource = Resource
 
 type ImageResource = Resource
 
