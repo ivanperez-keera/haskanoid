@@ -41,19 +41,19 @@ import Graphics.UI.SDL as SDL
 
 -- External imports (Wiimote)
 #ifdef wiimote
+import Control.Monad        (void)
 import Control.Monad.IfElse (awhen)
-import Control.Monad(void)
-import Data.Maybe (fromMaybe)
+import Data.Maybe           (fromMaybe)
 import System.CWiid
 #endif
 
 -- External imports (Kinect)
 #ifdef kinect
-import Control.Concurrent
-import Data.Vector.Storable (Vector, (!))
+import           Control.Concurrent
+import           Data.Vector.Storable (Vector, (!))
 import qualified Data.Vector.Storable as V
-import Data.Word
-import Freenect
+import           Data.Word
+import           Freenect
 #endif
 
 -- Internal imports
