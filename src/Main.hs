@@ -4,10 +4,10 @@ import Control.Monad.IfElse
 import FRP.Yampa as Yampa
 
 -- Internal imports
-import Game
 import Display
-import Input
+import Game
 import Graphics.UI.Extra.SDL
+import Input
 
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()
