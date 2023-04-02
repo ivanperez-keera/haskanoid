@@ -143,7 +143,7 @@ initializeWiimote :: ControllerDev
 initializeWiimote = do
   putStrLn "Initializing WiiMote. Please press 1+2 to connect."
   wm <- cwiidOpen
-  awhen wm (void . (`cwiidSetRptMode` 15)) -- Enable button reception, acc and IR
+  awhen wm (void . (`cwiidSetRptMode` 15)) -- Enable button reception, acc, IR
   case wm of
     Nothing -> return Nothing
     Just wm' -> return $ Just $ senseWiimote wm'
@@ -186,7 +186,9 @@ senseWiimote wmdev controller = do
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
   --     isRight = cwiidIsBtnPushed flags cwiidBtnRight 
   --     (x,y)   = controllerPos controller
-  --     x'      = if isLeft then x - wiiXDiff else if isRight then x + wiiXDiff else x
+  --     x'      | isLeft    = x - wiiXDiff
+  --             | isRight   = x + wiiXDiff
+  --             | otherwise = x
   --     x''     = inRange (0, gameWidth) x' 
   --     pos'    = (x'', y)
   -- wiiXDiff :: Float
@@ -226,14 +228,21 @@ sdlGetController info =
 handleEvent :: Controller -> SDL.Event -> Controller
 handleEvent c e =
   case e of
-    MouseMotion x y _ _                      -> c { controllerPos   = (fromIntegral x, fromIntegral y)}
-    MouseButtonDown _ _ ButtonLeft           -> c { controllerClick = True }
-    MouseButtonUp   _ _ ButtonLeft           -> c { controllerClick = False} 
-    KeyUp Keysym { symKey = SDLK_p }         -> c { controllerPause = not (controllerPause c) }
-    KeyDown Keysym { symKey = SDLK_SPACE }   -> c { controllerClick = True  }
-    KeyUp Keysym { symKey = SDLK_SPACE }     -> c { controllerClick = False }
-    KeyDown Keysym { symKey = SDLK_q }       -> c { controllerQuit  = True  }
-    _                                        -> c
+    MouseMotion x y _ _ ->
+      c { controllerPos = (fromIntegral x, fromIntegral y)}
+    MouseButtonDown _ _ ButtonLeft ->
+      c { controllerClick = True }
+    MouseButtonUp _ _ ButtonLeft ->
+      c { controllerClick = False}
+    KeyUp Keysym { symKey = SDLK_p } ->
+      c { controllerPause = not (controllerPause c) }
+    KeyDown Keysym { symKey = SDLK_SPACE } ->
+      c { controllerClick = True  }
+    KeyUp Keysym { symKey = SDLK_SPACE } ->
+      c { controllerClick = False }
+    KeyDown Keysym { symKey = SDLK_q } ->
+      c { controllerQuit  = True  }
+    _ -> c
 
 
 -- Kinect
@@ -292,7 +301,9 @@ updatePos lastPosRef newPos@(nx,ny) = do
   writeIORef lastPosRef (Just (mx, my))
   mx `seq` my `seq` return ()
 
-calculateMousePos :: (Double, Double) -> Vector Word16 -> Maybe (Double, Double) 
+calculateMousePos :: (Double, Double)
+                  -> Vector Word16
+                  -> Maybe (Double, Double)
 calculateMousePos (width, height) payload =
     fmap g (findFirst payload)
   where g (px,py) = (mousex, mousey)
@@ -305,8 +316,10 @@ calculateMousePos (width, height) payload =
             adjy     = height / 470.0
 
 mat :: Vector Float
-mat = V.generate 2048 (\i -> let v :: Float
-                                 v = ((fromIntegral i/2048.0)^3)*6.0 in v * 6.0 * 256.0)
+mat = V.generate 2048 $ \i ->
+  let v :: Float
+      v = ((fromIntegral i/2048.0)^3)*6.0
+  in v * 6.0 * 256.0
 
 findFirst :: Vector Word16 -> Maybe (Int, Int)
 findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
