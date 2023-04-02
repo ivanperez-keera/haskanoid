@@ -245,7 +245,6 @@ composeGameState' lives level pts = proc (oos,dead,points) -> do
 
   returnA -< (general, lastGeneral)
 
-
 -- ** Game with partial state information
 
 -- | Given an initial list of objects, it runs the game, presenting the output
@@ -331,8 +330,6 @@ gamePlay' objs = loopPre ([],[],0) $
             hasBall     = any ((=="ball").fst)
             countBlocks = length . filter (isPrefixOf "block" . fst)
 
-
-
 -- * Game objects
 --
 -- | Objects initially present: the walls, the ball, the paddle and the blocks.
@@ -347,7 +344,6 @@ initialObjects level = listToIL $
   ]
   ++ map (\p -> objBlock p (blockWidth, blockHeight))
          (blockCfgs $ levels!!level)
-
 
 -- *** Ball
 
