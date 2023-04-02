@@ -19,7 +19,7 @@ import Physics.TwoDimensions.Physics
 
 -- | Collision side of a rectangle
 data Side = TopSide | BottomSide | LeftSide | RightSide
-  deriving (Eq,Show)
+  deriving (Eq, Show)
 
 -- | Opposite side during a collision.
 --
@@ -39,7 +39,7 @@ shapeCollisionSide (Rectangle p1 s1) (Rectangle p2 s2)
     | wy > hx             = LeftSide
     | wy > -hx            = RightSide
     | otherwise           = BottomSide
-  where (dx,dy) = (p1 ^+^ (0.5 *^ s1)) ^-^ (p2 ^+^ (0.5 *^ s2)) -- p1 ^-^ p2
-        (w,h)   = 0.5 *^ (s1 ^+^ s2)
-        wy      = w * dy
-        hx      = h * dx
+  where (dx, dy) = (p1 ^+^ (0.5 *^ s1)) ^-^ (p2 ^+^ (0.5 *^ s2)) -- p1 ^-^ p2
+        (w, h)   = 0.5 *^ (s1 ^+^ s2)
+        wy       = w * dy
+        hx       = h * dx
