@@ -73,14 +73,17 @@ objShape obj = case objectKind obj of
     (Paddle s)  -> Rectangle p s
     (Block _ s) -> Rectangle p s
     (Side   s)  -> sideToShape p s
-  where p = objectPos obj
-        width'  = gameWidth
-        height' = gameHeight
-        d = collisionErrorMargin
-        sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2 * d, d)
-        sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2 * d)
-        sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2 * d)
-        sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2 * d, d)
+
+  where
+
+    p = objectPos obj
+    width'  = gameWidth
+    height' = gameHeight
+    d = collisionErrorMargin
+    sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2 * d, d)
+    sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2 * d)
+    sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2 * d)
+    sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2 * d, d)
 
 -- * Collisions
 type Collisions = [Collision]
@@ -113,20 +116,23 @@ collisionResponseObj :: Object -> Object -> Collision
 collisionResponseObj o1 o2 =
     Collision $
       map objectToCollision [(o1, side, o2), (o2, side', o1)]
-  where side  = collisionSide o1 o2
-        side' = oppositeSide side
 
-        objectReacts o = collisionEnergy o > 0 || displacedOnCollision o
+  where
 
-        objectToCollision (o, s, o') =
-          ( objectName o
-          , correctVel
-              (objectVel o ^+^ (velTrans *^ objectVel o'))
-              (collisionEnergy o)
-              s
-          )
+    side  = collisionSide o1 o2
+    side' = oppositeSide side
 
-        correctVel (vx, vy) e TopSide    = (vx, ensurePos (vy * (-e)))
-        correctVel (vx, vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
-        correctVel (vx, vy) e LeftSide   = (ensureNeg (vx * (-e)), vy)
-        correctVel (vx, vy) e RightSide  = (ensurePos (vx * (-e)), vy)
+    objectReacts o = collisionEnergy o > 0 || displacedOnCollision o
+
+    objectToCollision (o, s, o') =
+      ( objectName o
+      , correctVel
+          (objectVel o ^+^ (velTrans *^ objectVel o'))
+          (collisionEnergy o)
+          s
+      )
+
+    correctVel (vx, vy) e TopSide    = (vx, ensurePos (vy * (-e)))
+    correctVel (vx, vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
+    correctVel (vx, vy) e LeftSide   = (ensureNeg (vx * (-e)), vy)
+    correctVel (vx, vy) e RightSide  = (ensurePos (vx * (-e)), vy)
