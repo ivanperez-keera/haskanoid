@@ -164,8 +164,8 @@ senseWiimote wmdev controller = do
 
   -- Obtain positions of leds 1 and 2 (with a normal wii bar, those
   -- will be the ones we use).
-  let led1   = irs !! 0
-      led2   = irs !! 1
+  let led1 = irs !! 0
+      led2 = irs !! 1
 
   -- Calculate mid point between sensor bar leds
   let posX = ((cwiidIRSrcPosX led1) + (cwiidIRSrcPosX led2)) `div` 2
@@ -176,8 +176,8 @@ senseWiimote wmdev controller = do
       propY = fromIntegral (max 0 (posY - 384)) / 384.0
 
   -- Calculate game area coordinates
-  let finX  = width  * propX
-      finY  = height * propY
+  let finX = width  * propX
+      finY = height * propY
 
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
@@ -319,7 +319,7 @@ mat = V.generate 2048 $ \i ->
 
 findFirst :: Vector Word16 -> Maybe (Int, Int)
 findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
-  where i  = V.findIndex (\x -> mat ! (fromIntegral x) < 512) vs
+  where i = V.findIndex (\x -> mat ! (fromIntegral x) < 512) vs
 
 processPayload :: Vector Word16 -> [(Float, Int, Int)]
 processPayload ps = [(pval, tx, ty) | i <- [0 .. 640 * 480 - 1]
@@ -341,5 +341,4 @@ adjust maxD old new
   | abs (old - new) < maxD = new
   | old < new              = old + maxD
   | otherwise              = old - maxD
-
 #endif
