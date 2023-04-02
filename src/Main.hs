@@ -1,7 +1,7 @@
 -- External imports
-import Control.Applicative ((<$>))
+import Control.Applicative  ((<$>))
 import Control.Monad.IfElse
-import FRP.Yampa as Yampa
+import FRP.Yampa            as Yampa
 
 -- Internal imports
 import Display
