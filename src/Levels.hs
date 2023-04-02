@@ -17,7 +17,7 @@
 module Levels where
 
 -- External imports
-import Control.Arrow ((***), first)
+import Control.Arrow (first, (***))
 import Data.List (nub)
 
 -- Internal imports
