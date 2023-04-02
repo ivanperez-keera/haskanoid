@@ -14,16 +14,19 @@ import Physics.TwoDimensions.Dimensions
 
 width :: Double
 width  = 640
+
 height :: Double
 height = 600
 
 gameTop    :: Double
 gameTop    = 100
+
 gameLeft   :: Double
 gameLeft   = 0
 
 gameWidth :: Double
 gameWidth = width
+
 gameHeight :: Double
 gameHeight = height - gameTop
 
@@ -33,20 +36,27 @@ loadingDelay = 2 -- seconds
 paddleWidth, paddleHeight :: Double
 paddleWidth  = 104
 paddleHeight = 24
+
 paddleMargin :: Double
 paddleMargin = 50
+
 ballWidth, ballHeight :: Double
 ballWidth    = 10
 ballHeight   = 10
+
 ballMargin :: Double
 ballMargin   = 30
+
 blockWidth, blockHeight :: Double
 blockWidth   = 64
 blockHeight  = 32
+
 blockSeparation :: Double
 blockSeparation = 10
+
 maxBlockLife :: Int
 maxBlockLife = 3
+
 minBlockLife :: Int
 minBlockLife = 1
 
