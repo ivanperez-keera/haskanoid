@@ -16,10 +16,12 @@
 -- Together they form 'levels'.
 module Levels where
 
+-- External imports
 import Control.Arrow ((***), first)
 import Data.List (nub)
-import Physics.TwoDimensions.Dimensions
 
+-- Internal imports
+import Physics.TwoDimensions.Dimensions
 import Constants
 import Resources
 
