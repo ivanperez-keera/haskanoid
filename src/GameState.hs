@@ -15,6 +15,7 @@ module GameState where
 
 -- import FRP.Yampa as Yampa
 
+-- Internal imports
 import Objects
 
 -- | The running state is given by a bunch of 'Objects' and the current general
