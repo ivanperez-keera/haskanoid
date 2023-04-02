@@ -14,18 +14,18 @@ import FRP.Yampa
 
 -- holdWhen behaves normally, outputting only the b, when the second value
 -- is false, and it holds the last known value when the value is True. 
-holdWhen :: b -> SF a (b,Bool) -> SF a b
+holdWhen :: b -> SF a (b, Bool) -> SF a b
 holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
-  where holdOutput = arr (\(b,discard) -> if discard then noEvent else Event b)
+  where holdOutput = arr (\(b, discard) -> if discard then noEvent else Event b)
 
 -- Given an occasional producer of functions and a source of info, apply the
 -- functions when they exist
 mergeApply :: SF a b -> SF a (Event (b -> b)) -> SF a b
 mergeApply sf1 sf2 =
-  (sf1 &&& sf2) >>> (arr (\(b,ef) -> event b ($ b) ef))
+  (sf1 &&& sf2) >>> (arr (\(b, ef) -> event b ($ b) ef))
 
 mergeApply' :: SF a (b, Event (b -> b)) -> SF a b
-mergeApply' sf1 = sf1 >>> (arr (\(b,ef) -> event b ($ b) ef))
+mergeApply' sf1 = sf1 >>> (arr (\(b, ef) -> event b ($ b) ef))
 
 rRestart :: SF a (b, Event c) -> SF a b
 rRestart sf = r
