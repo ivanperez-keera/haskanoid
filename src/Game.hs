@@ -234,7 +234,7 @@ composeGameState lives level pts = futureDSwitch
 composeGameState' :: Int -> Int -> Int
                   -> SF (ObjectOutputs, Event (), Int)
                         (GameState, Event GameState)
-composeGameState' lives level pts = proc (oos,dead,points) -> do
+composeGameState' lives level pts = proc (oos, dead, points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
   let general = GameState objects
@@ -263,7 +263,7 @@ composeGameState' lives level pts = proc (oos,dead,points) -> do
 --    - The last known points (added to the new ones in every loop iteration).
 --
 gamePlay' :: ObjectSFs -> SF Controller (ObjectOutputs, Event (), Int)
-gamePlay' objs = loopPre ([],[],0) $
+gamePlay' objs = loopPre ([], [], 0) $
     -- Process physical movement and detect new collisions
     ( ( adaptInput
           >>> processMovement
@@ -273,24 +273,24 @@ gamePlay' objs = loopPre ([],[],0) $
     )
 
     -- Adds the old point count to the newly-made points
-    >>> (arr fst &&& arr (\((_,cs),o) -> o + countPoints cs))
+    >>> (arr fst &&& arr (\((_, cs), o) -> o + countPoints cs))
 
     -- Re-arrange output, selecting
     -- (objects+dead+points, objects+collisions+points)
-    >>> (composeOutput &&& arr (\((x,y),z) -> (x,y,z)))
+    >>> (composeOutput &&& arr (\((x, y), z) -> (x, y, z)))
 
   where
 
     -- Detect collisions between the ball and the bottom
     -- which are the only ones that matter outside gamePlay'
-    composeOutput = proc ((x,y),z) -> do
+    composeOutput = proc ((x, y), z) -> do
       y' <- collisionWithBottom -< y
-      returnA -< (x,y',z)
+      returnA -< (x, y', z)
 
     -- Just reorder the input
     adaptInput :: SF (Controller, (ObjectOutputs, Collisions, Int)) ObjectInput
     adaptInput =
-      arr (\(gi,(os,cs,pts)) -> ObjectInput gi cs (map outputObject os))
+      arr (\(gi, (os, cs, pts)) -> ObjectInput gi cs (map outputObject os))
 
     -- Parallely apply all object functions
     processMovement :: SF ObjectInput (IL ObjectOutput)
@@ -305,7 +305,7 @@ gamePlay' objs = loopPre ([],[],0) $
                                              -- (with new state, aka. sfs).
 
     suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
-    suicidalSect (_,oos) =
+    suicidalSect (_, oos) =
         -- Turn every event carrying a function that transforms the object
         -- signal function list into one function that performs all the efects
         -- in sequence
@@ -315,7 +315,7 @@ gamePlay' objs = loopPre ([],[],0) $
       -- removes it from the list
       where es :: [Event (IL ObjectSF -> IL ObjectSF)]
             es = [ harakiri oo `tag` deleteIL k
-                 | (k,oo) <- assocsIL oos ]
+                 | (k, oo) <- assocsIL oos ]
 
     -- From the actual objects, detect which ones collide
     detectObjectCollisions :: SF (IL ObjectOutput) Collisions
@@ -534,10 +534,10 @@ objPaddle = proc (ObjectInput ci cs os) -> do
 
   returnA -< livingObject $
                Object{ objectName           = name
-                     , objectKind           = Paddle (paddleWidth,paddleHeight)
+                     , objectKind           = Paddle (paddleWidth, paddleHeight)
                      , objectPos            = p
-                     , objectVel            = (0,0)
-                     , objectAcc            = (0,0)
+                     , objectVel            = (0, 0)
+                     , objectAcc            = (0, 0)
                      , objectDead           = False
                      , objectHit            = isHit
                      , canCauseCollisions   = True
@@ -565,10 +565,10 @@ yPosPaddle = gameHeight - paddleMargin
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
 objBlock :: (Pos2D, Int) -> Size2D -> ObjectSF
-objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
+objBlock ((x, y), initlives) (w, h) = proc (ObjectInput ci cs os) -> do
 
   -- Detect collisions
-  let name  = "blockat" ++ show (x,y)
+  let name  = "blockat" ++ show (x, y)
       isHit = inCollision name cs
   hit   <- edge -< isHit
 
@@ -591,9 +591,9 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
   returnA -< ObjectOutput
                Object{ objectName           = name
                      , objectKind           = Block lives (w, h)
-                     , objectPos            = (x,y)
-                     , objectVel            = (0,0)
-                     , objectAcc            = (0,0)
+                     , objectPos            = (x, y)
+                     , objectVel            = (0, 0)
+                     , objectAcc            = (0, 0)
                      , objectDead           = isDead
                      , objectHit            = isHit
                      , canCauseCollisions   = False
@@ -638,8 +638,8 @@ objWall name side pos = proc (ObjectInput ci cs os) -> do
                Object { objectName           = name
                       , objectKind           = Side side
                       , objectPos            = pos
-                      , objectVel            = (0,0)
-                      , objectAcc            = (0,0)
+                      , objectVel            = (0, 0)
+                      , objectAcc            = (0, 0)
                       , objectDead           = False
                       , objectHit            = isHit
                       , canCauseCollisions   = False
