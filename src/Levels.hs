@@ -1,4 +1,9 @@
--- | Level definition
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Level definition
 --
 -- This module includes the definition of the levels.
 --
