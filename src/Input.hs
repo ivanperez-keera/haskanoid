@@ -1,7 +1,11 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE CPP                       #-}
--- | Defines an abstraction for the game controller and the functions to read
--- it.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Defines an abstraction for the game controller and the functions to read it.
 --
 -- Lower-level devices replicate the higher-level API, and should accomodate to
 -- it. Each device should:
