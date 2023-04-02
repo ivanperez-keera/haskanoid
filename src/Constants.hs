@@ -6,7 +6,10 @@
 -- Game constants.
 module Constants where
 
+-- External imports
 import FRP.Yampa
+
+-- Internal imports
 import Physics.TwoDimensions.Dimensions
 
 width :: Double
