@@ -69,7 +69,7 @@ isPaddle o = case objectKind o of
 
 objShape :: Object -> Shape
 objShape obj = case objectKind obj of
-    (Ball r)    -> Rectangle (p ^-^ (r, r)) (2*r, 2*r)
+    (Ball r)    -> Rectangle (p ^-^ (r, r)) (2 * r, 2 * r)
     (Paddle s)  -> Rectangle p s
     (Block _ s) -> Rectangle p s
     (Side   s)  -> sideToShape p s
@@ -77,10 +77,10 @@ objShape obj = case objectKind obj of
         width'  = gameWidth
         height' = gameHeight
         d = collisionErrorMargin
-        sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2*d, d)
-        sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2*d)
-        sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2*d)
-        sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2*d, d)
+        sideToShape p TopSide    = Rectangle (p ^-^ (d, d)) (width' + 2 * d, d)
+        sideToShape p LeftSide   = Rectangle (p ^-^ (d, d)) (d, height' + 2 * d)
+        sideToShape p RightSide  = Rectangle (p ^-^ (0, d)) (d, height' + 2 * d)
+        sideToShape p BottomSide = Rectangle (p ^-^ (d, 0)) (width' + 2 * d, d)
 
 -- * Collisions
 type Collisions = [Collision]
