@@ -94,8 +94,8 @@ display resources shownState = do
     SDL.blitSurface bg Nothing screen $ Just rectBg
 
   hud <- createRGBSurface [SWSurface]
-             (round width) (round gameTop)
-             32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
+           (round width) (round gameTop)
+           32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintGeneral hud resources (gameInfo shownState)
   let rectHud = SDL.Rect 0 0 (round width) (round gameTop)
   SDL.blitSurface hud Nothing screen $ Just rectHud
@@ -104,8 +104,8 @@ display resources shownState = do
   -- The 32 is important because we are using Word32 for the masks
   -- FIXME: Should I use HWSurface and possibly other flags (alpha?)?
   surface <- createRGBSurface [SWSurface]
-             (round gameWidth) (round gameHeight)
-             32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
+               (round gameWidth) (round gameHeight)
+               32 0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
   paintGeneralMsg surface resources (gameStatus (gameInfo shownState))
   mapM_ (paintObject resources surface) $ gameObjects shownState
   let rect = SDL.Rect (round gameLeft) (round gameTop) (round gameWidth) (round gameHeight)
@@ -159,22 +159,22 @@ paintGeneralHUD screen resources over = void $ do
 -- | Paints a game object on a surface.
 paintObject :: Resources -> Surface -> Object -> IO ()
 paintObject resources screen object =
-  case objectKind object of
-    (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                 setColorKey bI [SrcColorKey, RLEAccel] t 
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
-    (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
-    (Ball r)        -> void $ do let x' = x - round r
-                                     y' = y - round r
-                                     sz = round (2*r)
-                                 -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
-                                 let bI = imgSurface $ ballImg resources
-                                 t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
-                                 setColorKey bI [SrcColorKey, RLEAccel] t 
-                                 SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
-    _              -> return ()
+    case objectKind object of
+      (Paddle (w,h))  -> void $ do let bI = imgSurface $ paddleImg resources
+                                   t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
+                                   setColorKey bI [SrcColorKey, RLEAccel] t 
+                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
+      (Block e (w,h)) -> void $ do let bI = imgSurface $ blockImage e
+                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x y (round w) (round h))
+      (Ball r)        -> void $ do let x' = x - round r
+                                       y' = y - round r
+                                       sz = round (2*r)
+                                   -- b <- convertSurface (imgSurface $ ballImg resources) (format) []
+                                   let bI = imgSurface $ ballImg resources
+                                   t <- mapRGB (surfaceGetPixelFormat bI) 0 255 0 
+                                   setColorKey bI [SrcColorKey, RLEAccel] t 
+                                   SDL.blitSurface bI Nothing screen $ Just (SDL.Rect x' y' sz sz)
+      _              -> return ()
   where format = surfaceGetPixelFormat screen
         p      = objectPos object
         x      = round (fst p)
@@ -290,15 +290,15 @@ updateAllResources res (GameLoading n) = do
       oldMusicFP = maybe "" musicName oldMusic
 
   newMusic <- if oldMusicFP == newMusicFP
-              then return oldMusic
-              else do -- Loading can fail, in which case we continue
-                      -- with the old music
-                      bgM <- loadMusic newMusicFP
-                      if isNothing bgM
-                       then do putStrLn $ "Could not load resource " ++ newMusicFP
-                               return oldMusic
-                       else do stopMusic
-                               return bgM
+                then return oldMusic
+                else do -- Loading can fail, in which case we continue
+                        -- with the old music
+                        bgM <- loadMusic newMusicFP
+                        if isNothing bgM
+                          then do putStrLn $ "Could not load resource " ++ newMusicFP
+                                  return oldMusic
+                          else do stopMusic
+                                  return bgM
 
   -- Load new background
   let newBgFP' = _resourceFP $ levelBg $ levels !! n
