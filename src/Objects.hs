@@ -34,7 +34,9 @@ data Object = Object { objectName           :: ObjectName
                      , objectHit            :: Bool
                      , canCauseCollisions   :: Bool
                      , collisionEnergy      :: Double
-                     , displacedOnCollision :: Bool       -- Theoretically, setting cE == 0 should suffice
+                     , displacedOnCollision :: Bool       -- Theoretically,
+                                                          -- setting cE == 0
+                                                          -- should suffice.
                      }
   deriving (Show)
 
@@ -113,8 +115,17 @@ collisionResponseObj o1 o2 =
       map objectToCollision [(o1, side, o2), (o2, side', o1)]
   where side  = collisionSide o1 o2
         side' = oppositeSide side
-        objectReacts      o             = collisionEnergy o > 0 || displacedOnCollision o
-        objectToCollision (o,s,o')      = (objectName o, correctVel (objectVel o ^+^ (velTrans *^ objectVel o')) (collisionEnergy o) s)
+
+        objectReacts o = collisionEnergy o > 0 || displacedOnCollision o
+
+        objectToCollision (o,s,o') =
+          ( objectName o
+          , correctVel
+              (objectVel o ^+^ (velTrans *^ objectVel o'))
+              (collisionEnergy o)
+              s
+          )
+
         correctVel (vx,vy) e TopSide    = (vx, ensurePos (vy * (-e)))
         correctVel (vx,vy) e BottomSide = (vx, ensureNeg (vy * (-e)))
         correctVel (vx,vy) e LeftSide   = (ensureNeg (vx * (-e)),vy)
