@@ -1,4 +1,9 @@
--- | Objects as signal functions.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Objects as signal functions.
 --
 -- Live objects in the game take user input and the game universe
 -- and define their state in terms of that. They can remember what
