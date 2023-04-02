@@ -43,4 +43,3 @@ stepFPSCounter (clock, fpsRef, every) = do
                          ++ ", Total running time: " ++ show newTime
             writeIORef fpsRef (newTime, every)
     else do writeIORef fpsRef (lastTime, left')
-
