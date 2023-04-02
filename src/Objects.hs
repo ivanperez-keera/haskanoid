@@ -60,7 +60,7 @@ isBall _        = False
 
 isBlock :: ObjectKind -> Bool
 isBlock Block {} = True
-isBlock _          = False
+isBlock _        = False
 
 isPaddle :: Object -> Bool
 isPaddle o = case objectKind o of
