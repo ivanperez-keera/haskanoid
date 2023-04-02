@@ -107,7 +107,8 @@ initializeInputDevices = do
 
     nr <- newIORef defaultInfo
     return $ ControllerRef (nr, dev')
-  where defaultInfo = Controller (0, 0) False False False
+  where
+    defaultInfo = Controller (0, 0) False False False
 
 -- | Sense from the controller, providing its current state. This should return
 -- a new Controller state if available, or the last one there was.
@@ -285,8 +286,9 @@ getDepthThread screenSize lastPos = forkIO $ do
         startDepth device
         forever $ processEvents context
 
-  where devices = [Camera]
-        index = 0 :: Integer
+  where
+    devices = [Camera]
+    index = 0 :: Integer
 
 updatePos :: IORef (Maybe (Double, Double)) -> (Double, Double) -> IO ()
 updatePos lastPosRef newPos@(nx, ny) = do
@@ -302,14 +304,15 @@ calculateMousePos :: (Double, Double)
                   -> Maybe (Double, Double)
 calculateMousePos (width, height) payload =
     fmap g (findFirst payload)
-  where g (px, py) = (mousex, mousey)
-          where
-            pointerx = fromIntegral (640 - px)
-            pointery = fromIntegral py
-            mousex   = pointerx -- pointerx * adjx
-            mousey   = pointery -- pointery * adjy
-            adjx     = width  / 630.0
-            adjy     = height / 470.0
+  where
+    g (px, py) = (mousex, mousey)
+      where
+        pointerx = fromIntegral (640 - px)
+        pointery = fromIntegral py
+        mousex   = pointerx -- pointerx * adjx
+        mousey   = pointery -- pointery * adjy
+        adjx     = width  / 630.0
+        adjy     = height / 470.0
 
 mat :: Vector Float
 mat = V.generate 2048 $ \i ->
@@ -319,7 +322,8 @@ mat = V.generate 2048 $ \i ->
 
 findFirst :: Vector Word16 -> Maybe (Int, Int)
 findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
-  where i = V.findIndex (\x -> mat ! (fromIntegral x) < 512) vs
+  where
+    i = V.findIndex (\x -> mat ! (fromIntegral x) < 512) vs
 
 processPayload :: Vector Word16 -> [(Float, Int, Int)]
 processPayload ps = [(pval, tx, ty) | i <- [0 .. 640 * 480 - 1]
@@ -332,8 +336,9 @@ processPayload ps = [(pval, tx, ty) | i <- [0 .. 640 * 480 - 1]
 -- Drop the fst elem, calculate the avg of snd and trd over the whole list
 avg :: [(Float, Int, Int)] -> (Int, Int)
 avg ls = (sumx `div` l, sumy `div` l)
-  where l = length ls
-        (sumx, sumy) = foldr (\(_, x, y) (rx, ry) -> (x + rx, y + ry)) (0, 0) ls
+  where
+    l = length ls
+    (sumx, sumy) = foldr (\(_, x, y) (rx, ry) -> (x + rx, y + ry)) (0, 0) ls
 
 -- Update a value, with a max cap
 adjust :: (Num a, Ord a) => a -> a -> a -> a
