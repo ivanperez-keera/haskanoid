@@ -62,7 +62,7 @@ detectCollisions''' m o
   | otherwise      = maybeToList (detectCollision (snd m) (snd o))
 
 -- updateObjPos :: SF (ILKey, Object) (ILKey, Object)
--- updateObjPos = proc (i,o) -> do
+-- updateObjPos = proc (i, o) -> do
 --   -- Since we are saving the position to avoid having to keep the last known
 --   -- position in memory every time and integrate over a range every time
 --   -- (would that really happen???) we use an integral over an interval.
@@ -70,13 +70,13 @@ detectCollisions''' m o
 --   -- expected to work. Does it work well for non-linear equations?
 --   --
 --   -- Integral only for dt interval
---   actualVel <- iterFrom (\_ (v1,v2) dt _ -> (v1 * dt, v2 * dt)) (0,0)
+--   actualVel <- iterFrom (\_ (v1, v2) dt _ -> (v1 * dt, v2 * dt)) (0, 0)
 --                  -< objectVel o
 -- 
 --   -- Update position
 --   let newPos = objectPos o ^+^ actualVel
 --       o'     = o { objectPos = newPos }
---   returnA -< (i,o')
+--   returnA -< (i, o')
 
 -- killBall :: ObjectOutput -> ObjectOutput 
 -- killBall oo = oo { outputObject = o' }
@@ -116,7 +116,7 @@ changedVelocity name cs =
     (_, v') : _ -> Just v'
 
     -- IP: It should be something like the following, but that doesn't work:
-    -- vs -> Just (foldl (^+^) (0,0) (map snd vs))
+    -- vs -> Just (foldl (^+^) (0, 0) (map snd vs))
 
 -- | True if the velocity of the object has been changed by any collision.
 inCollision :: ObjectName -> Collisions -> Bool
