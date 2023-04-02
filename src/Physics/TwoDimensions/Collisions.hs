@@ -1,4 +1,9 @@
--- | A trivial collision subsystem.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- A trivial collision subsystem.
 --
 -- Based on the physics module, it determines the side of collision
 -- between shapes.
