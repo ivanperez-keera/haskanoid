@@ -21,6 +21,6 @@ foldLoopM val sense cond act = r'
   where r' = do s <- sense
                 if cond s
                   then do
-                      val' <- act val s
-                      foldLoopM val' sense cond act
+                    val' <- act val s
+                    foldLoopM val' sense cond act
                   else return val
