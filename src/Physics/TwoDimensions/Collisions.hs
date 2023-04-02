@@ -9,7 +9,10 @@
 -- between shapes.
 module Physics.TwoDimensions.Collisions where
 
+-- External imports
 import Data.VectorSpace
+
+-- Internal imports
 import Physics.TwoDimensions.Physics
 
 -- * Collision sides
