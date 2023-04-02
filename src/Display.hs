@@ -10,23 +10,23 @@ module Display where
 import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Monad.IfElse
+import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.Maybe
-import Control.Monad.IO.Class
 import Data.IORef
 import Data.Maybe
 import Graphics.UI.SDL       as SDL
-import qualified Graphics.UI.SDL.TTF as TTF
 import Graphics.UI.SDL.Image as Image
+import qualified Graphics.UI.SDL.TTF as TTF
 
 -- Internal imports
 import Audio
 import Constants
 import GameState
-import Objects
-import Resources hiding (audio)
 import Levels
+import Objects
 import Paths_haskanoid
+import Resources hiding (audio)
 
 -- * Initialization
 
