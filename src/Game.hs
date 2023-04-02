@@ -520,6 +520,10 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   --     -- let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
   --     -- let p = refPosPaddle ci -- (initPosPaddle ^+^) ^<< integral -< v
   --     let v = 100.00 *^ (refPosPaddle ci ^-^ p)
+  --
+  --         -- The initial position of the paddle, horizontally centered.
+  --         initPosPaddle = ((gameWidth - paddleWidth)/2, yPosPaddle)
+  --
   --     p <- (initPosPaddle ^+^) ^<< integral -< v
   let p = refPosPaddle ci
   v <- derivative -< p
@@ -552,10 +556,6 @@ refPosPaddle c = (x', yPosPaddle)
     where
         (x, _) = controllerPos c
         x'     = inRange (0, gameWidth - paddleWidth) (x - (paddleWidth/2))
-
--- | The initial position of the paddle, horizontally centered.
-initPosPaddle :: Pos2D
-initPosPaddle = ((gameWidth - paddleWidth)/2, yPosPaddle)
 
 -- | The paddle's vertical position, at a reasonable distance from the bottom.
 yPosPaddle :: Double
