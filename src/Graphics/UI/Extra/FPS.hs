@@ -1,3 +1,4 @@
+-- | Auxiliary functions to calculate frames-per-second.
 module Graphics.UI.Extra.FPS where
 
 import Control.Monad
