@@ -343,4 +343,3 @@ adjust maxD old new
   | otherwise              = old - maxD
 
 #endif
-
