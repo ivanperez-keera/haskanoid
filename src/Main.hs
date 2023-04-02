@@ -1,7 +1,9 @@
+-- External imports
 import Control.Applicative ((<$>))
 import Control.Monad.IfElse
 import FRP.Yampa as Yampa
 
+-- Internal imports
 import Game
 import Display
 import Input
