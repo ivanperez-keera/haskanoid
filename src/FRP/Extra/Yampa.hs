@@ -41,4 +41,3 @@ boolToEvent :: Bool -> a -> Event a
 boolToEvent True = Event
 boolToEvent _    = \_ -> noEvent
 {-# INLINE boolToEvent #-}
-
