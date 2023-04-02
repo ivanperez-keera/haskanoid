@@ -16,7 +16,8 @@ import FRP.Yampa
 -- is false, and it holds the last known value when the value is True.
 holdWhen :: b -> SF a (b, Bool) -> SF a b
 holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
-  where holdOutput = arr (\(b, discard) -> if discard then noEvent else Event b)
+  where
+    holdOutput = arr (\(b, discard) -> if discard then noEvent else Event b)
 
 -- Given an occasional producer of functions and a source of info, apply the
 -- functions when they exist
@@ -29,7 +30,8 @@ mergeApply' sf1 = sf1 >>> arr (\(b, ef) -> event b ($ b) ef)
 
 rRestart :: SF a (b, Event c) -> SF a b
 rRestart sf = r
-  where r = switch sf (const r)
+  where
+    r = switch sf (const r)
 
 futureSwitch :: SF a (b, Event c) -> (c -> SF a b) -> SF a b
 futureSwitch sf cont = switch (sf >>> (arr id *** notYet)) cont
