@@ -20,8 +20,8 @@ import Data.List
 import Data.Maybe
 
 -- Internal imports
-import Objects
 import Data.IdentityList
+import Objects
 import Physics.TwoDimensions.Dimensions
 
 -- | Given a list of objects, it detects all the collisions between them.
