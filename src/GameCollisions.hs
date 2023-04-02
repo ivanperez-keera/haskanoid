@@ -72,13 +72,13 @@ detectCollisions''' m o
 --   -- Integral only for dt interval
 --   actualVel <- iterFrom (\_ (v1, v2) dt _ -> (v1 * dt, v2 * dt)) (0, 0)
 --                  -< objectVel o
--- 
+--
 --   -- Update position
 --   let newPos = objectPos o ^+^ actualVel
 --       o'     = o { objectPos = newPos }
 --   returnA -< (i, o')
 
--- killBall :: ObjectOutput -> ObjectOutput 
+-- killBall :: ObjectOutput -> ObjectOutput
 -- killBall oo = oo { outputObject = o' }
 --  where o  = outputObject oo
 --        o' = o { objectDead = True}
@@ -110,7 +110,7 @@ detectCollisions''' m o
 --   collieded with to facilitate impl. of "inCollisionWith".
 --
 changedVelocity :: ObjectName -> Collisions -> Maybe Vel2D
-changedVelocity name cs = 
+changedVelocity name cs =
   case concatMap (filter ((== name) . fst) . collisionData) cs of
     []          -> Nothing
     (_, v') : _ -> Just v'
