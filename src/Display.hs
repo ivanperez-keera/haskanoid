@@ -184,7 +184,7 @@ paintObject resources screen object =
                                       Just (SDL.Rect x y (round w) (round h))
       (Ball r)         -> void $ do let x' = x - round r
                                         y' = y - round r
-                                        sz = round (2*r)
+                                        sz = round (2 * r)
                                     -- b <- convertSurface
                                     --        (imgSurface $ ballImg resources)
                                     --        (format)
