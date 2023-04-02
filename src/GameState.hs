@@ -1,4 +1,9 @@
--- | The state of the game during execution. It has two
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- The state of the game during execution. It has two
 -- parts: general info (level, points, etc.) and
 -- the actual gameplay info (objects).
 --
