@@ -31,16 +31,18 @@ import Physics.TwoDimensions.Dimensions
 --
 detectCollisions :: IL Object -> Collisions
 detectCollisions = detectCollisionsH
-  where detectCollisionsH objsT = flattened
-          where -- Eliminate empty collision sets
-                -- TODO: why is this really necessary?
-                flattened = filter (\(Collision n) -> not (null n)) collisions
+  where
+    detectCollisionsH objsT = flattened
+      where
+        -- Eliminate empty collision sets
+        -- TODO: why is this really necessary?
+        flattened = filter (\(Collision n) -> not (null n)) collisions
 
-                -- Detect collisions between moving objects and any other objects
-                collisions = detectCollisions' objsT moving
+        -- Detect collisions between moving objects and any other objects
+        collisions = detectCollisions' objsT moving
 
-                -- Partition the object space between moving and static objects
-                (moving, _static) = partition (canCauseCollisions.snd) $ assocsIL objsT
+        -- Partition the object space between moving and static objects
+        (moving, _static) = partition (canCauseCollisions.snd) $ assocsIL objsT
 
 -- | Detect collisions between each moving object and every other object.
 detectCollisions' :: IL Object -> [(ILKey, Object)] -> [Collision]
