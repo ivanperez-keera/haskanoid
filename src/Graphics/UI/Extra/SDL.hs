@@ -6,6 +6,7 @@
 -- Auxiliary functions related to Graphics.UI.SDL.
 module Graphics.UI.Extra.SDL where
 
+-- External imports
 import Data.IORef
 import Graphics.UI.SDL as SDL
 
