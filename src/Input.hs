@@ -262,6 +262,7 @@ kinectWidth  = 640
 kinectHeight = 480
 
 type KinectPosRef = IORef KinectPos
+
 type KinectPos = Maybe (Double, Double)
 
 initializeKinect :: (Double, Double) -> IO KinectPosRef
