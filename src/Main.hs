@@ -29,4 +29,3 @@ main = do
                )
                (\_ (e, c) -> render res' e >> return (controllerQuit c))
                (wholeGame &&& arr id)
-
