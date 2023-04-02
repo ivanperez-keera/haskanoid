@@ -227,6 +227,7 @@ data Resources = Resources
   }
 
 data Image = Image { imgName  :: String, imgSurface :: Surface }
+
 data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 
 -- | Ad-hoc resource loading
