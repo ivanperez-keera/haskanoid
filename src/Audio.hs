@@ -19,6 +19,7 @@ module Audio
      stopMusic,
      musicPlaying) where
 
+-- External imports
 import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Concurrent
