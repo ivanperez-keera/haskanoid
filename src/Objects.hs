@@ -17,7 +17,6 @@ import Physics.TwoDimensions.Physics
 
 -- Internal imports
 import Constants
-import Data.Extra.Num
 
 -- * Objects
 
