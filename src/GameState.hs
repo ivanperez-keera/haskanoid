@@ -69,4 +69,4 @@ data GameStatus = GamePlaying
                 | GameOver
                 | GameFinished
                 | GameStarted
- deriving Eq
+  deriving Eq
