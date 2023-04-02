@@ -1,3 +1,4 @@
+-- | Game constants.
 module Constants where
 
 import FRP.Yampa
