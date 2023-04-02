@@ -50,7 +50,6 @@ import System.CWiid
 -- External imports (Kinect)
 #ifdef kinect
 import Control.Concurrent
-import Data.Maybe (fromJust)
 import Data.Vector.Storable (Vector,(!))
 import qualified Data.Vector.Storable as V
 import Data.Word
