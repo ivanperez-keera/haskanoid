@@ -240,7 +240,6 @@ handleEvent c e =
       c { controllerQuit  = True  }
     _ -> c
 
-
 -- Kinect
 
 #ifdef kinect
