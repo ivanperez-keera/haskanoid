@@ -15,8 +15,11 @@
 --
 module GameCollisions where
 
+-- External imports
 import Data.List
 import Data.Maybe
+
+-- Internal imports
 import Objects
 import Data.IdentityList
 import Physics.TwoDimensions.Dimensions
