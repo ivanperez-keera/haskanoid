@@ -16,8 +16,10 @@
 -- general.
 module ObjectSF where
 
+-- External imports
 import FRP.Yampa
 
+-- Internal imports
 import Objects
 import Input
 import Data.IdentityList
