@@ -313,9 +313,10 @@ gamePlay' objs = loopPre ([], [], 0) $
 
       -- Turn every object that wants to kill itself into a function that
       -- removes it from the list
-      where es :: [Event (IL ObjectSF -> IL ObjectSF)]
-            es = [ harakiri oo `tag` deleteIL k
-                 | (k, oo) <- assocsIL oos ]
+      where
+        es :: [Event (IL ObjectSF -> IL ObjectSF)]
+        es = [ harakiri oo `tag` deleteIL k
+             | (k, oo) <- assocsIL oos ]
 
     -- From the actual objects, detect which ones collide
     detectObjectCollisions :: SF (IL ObjectOutput) Collisions
@@ -324,11 +325,12 @@ gamePlay' objs = loopPre ([], [], 0) $
     -- Count-points
     countPoints :: Collisions -> Int
     countPoints = sum . map numPoints
-      where numPoints (Collision cd)
-              | hasBall cd = countBlocks cd
-              | otherwise  = 0
-            hasBall     = any ((=="ball").fst)
-            countBlocks = length . filter (isPrefixOf "block" . fst)
+      where
+        numPoints (Collision cd)
+          | hasBall cd = countBlocks cd
+          | otherwise  = 0
+        hasBall     = any ((=="ball").fst)
+        countBlocks = length . filter (isPrefixOf "block" . fst)
 
 -- * Game objects
 --
@@ -391,18 +393,19 @@ followPaddle = arr $ \oi ->
                             ((paddleWidth / 2, - ballHeight) ^+^)
                             mbPaddlePos
     in ObjectOutput (inertBallAt ballPos) noEvent
-  where outOfScreen = -10
-        inertBallAt p = Object { objectName           = "ball"
-                               , objectKind           = Ball ballWidth
-                               , objectPos            = p
-                               , objectVel            = (0, 0)
-                               , objectAcc            = (0, 0)
-                               , objectDead           = False
-                               , objectHit            = False
-                               , canCauseCollisions   = False
-                               , collisionEnergy      = 0
-                               , displacedOnCollision = False
-                               }
+  where
+    outOfScreen = -10
+    inertBallAt p = Object { objectName           = "ball"
+                           , objectKind           = Ball ballWidth
+                           , objectPos            = p
+                           , objectVel            = (0, 0)
+                           , objectAcc            = (0, 0)
+                           , objectDead           = False
+                           , objectHit            = False
+                           , canCauseCollisions   = False
+                           , collisionEnergy      = 0
+                           , displacedOnCollision = False
+                           }
 
 -- A bouncing ball moves freely until there is a collision, then bounces and
 -- goes on and on.
