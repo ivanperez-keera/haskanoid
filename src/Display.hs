@@ -286,7 +286,6 @@ loadResources = runMaybeT $ do
   liftIO $ ResourceMgr <$>
     newIORef (ResourceManager GameStarted res)
 
-
 loadNewResources :: ResourceMgr ->  GameState -> IO Resources
 loadNewResources mgr state = do
   manager <- readIORef (unResMgr mgr)
