@@ -6,6 +6,7 @@
 -- Auxiliary functions related to FRP.Yampa.
 module FRP.Extra.Yampa where
 
+-- External imports
 import Control.Arrow
 import FRP.Yampa
 
