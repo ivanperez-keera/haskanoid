@@ -26,5 +26,6 @@ data Shape = Rectangle Pos2D Size2D   -- A corner and the whole size
 
 overlapShape :: Shape -> Shape -> Bool
 overlapShape (Rectangle p1 s1) (Rectangle p2 s2) = abs dx <= w && abs dy <= h
-  where (dx, dy) = (p1 ^+^ (0.5 *^ s1)) ^-^ (p2 ^+^ (0.5 *^ s2))
-        (w, h)   = 0.5 *^ (s1 ^+^ s2)
+  where
+    (dx, dy) = (p1 ^+^ (0.5 *^ s1)) ^-^ (p2 ^+^ (0.5 *^ s2))
+    (w, h)   = 0.5 *^ (s1 ^+^ s2)
