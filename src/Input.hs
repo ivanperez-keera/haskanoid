@@ -22,7 +22,7 @@
 -- updated version.
 --
 -- Limitations:
--- 
+--
 --    - Device failures are not handled.
 --
 --    - Falling back to the next available device when there's a problem.
@@ -111,7 +111,7 @@ initializeInputDevices = do
 
 -- | Sense from the controller, providing its current state. This should return
 -- a new Controller state if available, or the last one there was.
--- 
+--
 -- It is assumed that the sensing function is always callable, and that it
 -- knows how to update the Controller info if necessary.
 senseInput :: ControllerRef -> IO Controller
@@ -181,12 +181,12 @@ senseWiimote wmdev controller = do
 
   -- Direction (old system based on buttons)
   -- let isLeft  = cwiidIsBtnPushed flags cwiidBtnLeft
-  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight 
+  --     isRight = cwiidIsBtnPushed flags cwiidBtnRight
   --     (x, y)  = controllerPos controller
   --     x'      | isLeft    = x - wiiXDiff
   --             | isRight   = x + wiiXDiff
   --             | otherwise = x
-  --     x''     = inRange (0, gameWidth) x' 
+  --     x''     = inRange (0, gameWidth) x'
   --     pos'    = (x'', y)
   -- wiiXDiff :: Float
   -- wiiXDiff = 6
