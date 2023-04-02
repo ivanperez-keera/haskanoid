@@ -9,6 +9,9 @@
 module Physics.TwoDimensions.Dimensions where
 
 type Size2D = (Double, Double)
+
 type Pos2D  = (Double, Double)
+
 type Vel2D  = (Double, Double)
+
 type Acc2D  = (Double, Double)
