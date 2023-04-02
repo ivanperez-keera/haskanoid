@@ -63,28 +63,6 @@ detectCollisions''' m o
   | fst m == fst o = []    -- Same object -> no collision
   | otherwise      = maybeToList (detectCollision (snd m) (snd o))
 
--- updateObjPos :: SF (ILKey, Object) (ILKey, Object)
--- updateObjPos = proc (i, o) -> do
---   -- Since we are saving the position to avoid having to keep the last known
---   -- position in memory every time and integrate over a range every time
---   -- (would that really happen???) we use an integral over an interval.
---   -- I really wonder if this integration thing in Yampa works the way it is
---   -- expected to work. Does it work well for non-linear equations?
---   --
---   -- Integral only for dt interval
---   actualVel <- iterFrom (\_ (v1, v2) dt _ -> (v1 * dt, v2 * dt)) (0, 0)
---                  -< objectVel o
---
---   -- Update position
---   let newPos = objectPos o ^+^ actualVel
---       o'     = o { objectPos = newPos }
---   returnA -< (i, o')
-
--- killBall :: ObjectOutput -> ObjectOutput
--- killBall oo = oo { outputObject = o' }
---  where o  = outputObject oo
---        o' = o { objectDead = True}
-
 -- | Return the new velocity as changed by the collection of collisions.
 --
 -- HN 2014-09-07: New interface to collision detection.
