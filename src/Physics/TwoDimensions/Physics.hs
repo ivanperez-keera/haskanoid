@@ -9,7 +9,10 @@
 -- derivatives.
 module Physics.TwoDimensions.Physics where
 
+-- External imports
 import Data.VectorSpace
+
+-- Internal imports
 import Physics.TwoDimensions.Dimensions
 
 data Shape = Rectangle Pos2D Size2D     -- A corner and the whole size
