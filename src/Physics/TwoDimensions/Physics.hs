@@ -15,9 +15,9 @@ import Data.VectorSpace
 -- Internal imports
 import Physics.TwoDimensions.Dimensions
 
-data Shape = Rectangle Pos2D Size2D     -- A corner and the whole size
-             -- Circle    Pos2D Float   -- Position and radius -- NOT FOR NOW
-             -- SemiPlane Pos2D Float   -- Position and angle of plane normal -- NFN
+data Shape = Rectangle Pos2D Size2D   -- A corner and the whole size
+             -- Circle    Pos2D Float -- Position and radius -- NOT FOR NOW
+             -- SemiPlane Pos2D Float -- Position, angle of plane normal NFN
 
 -- | Detects if two shapes overlap.
 --
