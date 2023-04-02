@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to Control.Monad.
 module Control.Extra.Monad where
 
 import Control.Monad
