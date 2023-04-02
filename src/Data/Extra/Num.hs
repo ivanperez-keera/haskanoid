@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to the 'Num' typeclass.
 module Data.Extra.Num where
 
 ensurePos :: (Eq a, Num a) => a -> a
