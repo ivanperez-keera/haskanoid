@@ -11,13 +11,13 @@ import Data.VectorSpace
 
 -- Internal imports (general purpose)
 import Data.Extra.Num
-import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.Collisions
+import Physics.TwoDimensions.Dimensions
 import Physics.TwoDimensions.Physics
 
 -- Internal imports
-import Data.Extra.Num
 import Constants
+import Data.Extra.Num
 
 -- * Objects
 
