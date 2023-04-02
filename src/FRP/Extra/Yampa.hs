@@ -22,10 +22,10 @@ holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
 -- functions when they exist
 mergeApply :: SF a b -> SF a (Event (b -> b)) -> SF a b
 mergeApply sf1 sf2 =
-  (sf1 &&& sf2) >>> (arr (\(b, ef) -> event b ($ b) ef))
+  (sf1 &&& sf2) >>> arr (\(b, ef) -> event b ($ b) ef)
 
 mergeApply' :: SF a (b, Event (b -> b)) -> SF a b
-mergeApply' sf1 = sf1 >>> (arr (\(b, ef) -> event b ($ b) ef))
+mergeApply' sf1 = sf1 >>> arr (\(b, ef) -> event b ($ b) ef)
 
 rRestart :: SF a (b, Event c) -> SF a b
 rRestart sf = r
