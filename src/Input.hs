@@ -164,8 +164,8 @@ senseWiimote wmdev controller = do
 
   -- Obtain positions of leds 1 and 2 (with a normal wii bar, those
   -- will be the ones we use).
-  let led1   = irs!!0
-      led2   = irs!!1
+  let led1   = irs !! 0
+      led2   = irs !! 1
 
   -- Calculate mid point between sensor bar leds
   let posX = ((cwiidIRSrcPosX led1) + (cwiidIRSrcPosX led2)) `div` 2
@@ -314,16 +314,16 @@ calculateMousePos (width, height) payload =
 mat :: Vector Float
 mat = V.generate 2048 $ \i ->
   let v :: Float
-      v = ((fromIntegral i/2048.0)^3)*6.0
+      v = ((fromIntegral i / 2048.0)^3) * 6.0
   in v * 6.0 * 256.0
 
 findFirst :: Vector Word16 -> Maybe (Int, Int)
 findFirst vs = fmap (\v -> (v `mod` 640, v `div` 640)) i
-  where i  = V.findIndex (\x -> mat!(fromIntegral x) < 512) vs
+  where i  = V.findIndex (\x -> mat ! (fromIntegral x) < 512) vs
 
 processPayload :: Vector Word16 -> [(Float, Int, Int)]
-processPayload ps = [(pval, tx, ty) | i <- [0..640*480-1]
-                                    , let pval = mat!(fromIntegral (ps!i))
+processPayload ps = [(pval, tx, ty) | i <- [0 .. 640 * 480 - 1]
+                                    , let pval = mat ! (fromIntegral (ps ! i))
                                     , pval < 300
                                     , let ty = i `div` 640
                                           tx = i `mod` 640
@@ -333,7 +333,7 @@ processPayload ps = [(pval, tx, ty) | i <- [0..640*480-1]
 avg :: [(Float, Int, Int)] -> (Int, Int)
 avg ls = (sumx `div` l, sumy `div` l)
   where l = length ls
-        (sumx, sumy) = foldr (\(_, x, y) (rx, ry) -> (x+rx, y+ry)) (0, 0) ls
+        (sumx, sumy) = foldr (\(_, x, y) (rx, ry) -> (x + rx, y + ry)) (0, 0) ls
 
 -- Update a value, with a max cap
 adjust :: (Num a, Ord a) => a -> a -> a -> a
