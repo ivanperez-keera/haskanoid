@@ -11,8 +11,6 @@
 -- empty.
 module GameState where
 
--- import FRP.Yampa as Yampa
-
 -- Internal imports
 import Objects
 
