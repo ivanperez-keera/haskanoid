@@ -215,7 +215,7 @@ blockDescS 3 = map (first adjustPos) allBlocks
         allBlocks = [ ((x, y), maxBlockLife)
                     | x <- [0..blockColumns - 1]
                     , y <- [0..blockRows - 1]
-                    , ((even x) && (odd y) || (odd x) && (even y))
+                    , even x && odd y || odd x && even y
                     ]
 
         blockRows :: Num a => a
