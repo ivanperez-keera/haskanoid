@@ -235,7 +235,8 @@ composeGameState lives level pts = futureDSwitch
 -- detect when a live is lost. When that happens, keep the last known game
 -- state.
 composeGameState' :: Int -> Int -> Int
-                  -> SF (ObjectOutputs, Event (), Int) (GameState, Event GameState)
+                  -> SF (ObjectOutputs, Event (), Int)
+                        (GameState, Event GameState)
 composeGameState' lives level pts = proc (oos,dead,points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
@@ -269,13 +270,18 @@ composeGameState' lives level pts = proc (oos,dead,points) -> do
 gamePlay' :: ObjectSFs -> SF Controller (ObjectOutputs, Event (), Int)
 gamePlay' objs = loopPre ([],[],0) $
     -- Process physical movement and detect new collisions
-    ((adaptInput >>> processMovement >>> (arr elemsIL &&& detectObjectCollisions))
-    &&& arr (thd3.snd)) -- This last bit just carries the old points forward
+    ( ( adaptInput
+          >>> processMovement
+          >>> (arr elemsIL &&& detectObjectCollisions)
+      )
+      &&& arr (thd3.snd) -- This last bit just carries the old points forward
+    )
 
     -- Adds the old point count to the newly-made points
     >>> (arr fst &&& arr (\((_,cs),o) -> o + countPoints cs))
 
-    -- Re-arrange output, selecting (objects+dead+points, objects+collisions+points)
+    -- Re-arrange output, selecting
+    -- (objects+dead+points, objects+collisions+points)
     >>> (composeOutput &&& arr (\((x,y),z) -> (x,y,z)))
 
   where
@@ -288,7 +294,8 @@ gamePlay' objs = loopPre ([],[],0) $
 
     -- Just reorder the input
     adaptInput :: SF (Controller, (ObjectOutputs, Collisions, Int)) ObjectInput
-    adaptInput = arr (\(gi,(os,cs,pts)) -> ObjectInput gi cs (map outputObject os))
+    adaptInput =
+      arr (\(gi,(os,cs,pts)) -> ObjectInput gi cs (map outputObject os))
 
     -- Parallely apply all object functions
     processMovement :: SF ObjectInput (IL ObjectOutput)
@@ -296,9 +303,11 @@ gamePlay' objs = loopPre ([],[],0) $
 
     processMovement' :: ObjectSFs -> SF ObjectInput (IL ObjectOutput)
     processMovement' objs = dpSwitchB
-      objs                                   -- Signal functions
-      (noEvent --> arr suicidalSect)         -- When necessary, remove all elements that must be removed
-      (\sfs' f -> processMovement' (f sfs')) -- Move along! Move along! (with new state, aka. sfs)
+      objs                                   -- Signal functions.
+      (noEvent --> arr suicidalSect)         -- When necessary, remove all
+                                             -- elements that must be removed.
+      (\sfs' f -> processMovement' (f sfs')) -- Move along! Move along!
+                                             -- (with new state, aka. sfs).
 
     suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
     suicidalSect (_,oos) =
@@ -340,7 +349,8 @@ initialObjects level = listToIL $
   , objPaddle
   , objBall
   ]
-  ++ map (\p -> objBlock p (blockWidth, blockHeight)) (blockCfgs $ levels!!level)
+  ++ map (\p -> objBlock p (blockWidth, blockHeight))
+         (blockCfgs $ levels!!level)
 
 
 -- *** Ball
