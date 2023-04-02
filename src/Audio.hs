@@ -21,13 +21,13 @@ module Audio
 
 -- External imports
 import Control.Applicative ((<$>))
-import Control.Monad
 import Control.Concurrent
-import qualified Graphics.UI.SDL.Mixer.General as SDL.Mixer
+import Control.Monad
 import qualified Graphics.UI.SDL.Mixer.Channels as SDL.Mixer.Channels
+import qualified Graphics.UI.SDL.Mixer.General as SDL.Mixer
 import qualified Graphics.UI.SDL.Mixer.Music as SDL.Mixer.Music
-import qualified Graphics.UI.SDL.Mixer.Types as SDL.Mixer.Types
 import qualified Graphics.UI.SDL.Mixer.Samples as SDL.Mixer.Samples
+import qualified Graphics.UI.SDL.Mixer.Types as SDL.Mixer.Types
 
 data Music = Music { musicName :: String, unMusic :: SDL.Mixer.Types.Music }
 data Audio = Audio { audioName :: String, unAudio :: SDL.Mixer.Types.Chunk }
