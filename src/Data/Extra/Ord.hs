@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to the 'Ord' typeclass.
 module Data.Extra.Ord where
 
 inRange :: Ord a => (a,a) -> a -> a
