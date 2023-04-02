@@ -1,3 +1,4 @@
+-- | Resource specifications.
 module Resources where
 
 data ResourceSpec = ResourceSpec
