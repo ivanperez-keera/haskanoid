@@ -13,7 +13,7 @@ import FRP.Yampa
 -- Auxiliary Yampa stuff
 
 -- holdWhen behaves normally, outputting only the b, when the second value
--- is false, and it holds the last known value when the value is True. 
+-- is false, and it holds the last known value when the value is True.
 holdWhen :: b -> SF a (b, Bool) -> SF a b
 holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
   where holdOutput = arr (\(b, discard) -> if discard then noEvent else Event b)
