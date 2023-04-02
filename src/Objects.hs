@@ -46,10 +46,10 @@ type Objects   = [Object]
 --
 -- TODO: Use a GADT to separate these properties in two types and guarantee a
 -- proper correspondence in 'Object'.
-data ObjectKind = Ball    Double -- radius?
-                | Paddle  Size2D
-                | Block   Energy Size2D
-                | Side    Side
+data ObjectKind = Ball   Double -- radius?
+                | Paddle Size2D
+                | Block  Energy Size2D
+                | Side   Side
   deriving (Show, Eq)
 
 type Energy = Int
