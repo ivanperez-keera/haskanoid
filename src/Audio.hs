@@ -68,6 +68,6 @@ loadAudio fp = fmap (Audio fp) <$> SDL.Mixer.Samples.tryLoadWAV fp
 -- This function spawns a new OS thread. Remember to compile your program
 -- with the threaded RTS.
 playFile :: Audio -> Int -> IO ()
-playFile wav t = void $ forkOS $ do 
+playFile wav t = void $ forkOS $ do
   _v <- SDL.Mixer.Channels.playChannel (-1) (unAudio wav) 0
   threadDelay (t * 1000)
