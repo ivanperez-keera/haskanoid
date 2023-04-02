@@ -21,8 +21,8 @@ import Control.Arrow ((***), first)
 import Data.List (nub)
 
 -- Internal imports
-import Physics.TwoDimensions.Dimensions
 import Constants
+import Physics.TwoDimensions.Dimensions
 import Resources
 
 -- * Levels
