@@ -32,16 +32,16 @@ import Physics.TwoDimensions.Dimensions
 --
 detectCollisions :: IL Object -> Collisions
 detectCollisions = detectCollisionsH
- where detectCollisionsH objsT = flattened
-         where -- Eliminate empty collision sets
-               -- TODO: why is this really necessary?
-               flattened = filter (\(Collision n) -> not (null n)) collisions
+  where detectCollisionsH objsT = flattened
+          where -- Eliminate empty collision sets
+                -- TODO: why is this really necessary?
+                flattened = filter (\(Collision n) -> not (null n)) collisions
 
-               -- Detect collisions between moving objects and any other objects
-               collisions = detectCollisions' objsT moving
+                -- Detect collisions between moving objects and any other objects
+                collisions = detectCollisions' objsT moving
 
-               -- Partition the object space between moving and static objects
-               (moving, _static) = partition (canCauseCollisions.snd) $ assocsIL objsT
+                -- Partition the object space between moving and static objects
+                (moving, _static) = partition (canCauseCollisions.snd) $ assocsIL objsT
 
 -- | Detect collisions between each moving object and
 -- every other object.
@@ -60,8 +60,8 @@ detectCollisions'' objsT m = concatMap (detectCollisions''' m) (assocsIL objsT)
 -- determine whether the two objects do collide.
 detectCollisions''' :: (ILKey, Object) -> (ILKey, Object) -> [Collision]
 detectCollisions''' m o
- | fst m == fst o = []    -- Same object -> no collision
- | otherwise      = maybeToList (detectCollision (snd m) (snd o))
+  | fst m == fst o = []    -- Same object -> no collision
+  | otherwise      = maybeToList (detectCollision (snd m) (snd o))
 
 -- updateObjPos :: SF (ILKey, Object) (ILKey, Object)
 -- updateObjPos = proc (i,o) -> do
@@ -112,13 +112,13 @@ detectCollisions''' m o
 --
 changedVelocity :: ObjectName -> Collisions -> Maybe Vel2D
 changedVelocity name cs = 
-    case concatMap (filter ((== name) . fst) . collisionData) cs of
-        []          -> Nothing
-        (_, v') : _ -> Just v'
+  case concatMap (filter ((== name) . fst) . collisionData) cs of
+    []          -> Nothing
+    (_, v') : _ -> Just v'
 
-        -- IP: It should be something like the following, but that doesn't
-        -- work:
-        -- vs -> Just (foldl (^+^) (0,0) (map snd vs))
+    -- IP: It should be something like the following, but that doesn't
+    -- work:
+    -- vs -> Just (foldl (^+^) (0,0) (map snd vs))
 
 -- | True if the velocity of the object has been changed by any collision.
 inCollision :: ObjectName -> Collisions -> Bool
@@ -127,7 +127,7 @@ inCollision name cs = isJust (changedVelocity name cs)
 -- | True if the two objects are colliding with one another.
 inCollisionWith :: ObjectName -> ObjectName -> Collisions -> Bool
 inCollisionWith nm1 nm2 cs = any (both nm1 nm2) cs
-    where
-        both nm1 nm2 (Collision nmvs) =
-            any ((== nm1) . fst) nmvs
-            && any ((== nm2) . fst) nmvs
+  where
+    both nm1 nm2 (Collision nmvs) =
+      any ((== nm1) . fst) nmvs
+      && any ((== nm2) . fst) nmvs
