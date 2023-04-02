@@ -6,6 +6,7 @@
 -- Audio and video renderer.
 module Display where
 
+-- External imports
 import Control.Applicative ((<$>))
 import Control.Monad
 import Control.Monad.IfElse
@@ -18,6 +19,7 @@ import Graphics.UI.SDL       as SDL
 import qualified Graphics.UI.SDL.TTF as TTF
 import Graphics.UI.SDL.Image as Image
 
+-- Internal imports
 import Audio
 import Constants
 import GameState
