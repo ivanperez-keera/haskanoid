@@ -226,7 +226,7 @@ composeGameState :: Int -> Int -> Int
                  -> SF (ObjectOutputs, Event (), Int) GameState
 composeGameState lives level pts = futureDSwitch
   (composeGameState' lives level pts)
-  (\_ -> composeGameState (lives-1) level pts)
+  (\_ -> composeGameState (lives - 1) level pts)
 
 -- | Based on the internal gameplay info, compose the main game state and
 -- detect when a live is lost. When that happens, keep the last known game
@@ -238,7 +238,7 @@ composeGameState' lives level pts = proc (oos, dead, points) -> do
   -- Compose game state
   objects <- extractObjects -< oos
   let general = GameState objects
-                          (GameInfo GamePlaying lives level (pts+points))
+                          (GameInfo GamePlaying lives level (pts + points))
 
   -- Detect death
   let lastGeneral = dead `tag` general
@@ -276,7 +276,7 @@ gamePlay' objs = loopPre ([], [], 0) $
     >>> (arr fst &&& arr (\((_, cs), o) -> o + countPoints cs))
 
     -- Re-arrange output, selecting
-    -- (objects+dead+points, objects+collisions+points)
+    -- (objects + dead + points, objects + collisions + points)
     >>> (composeOutput &&& arr (\((x, y), z) -> (x, y, z)))
 
   where
@@ -343,7 +343,7 @@ initialObjects level = listToIL $
   , objBall
   ]
   ++ map (\p -> objBlock p (blockWidth, blockHeight))
-         (blockCfgs $ levels!!level)
+         (blockCfgs $ levels !! level)
 
 -- *** Ball
 
@@ -388,7 +388,7 @@ followPaddle = arr $ \oi ->
     -- should never happen in practice.
     let mbPaddlePos = objectPos <$> find isPaddle (knownObjects oi)
         ballPos     = maybe (outOfScreen, outOfScreen)
-                            ((paddleWidth/2, - ballHeight) ^+^)
+                            ((paddleWidth / 2, - ballHeight) ^+^)
                             mbPaddlePos
     in ObjectOutput (inertBallAt ballPos) noEvent
   where outOfScreen = -10
@@ -551,7 +551,7 @@ refPosPaddle :: Controller -> Pos2D
 refPosPaddle c = (x', yPosPaddle)
   where
     (x, _) = controllerPos c
-    x'     = inRange (0, gameWidth - paddleWidth) (x - (paddleWidth/2))
+    x'     = inRange (0, gameWidth - paddleWidth) (x - (paddleWidth / 2))
 
 -- | The paddle's vertical position, at a reasonable distance from the bottom.
 yPosPaddle :: Double
