@@ -1,4 +1,9 @@
--- | A very rudimentary collision system.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- A very rudimentary collision system.
 --
 -- It compares every pair of objects, trying to determine if there is a
 -- collision between the two of them.
