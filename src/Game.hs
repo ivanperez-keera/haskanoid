@@ -614,16 +614,16 @@ objBlock ((x, y), initlives) (w, h) = proc (ObjectInput ci cs os) -> do
 -- (for instance, if a really major Garbage Collection kicks in.  One potential
 -- optimisation is to trigger these with every SF iteration or every rendering,
 -- to decrease the workload and thus the likelyhood of BTP effects.
-objSideRight  :: ObjectSF
-objSideRight  = objWall "rightWall"  RightSide  (gameWidth, 0)
+objSideRight :: ObjectSF
+objSideRight = objWall "rightWall" RightSide (gameWidth, 0)
 
 -- | See 'objSideRight'.
-objSideLeft   :: ObjectSF
-objSideLeft   = objWall "leftWall"   LeftSide   (0, 0)
+objSideLeft :: ObjectSF
+objSideLeft = objWall "leftWall" LeftSide (0, 0)
 
 -- | See 'objSideRight'.
-objSideTop    :: ObjectSF
-objSideTop    = objWall "topWall"    TopSide    (0, 0)
+objSideTop :: ObjectSF
+objSideTop = objWall "topWall" TopSide (0, 0)
 
 -- | See 'objSideRight'.
 objSideBottom :: ObjectSF
