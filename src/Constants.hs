@@ -13,16 +13,16 @@ import FRP.Yampa
 import Physics.TwoDimensions.Dimensions
 
 width :: Double
-width  = 640
+width = 640
 
 height :: Double
 height = 600
 
-gameTop    :: Double
-gameTop    = 100
+gameTop :: Double
+gameTop = 100
 
-gameLeft   :: Double
-gameLeft   = 0
+gameLeft :: Double
+gameLeft = 0
 
 gameWidth :: Double
 gameWidth = width
@@ -41,15 +41,15 @@ paddleMargin :: Double
 paddleMargin = 50
 
 ballWidth, ballHeight :: Double
-ballWidth    = 10
-ballHeight   = 10
+ballWidth  = 10
+ballHeight = 10
 
 ballMargin :: Double
-ballMargin   = 30
+ballMargin = 30
 
 blockWidth, blockHeight :: Double
-blockWidth   = 64
-blockHeight  = 32
+blockWidth  = 64
+blockHeight = 32
 
 blockSeparation :: Double
 blockSeparation = 10
