@@ -1,4 +1,9 @@
--- | Auxiliary functions to calculate frames-per-second.
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Auxiliary functions to calculate frames-per-second.
 module Graphics.UI.Extra.FPS where
 
 import Control.Monad
