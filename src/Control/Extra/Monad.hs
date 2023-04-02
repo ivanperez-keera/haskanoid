@@ -6,6 +6,7 @@
 -- Auxiliary functions related to Control.Monad.
 module Control.Extra.Monad where
 
+-- External imports
 import Control.Monad
 
 whileLoopM :: Monad m => m a -> (a -> Bool) -> (a -> m ()) -> m ()
