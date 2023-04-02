@@ -77,13 +77,6 @@ velTrans = 0.2
 maxVNorm :: Double
 maxVNorm = 300
 
--- Delays
--- restartDelay :: Time
--- restartDelay = 3
---
--- wonDelay :: Time
--- wonDelay = 3
-
 -- * Debugging
 
 -- | Initial level. Change this in the code to start
