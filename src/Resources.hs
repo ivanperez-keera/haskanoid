@@ -14,8 +14,11 @@ data ResourceSpec = ResourceSpec
   }
 
 type FontResource  = Resource
+
 type ImageResource = Resource
+
 type MusicResource = Resource
+
 type AudioResource = Resource
 
 newtype Resource = Resource { _resourceFP :: FilePath }
