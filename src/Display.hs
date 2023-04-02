@@ -7,17 +7,17 @@
 module Display where
 
 -- External imports
-import Control.Applicative ((<$>))
-import Control.Monad
-import Control.Monad.IfElse
-import Control.Monad.IO.Class
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Maybe
-import Data.IORef
-import Data.Maybe
-import Graphics.UI.SDL       as SDL
-import Graphics.UI.SDL.Image as Image
-import qualified Graphics.UI.SDL.TTF as TTF
+import           Control.Applicative       ((<$>))
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.IfElse
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe
+import           Data.IORef
+import           Data.Maybe
+import           Graphics.UI.SDL           as SDL
+import           Graphics.UI.SDL.Image     as Image
+import qualified Graphics.UI.SDL.TTF       as TTF
 
 -- Internal imports
 import Audio
@@ -26,7 +26,7 @@ import GameState
 import Levels
 import Objects
 import Paths_haskanoid
-import Resources hiding (audio)
+import Resources       hiding (audio)
 
 -- * Initialization
 
