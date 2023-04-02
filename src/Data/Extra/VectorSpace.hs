@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to Data.VectorSpace.
 module Data.Extra.VectorSpace where
 
 import Data.VectorSpace
