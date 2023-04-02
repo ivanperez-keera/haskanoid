@@ -1,3 +1,4 @@
+-- | Auxiliary functions related to FRP.Yampa.
 module FRP.Extra.Yampa where
 
 import Control.Arrow
