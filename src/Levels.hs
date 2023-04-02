@@ -436,9 +436,10 @@ blockDescS 13 = map (first adjustPos) allBlocks
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
         allBlocks = [((x,y), blockLife) | x <- [0..blockColumns - 1]
                                         , y <- [0..blockRows - 1]
-                                        , let blockLife = if even (x + y)
-                                                            then maxBlockLife
-                                                            else maxBlockLife - 1
+                                        , let blockLife =
+                                                if even (x + y)
+                                                  then maxBlockLife
+                                                  else maxBlockLife - 1
                                         ]
                     
         blockRows :: Num a => a
@@ -530,17 +531,18 @@ blockDescS 15 = map (first adjustPos) allBlocks
 blockDescS 16 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-        allBlocks = [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                               , y <- [midColumn - 1, midColumn]
-                                               , (even x && y == midColumn)
-                                                 || (odd x && y == midColumn -1)]
-                    ++ [((x,y), minBlockLife) | x <- [midColumn - 1, midColumn]
-                                              , y <- [0, 1,
-                                                      blockRows - 2, blockRows - 1]]
-                    ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                              , y <- [0, 1,
-                                                      blockRows - 2, blockRows - 1]
-                                              , x /= midColumn - 1, x /= midColumn]
+        allBlocks =
+          [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
+                                     , y <- [midColumn - 1, midColumn]
+                                     , (even x && y == midColumn)
+                                       || (odd x && y == midColumn -1)]
+          ++ [((x,y), minBlockLife) | x <- [midColumn - 1, midColumn]
+                                    , y <- [0, 1,
+                                            blockRows - 2, blockRows - 1]]
+          ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
+                                    , y <- [0, 1,
+                                            blockRows - 2, blockRows - 1]
+                                    , x /= midColumn - 1, x /= midColumn]
 
 
         blockRows :: Num a => a
@@ -569,16 +571,18 @@ blockDescS 16 = map (first adjustPos) allBlocks
 blockDescS 17 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a,a), Int)]
-        allBlocks = [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
-                                               , y <- [3, 4]
-                                               , odd x]
-                    ++ [((x,y), minBlockLife) | x <- [0..blockColumns - 1]
-                                              , y <- [1, 2, 
-                                                      blockRows - 4, blockRows - 3]
-                                              , even x ]
-                    ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
-                                              , y <- [0, blockRows - 1]
-                                              , y == 0 || x /= midColumn]
+        allBlocks =
+          [((x,y), maxBlockLife - 1) | x <- [0..blockColumns - 1]
+                                     , y <- [3, 4]
+                                     , odd x]
+          ++ [((x,y), minBlockLife) | x <- [0..blockColumns - 1]
+                                    , y <- [1, 2, 
+                                            blockRows - 4, blockRows - 3]
+                                    , even x ]
+          ++ [((x,y), maxBlockLife) | x <- [0..blockColumns - 1]
+                                    , y <- [0, blockRows - 1]
+                                    , y == 0 || x /= midColumn]
+
         blockRows :: Num a => a
         blockRows = 9
 
