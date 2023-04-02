@@ -17,7 +17,9 @@ module Audio
     , playMusic
     , playFile
     , stopMusic
-    , musicPlaying) where
+    , musicPlaying
+    )
+  where
 
 -- External imports
 import           Control.Applicative            ((<$>))
