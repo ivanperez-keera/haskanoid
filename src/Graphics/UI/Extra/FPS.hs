@@ -6,6 +6,7 @@
 -- Auxiliary functions to calculate frames-per-second.
 module Graphics.UI.Extra.FPS where
 
+-- External imports
 import Control.Monad
 import Data.IORef
 
