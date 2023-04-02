@@ -35,14 +35,14 @@
 module Input where
 
 -- External imports
+import Control.Monad
 import Data.IORef
 import Graphics.UI.SDL as SDL
-import Control.Monad
 
 -- External imports (Wiimote)
 #ifdef wiimote
-import Control.Monad(void)
 import Control.Monad.IfElse (awhen)
+import Control.Monad(void)
 import Data.Maybe (fromMaybe)
 import System.CWiid
 #endif
@@ -52,16 +52,15 @@ import System.CWiid
 import Control.Concurrent
 import Data.Maybe (fromJust)
 import Data.Vector.Storable (Vector,(!))
+import qualified Data.Vector.Storable as V
 import Data.Word
 import Freenect
-import qualified Data.Vector.Storable as V
 #endif
 
 -- Internal imports
+import Constants
 import Control.Extra.Monad
 import Graphics.UI.Extra.SDL
-
-import Constants
 
 -- * Game controller
 
