@@ -196,13 +196,14 @@ paintObject resources screen object =
                                     SDL.blitSurface bI Nothing screen $
                                       Just (SDL.Rect x' y' sz sz)
       _               -> return ()
-  where format = surfaceGetPixelFormat screen
-        p      = objectPos object
-        x      = round (fst p)
-        y      = round (snd p)
-        blockImage 3 = block1Img resources
-        blockImage 2 = block2Img resources
-        blockImage n = block3Img resources
+  where
+    format = surfaceGetPixelFormat screen
+    p      = objectPos object
+    x      = round (fst p)
+    y      = round (snd p)
+    blockImage 3 = block1Img resources
+    blockImage 2 = block2Img resources
+    blockImage n = block3Img resources
 
 -- * Resource management
 
