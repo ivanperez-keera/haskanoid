@@ -31,14 +31,14 @@ stepFPSCounter (clock, fpsRef, every) = do
   (lastTime, left) <- readIORef fpsRef
   let left' = left - 1
   if left' < 0
-     then do newTime <- clock
-             let
-                 msf = fromIntegral (newTime - lastTime) / (fromIntegral every :: Double)
-                 fps = 1000 / msf
-             do -- when (msf > 0) $
-               putStrLn $ "Performance report :: Time per frame: " ++ show msf
-                          ++ "ms, FPS: " ++ show fps
-                          ++ ", Total running time: " ++ show newTime
-             writeIORef fpsRef (newTime, every)
-     else do writeIORef fpsRef (lastTime, left')
+    then do newTime <- clock
+            let
+                msf = fromIntegral (newTime - lastTime) / (fromIntegral every :: Double)
+                fps = 1000 / msf
+            do -- when (msf > 0) $
+              putStrLn $ "Performance report :: Time per frame: " ++ show msf
+                         ++ "ms, FPS: " ++ show fps
+                         ++ ", Total running time: " ++ show newTime
+            writeIORef fpsRef (newTime, every)
+    else do writeIORef fpsRef (lastTime, left')
 
