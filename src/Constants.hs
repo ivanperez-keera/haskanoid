@@ -76,11 +76,11 @@ velTrans = 0.2
 -- Max speed
 maxVNorm :: Double
 maxVNorm = 300
-      
+
 -- Delays
 -- restartDelay :: Time
 -- restartDelay = 3
--- 
+--
 -- wonDelay :: Time
 -- wonDelay = 3
 
