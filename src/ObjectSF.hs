@@ -20,9 +20,9 @@ module ObjectSF where
 import FRP.Yampa
 
 -- Internal imports
-import Objects
-import Input
 import Data.IdentityList
+import Input
+import Objects
 
 -- | Objects are defined as transformations that take 'ObjectInput' signals and
 -- return 'ObjectOutput' signals.
