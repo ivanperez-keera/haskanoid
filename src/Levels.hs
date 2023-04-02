@@ -338,7 +338,8 @@ blockDescS 9 = map (first ((adjustHPos *** adjustVPos) . fI2)) allBlocks
         adjustHPos = (leftMargin +) . ((blockWidth + blockSeparation) *)
 
         leftMargin :: Num a => a
-        leftMargin = round' ((gameWidth - (blockWidth + blockSeparation) * 7)/2)
+        leftMargin =
+            round' ((gameWidth - (blockWidth + blockSeparation) * 7) / 2)
           where round' = fromIntegral . floor
 
 -- Level 10
@@ -378,8 +379,8 @@ blockDescS 10 = map (first adjustPos) allBlocks
 blockDescS 11 = map (first adjustPos) allBlocks
 
   where allBlocks :: (Enum a, Num a, Eq a, Integral a) => [((a, a), Int)]
-        allBlocks = [((x, y), maxBlockLife) | y <- [0..blockRows-1]
-                                            , x <- [0..(blockColumns-1)
+        allBlocks = [((x, y), maxBlockLife) | y <- [0 .. blockRows - 1]
+                                            , x <- [0 .. (blockColumns - 1)
                                                    - (2 * abs (y - midRow))]
                     ]
                    
