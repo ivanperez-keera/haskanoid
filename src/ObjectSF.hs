@@ -5,15 +5,14 @@
 --
 -- Objects as signal functions.
 --
--- Live objects in the game take user input and the game universe
--- and define their state in terms of that. They can remember what
--- happened (see Yampa's Arrow combinators, which hide continuations),
--- change their behaviour (see switches in Yampa).
+-- Live objects in the game take user input and the game universe and define
+-- their state in terms of that. They can remember what happened (see Yampa's
+-- Arrow combinators, which hide continuations), change their behaviour (see
+-- switches in Yampa).
 --
 -- They cannot affect other objects, but they can kill themselves (see
--- 'harakiri'). Should you need to spawn new game elements upon
--- events, you might want to change 'harakiri' to something more
--- general.
+-- 'harakiri'). Should you need to spawn new game elements upon events, you
+-- might want to change 'harakiri' to something more general.
 module ObjectSF where
 
 -- External imports
@@ -33,11 +32,11 @@ type ObjectSF = SF ObjectInput ObjectOutput
 -- ('collisions'), and the presence of any pre-existing objects
 -- ('knownObjects').
 --
--- The reason for depending on 'Collisions' is that objects may ``die''
--- when hit.
+-- The reason for depending on 'Collisions' is that objects may ``die'' when
+-- hit.
 --
--- The reason for depending on 'Objects' is that objects may choose to
--- follow other objects.
+-- The reason for depending on 'Objects' is that objects may choose to follow
+-- other objects.
 --
 -- TODO: Would it be possible to depend on the specific object sfs internally
 -- and remove the explicit 'knownObjects'? I guess so, so long as it's possible
@@ -50,8 +49,8 @@ data ObjectInput = ObjectInput
   , knownObjects :: Objects
   }
 
--- | What we can see about each live object at each time. It's a
--- snapshot of the object.
+-- | What we can see about each live object at each time. It's a snapshot of
+-- the object.
 data ObjectOutput = ObjectOutput
   { outputObject :: Object   -- ^ The object's state (position, shape, etc.).
   , harakiri     :: Event () -- ^ Whether the object has died (killed itself).
