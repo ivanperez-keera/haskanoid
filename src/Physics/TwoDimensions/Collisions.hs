@@ -5,8 +5,8 @@
 --
 -- A trivial collision subsystem.
 --
--- Based on the physics module, it determines the side of collision
--- between shapes.
+-- Based on the physics module, it determines the side of collision between
+-- shapes.
 module Physics.TwoDimensions.Collisions where
 
 -- External imports
@@ -23,16 +23,14 @@ data Side = TopSide | BottomSide | LeftSide | RightSide
 
 -- | Opposite side during a collision.
 --
--- If A collides with B, the collision sides on
--- A and B are always opposite.
+-- If A collides with B, the collision sides on A and B are always opposite.
 oppositeSide :: Side -> Side
 oppositeSide TopSide    = BottomSide
 oppositeSide BottomSide = TopSide
 oppositeSide LeftSide   = RightSide
 oppositeSide RightSide  = LeftSide
 
--- | Calculates the collision side of a shape
--- that collides against another.
+-- | Calculates the collision side of a shape that collides against another.
 --
 -- PRE: the shapes do collide. Use 'overlapShape' to check.
 shapeCollisionSide :: Shape -> Shape -> Side
