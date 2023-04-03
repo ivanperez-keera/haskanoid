@@ -18,12 +18,11 @@
 -- Objects are represented as Signal Functions as well ('ObjectSF'). This
 -- allows them to react to user input and change with time.  Each object is
 -- responsible for itself, but it cannot affect others: objects can watch
--- others, depend on others and react to them, but they cannot /send a
--- message/ or eliminate other objects. However, if you would like to
--- dynamically introduce new elements in the game (for instance, falling
--- powerups that the player must collect before they hit the ground) then it
--- might be a good idea to allow objects not only to /kill themselves/ but
--- also to spawn new object.
+-- others, depend on others and react to them, but they cannot /send a message/
+-- or eliminate other objects. However, if you would like to dynamically
+-- introduce new elements in the game (for instance, falling powerups that the
+-- player must collect before they hit the ground) then it might be a good idea
+-- to allow objects not only to /kill themselves/ but also to spawn new object.
 --
 -- This module contains three sections:
 --
@@ -157,12 +156,11 @@ levelLoading lvs lvl pts = arr $ const $
 
 -- | Start the game at a given level, with a given number of lives.
 --
--- It executes the normal gameplay until the level is completed.
--- It then switches to the next level (remembering the current
--- lives and points).
+-- It executes the normal gameplay until the level is completed.  It then
+-- switches to the next level (remembering the current lives and points).
 --
--- Conditions like finishing the game or running out of lives are
--- detected in 'wholeGame' and 'canLose', respectively.
+-- Conditions like finishing the game or running out of lives are detected in
+-- 'wholeGame' and 'canLose', respectively.
 --
 gameWithLives :: Int -> Int -> Int -> SF Controller GameState
 gameWithLives numLives level pts = dSwitch
@@ -186,9 +184,8 @@ isLevelCompleted = proc s -> do
 
 -- | Run the normal game.
 --
--- NOTE: The code includes a commented piece that detects
--- a request to pause the game. Check out the code to learn how to
--- implement pausing.
+-- NOTE: The code includes a commented piece that detects a request to pause
+-- the game. Check out the code to learn how to implement pausing.
 gamePlayOrPause :: Int -> Int -> Int -> SF Controller GameState
 gamePlayOrPause lives level pts = gamePlay lives level pts
 --  ((arr id) &&& (pause undefined (False --> isPaused) (mainLoop lives level)))
@@ -215,8 +212,8 @@ gamePlay lives level pts =
   gamePlay' (initialObjects level) >>> composeGameState lives level pts
 
 -- | Based on the internal gameplay info, compose the main game state and
--- detect when a live is lost. When that happens, restart this SF
--- with one less life available.
+-- detect when a live is lost. When that happens, restart this SF with one less
+-- life available.
 --
 -- NOTE: it will be some other SF's responsibility to determine if the player's
 -- run out of lives.
@@ -255,9 +252,8 @@ composeGameState' lives level pts = proc (oos,dead,points) -> do
 -- from those objects at all times, notifying any time the ball hits the floor,
 -- and and of any additional points made.
 --
--- This works as a game loop with a post-processing step. It uses
--- a well-defined initial accumulator and a traditional feedback
--- loop.
+-- This works as a game loop with a post-processing step. It uses a
+-- well-defined initial accumulator and a traditional feedback loop.
 --
 -- The internal accumulator holds:
 --
@@ -311,13 +307,13 @@ gamePlay' objs = loopPre ([],[],0) $
 
     suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
     suicidalSect (_,oos) =
-        -- Turn every event carrying a function that transforms the
-        -- object signal function list into one function that performs
-        -- all the efects in sequence
+        -- Turn every event carrying a function that transforms the object
+        -- signal function list into one function that performs all the efects
+        -- in sequence
         foldl (mergeBy (.)) noEvent es
 
-      -- Turn every object that wants to kill itself into
-      -- a function that removes it from the list
+      -- Turn every object that wants to kill itself into a function that
+      -- removes it from the list
       where es :: [Event (IL ObjectSF -> IL ObjectSF)]
             es = [ harakiri oo `tag` deleteIL k
                  | (k,oo) <- assocsIL oos ]
@@ -366,10 +362,9 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
           switch (bounceAroundDetectMiss p) $ \_ ->
           objBall
   where
-    -- Yampa's edge is used to turn the continuous
-    -- signal produced by controllerClick into an
-    -- event-carrying signal, only true the instant
-    -- the mouse button is clicked.
+    -- Yampa's edge is used to turn the continuous signal produced by
+    -- controllerClick into an event-carrying signal, only true the instant the
+    -- mouse button is clicked.
     followPaddleDetectLaunch = proc oi -> do
       o     <- followPaddle -< oi
       click <- edge         -< controllerClick (userInput oi)
@@ -380,11 +375,10 @@ objBall = switch followPaddleDetectLaunch   $ \p ->
       miss <- collisionWithBottom           -< collisions oi
       returnA -< (o, miss)
 
--- | Fires an event when the ball *enters in* a collision with the
--- bottom wall.
+-- | Fires an event when the ball *enters in* a collision with the bottom wall.
 --
--- NOTE: even if the overlap is not corrected, 'edge' makes
--- the event only take place once per collision.
+-- NOTE: even if the overlap is not corrected, 'edge' makes the event only take
+-- place once per collision.
 collisionWithBottom :: SF Collisions (Event ())
 collisionWithBottom = inCollisionWith "ball" "bottomWall" ^>> edge
 
@@ -417,9 +411,9 @@ followPaddle = arr $ \oi ->
 -- A bouncing ball moves freely until there is a collision, then bounces and
 -- goes on and on.
 --
--- This SF needs an initial position and velocity. Every time
--- there is a bounce, it takes a snapshot of the point of
--- collision and corrected velocity, and starts again.
+-- This SF needs an initial position and velocity. Every time there is a
+-- bounce, it takes a snapshot of the point of collision and corrected
+-- velocity, and starts again.
 --
 bouncingBall :: Pos2D -> Vel2D -> ObjectSF
 bouncingBall p0 v0 =
@@ -428,8 +422,7 @@ bouncingBall p0 v0 =
                                   -- \(p', v') -> bouncingBall p' v')
   where
 
-    -- Calculate the future tentative position, and
-    -- bounce if necessary.
+    -- Calculate the future tentative position, and bounce if necessary.
     --
     -- The ballBounce needs the ball SF' input (which has knowledge of
     -- collisions), so we carry it parallely to the tentative new positions,
@@ -455,7 +448,7 @@ bouncingBall p0 v0 =
 -- NOTE: To avoid infinite loops when switching, the initial input is discarded
 -- and never causes a bounce. This works in this game and in this particular
 -- case because the ball never-ever bounces immediately as fired from the
--- paddle.  This might not be true if a block is extremely close, if you add
+-- paddle. This might not be true if a block is extremely close, if you add
 -- flying enemies to the game, etc.
 ballBounce :: SF (ObjectInput, ObjectOutput) (Event (Pos2D, Vel2D))
 ballBounce = noEvent --> ballBounce'
@@ -465,13 +458,13 @@ ballBounce = noEvent --> ballBounce'
 --
 -- This does the core of the work, and does not ignore the initial input.
 --
--- It proceeds by detecting whether any collision affects
--- the ball's velocity, and outputs a snapshot of the object
--- position and the corrected velocity if necessary.
+-- It proceeds by detecting whether any collision affects the ball's velocity,
+-- and outputs a snapshot of the object position and the corrected velocity if
+-- necessary.
 ballBounce' :: SF (ObjectInput, ObjectOutput) (Event (Pos2D, Vel2D))
 ballBounce' = proc (ObjectInput ci cs os, o) -> do
-  -- HN 2014-09-07: With the present strategy, need to be able to
-  -- detect an event directly after
+  -- HN 2014-09-07: With the present strategy, need to be able to detect an
+  -- event directly after
   -- ev <- edgeJust -< changedVelocity "ball" cs
   let ev = maybe noEvent Event (changedVelocity "ball" cs)
   returnA -< fmap (\v -> (objectPos (outputObject o), v)) ev
@@ -490,9 +483,8 @@ freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
   -- Cap speed
   let v = limitNorm v0 maxVNorm
 
-  -- Any free moving object behaves like this (but with
-  -- acceleration. This should be in some FRP.NewtonianPhysics
-  -- module)
+  -- Any free moving object behaves like this (but with acceleration. This
+  -- should be in some FRP.NewtonianPhysics module)
   p <- (p0 ^+^) ^<< integral -< v
 
   let obj = Object { objectName           = name
@@ -523,8 +515,7 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   let name = "paddle"
   let isHit = inCollision name cs
 
-  -- Try to get to the mouse position, but with a capped
-  -- velocity.
+  -- Try to get to the mouse position, but with a capped velocity.
 
   -- rec
   --     -- let v = limitNorm (20.0 *^ (refPosPaddle ci ^-^ p)) maxVNorm
@@ -538,10 +529,9 @@ objPaddle = proc (ObjectInput ci cs os) -> do
   let p = refPosPaddle ci
   v <- derivative -< p
 
-  --  Use this code if you want instantaneous movement,
-  --  particularly cool with the Wiimote, but remember to cap
-  --  the balls velocity or you will get incredibly high
-  --  velocities when the paddle hits the ball.
+  --  Use this code if you want instantaneous movement, particularly cool with
+  --  the Wiimote, but remember to cap the balls velocity or you will get
+  --  incredibly high velocities when the paddle hits the ball.
   --
   --  let p = refPosPaddle ci
   --  v <- derivative -< p
@@ -559,8 +549,8 @@ objPaddle = proc (ObjectInput ci cs os) -> do
                      , displacedOnCollision = False
                      }
 
--- | Follow the controller's horizontal position, keeping a constant
--- vertical position.
+-- | Follow the controller's horizontal position, keeping a constant vertical
+-- position.
 refPosPaddle :: Controller -> Pos2D
 refPosPaddle c = (x', yPosPaddle)
   where
@@ -588,8 +578,8 @@ objBlock ((x,y), initlives) (w,h) = proc (ObjectInput ci cs os) -> do
 
   -- Must be hit initlives times to disappear
   --
-  -- If you want them to "recover" or self-heal with time,
-  -- use the following code in place of lives.
+  -- If you want them to "recover" or self-heal with time, use the following
+  -- code in place of lives.
   --
   -- recover <- delayEvent 5.0 -< hit
   -- lives <- accumHoldBy (+) 3 -< (hit `tag` (-1) `lMerge` recover `tag` 1)
