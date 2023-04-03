@@ -249,7 +249,7 @@ composeGameState' lives level pts = proc (oos, dead, points) -> do
 
 -- | Given an initial list of objects, it runs the game, presenting the output
 -- from those objects at all times, notifying any time the ball hits the floor,
--- and and of any additional points made.
+-- and of any additional points made.
 --
 -- This works as a game loop with a post-processing step. It uses a
 -- well-defined initial accumulator and a traditional feedback loop.
@@ -307,7 +307,7 @@ gamePlay' objs = loopPre ([], [], 0) $
     suicidalSect :: (a, IL ObjectOutput) -> Event (IL ObjectSF -> IL ObjectSF)
     suicidalSect (_, oos) =
         -- Turn every event carrying a function that transforms the object
-        -- signal function list into one function that performs all the efects
+        -- signal function list into one function that performs all the effects
         -- in sequence
         foldl (mergeBy (.)) noEvent es
 
@@ -384,7 +384,7 @@ collisionWithBottom = inCollisionWith "ball" "bottomWall" ^>> edge
 -- otherwise). To avoid reacting to collisions, this ball is non-interactive.
 followPaddle :: ObjectSF
 followPaddle = arr $ \oi ->
-    -- Calculate ball position, midway on top of the the paddle
+    -- Calculate ball position, midway on top of the paddle
     --
     -- This code allows for the paddle not to exist (Maybe), although that
     -- should never happen in practice.
@@ -424,7 +424,7 @@ bouncingBall p0 v0 =
     -- Calculate the future tentative position, and bounce if necessary.
     --
     -- The ballBounce needs the ball SF' input (which has knowledge of
-    -- collisions), so we carry it parallely to the tentative new positions,
+    -- collisions), so we carry it parallelly to the tentative new positions,
     -- and then use it to detect when it's time to bounce
 
     --      ==========================    ============================
@@ -436,7 +436,7 @@ bouncingBall p0 v0 =
     --      ==========================    ============================
     progressAndBounce = (arr id &&& freeBall') >>> (arr snd &&& ballBounce)
 
-    -- Position of the ball, starting from p0 with velicity v0, since the
+    -- Position of the ball, starting from p0 with velocity v0, since the
     -- time of last switching (or being fired, whatever happened last)
     -- provided that no obstacles are encountered.
     freeBall' = freeBall p0 v0
@@ -468,7 +468,7 @@ ballBounce' = proc (ObjectInput ci cs os, o) -> do
   let ev = maybe noEvent Event (changedVelocity "ball" cs)
   returnA -< fmap (\v -> (objectPos (outputObject o), v)) ev
 
--- | Position of the ball, starting from p0 with velicity v0, since the time of
+-- | Position of the ball, starting from p0 with velocity v0, since the time of
 -- last switching (that is, collision, or the beginning of time --being fired
 -- from the paddle-- if never switched before), provided that no obstacles are
 -- encountered.
@@ -562,9 +562,9 @@ yPosPaddle = gameHeight - paddleMargin
 
 -- *** Blocks
 
--- | Block SF generator. It uses the blocks's size, position and a number of
+-- | Block SF generator. It uses the blocks' size, position and a number of
 -- lives that the block has. The block's position is used for it's unique ID,
--- which means that two simulatenously existing blocks should never have the
+-- which means that two simultaneously existing blocks should never have the
 -- same position. This is ok in this case because they are static, but would not
 -- work if they could move and be created dynamically.
 objBlock :: (Pos2D, Int) -> Size2D -> ObjectSF
@@ -613,10 +613,10 @@ objBlock ((x, y), initlives) (w, h) = proc (ObjectInput ci cs os) -> do
 -- The function that turns walls into 'Shape's for collision detection
 -- determines how big they really are. In particular, this has implications in
 -- ball-through-paper effects (ball going through objects, potentially never
--- coming back), which can be seen if the FPS suddently drops due to CPU load
+-- coming back), which can be seen if the FPS suddenly drops due to CPU load
 -- (for instance, if a really major Garbage Collection kicks in.  One potential
 -- optimisation is to trigger these with every SF iteration or every rendering,
--- to decrease the workload and thus the likelyhood of BTP effects.
+-- to decrease the workload and thus the likelihood of BTP effects.
 objSideRight :: ObjectSF
 objSideRight = objWall "rightWall" RightSide (gameWidth, 0)
 
