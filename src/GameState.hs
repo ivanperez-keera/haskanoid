@@ -22,7 +22,7 @@ import Objects
 --
 -- Different parts of the game deal with these data structures.  It is
 -- therefore convenient to group them in subtrees, even if there's no
--- substantial difference betweem them.
+-- substantial difference between them.
 data GameState = GameState
   { gameObjects :: Objects
   , gameInfo    :: GameInfo
@@ -35,7 +35,7 @@ neutralGameState = GameState
   , gameInfo    = neutralGameInfo
   }
 
--- | The gameinfo tells us the current game state (running, paused, etc.) and
+-- | The GameInfo tells us the current game state (running, paused, etc.) and
 -- general information, in this case, the number of lives, the level and the
 -- points.
 --
