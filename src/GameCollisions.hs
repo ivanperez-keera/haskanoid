@@ -49,7 +49,7 @@ detectCollisions' :: IL Object -> [(ILKey, Object)] -> [Collision]
 detectCollisions' objsT ms = concatMap (detectCollisions'' objsT) ms
 
 -- | Detect collisions between one specific moving object and every existing
--- object. Each collision is idependent of the rest (which is not necessarily
+-- object. Each collision is independent of the rest (which is not necessarily
 -- what should happen, but since the transformed velocities are eventually
 -- added, there isn't much difference in the end).
 detectCollisions'' :: IL Object -> (ILKey, Object) -> [Collision]
@@ -109,7 +109,7 @@ detectCollisions''' m o
 --   spawning a stateful collision detector when two objects are getting close?
 --   Cf. the old tail-gating approach.
 -- - Maybe a collision should also carry the identity of the object one
---   collieded with to facilitate impl. of "inCollisionWith".
+--   collided with to facilitate impl. of "inCollisionWith".
 --
 changedVelocity :: ObjectName -> Collisions -> Maybe Vel2D
 changedVelocity name cs =
