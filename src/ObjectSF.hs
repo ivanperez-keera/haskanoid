@@ -38,7 +38,7 @@ type ObjectSF = SF ObjectInput ObjectOutput
 -- The reason for depending on 'Objects' is that objects may choose to follow
 -- other objects.
 --
--- TODO: Would it be possible to depend on the specific object sfs internally
+-- TODO: Would it be possible to depend on the specific object SFs internally
 -- and remove the explicit 'knownObjects'? I guess so, so long as it's possible
 -- to always provide the same input to those SFs that they will have in the
 -- game: because they are different instances, we need the exact same input to
