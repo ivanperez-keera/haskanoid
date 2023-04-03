@@ -1,11 +1,13 @@
-import Control.Applicative ((<$>))
+-- External imports
+import Control.Applicative  ((<$>))
 import Control.Monad.IfElse
-import FRP.Yampa as Yampa
+import FRP.Yampa            as Yampa
 
-import Game
+-- Internal imports
 import Display
-import Input
+import Game
 import Graphics.UI.Extra.SDL
+import Input
 
 -- TODO: Use MaybeT or ErrorT to report errors
 main :: IO ()
@@ -27,4 +29,3 @@ main = do
                )
                (\_ (e, c) -> render res' e >> return (controllerQuit c))
                (wholeGame &&& arr id)
-

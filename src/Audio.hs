@@ -1,31 +1,38 @@
--- | A layer of abstraction on top of SDL audio.
+-- |
+-- Copyright  : (c) Keera Studios, 2010-2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- A layer of abstraction on top of SDL audio.
 --
 -- It plays audio soundfx asynchronously (in a new thread), which means that
 -- programs must be compiled with the threaded Runtime System (ghc flag is
 -- -threaded).
---
--- This module is 2010-2014 (c) Keera Studios, redistributed with permission.
 module Audio
-    (Music(..),
-     Audio(..),
-     initAudio,
-     loadAudio,
-     loadMusic,
-     playMusic,
-     playFile,
-     stopMusic,
-     musicPlaying) where
+    ( Music(..)
+    , Audio(..)
+    , initAudio
+    , loadAudio
+    , loadMusic
+    , playMusic
+    , playFile
+    , stopMusic
+    , musicPlaying
+    )
+  where
 
-import Control.Applicative ((<$>))
-import Control.Monad
-import Control.Concurrent
-import qualified Graphics.UI.SDL.Mixer.General as SDL.Mixer
+-- External imports
+import           Control.Applicative            ((<$>))
+import           Control.Concurrent
+import           Control.Monad
 import qualified Graphics.UI.SDL.Mixer.Channels as SDL.Mixer.Channels
-import qualified Graphics.UI.SDL.Mixer.Music as SDL.Mixer.Music
-import qualified Graphics.UI.SDL.Mixer.Types as SDL.Mixer.Types
-import qualified Graphics.UI.SDL.Mixer.Samples as SDL.Mixer.Samples
+import qualified Graphics.UI.SDL.Mixer.General  as SDL.Mixer
+import qualified Graphics.UI.SDL.Mixer.Music    as SDL.Mixer.Music
+import qualified Graphics.UI.SDL.Mixer.Samples  as SDL.Mixer.Samples
+import qualified Graphics.UI.SDL.Mixer.Types    as SDL.Mixer.Types
 
 data Music = Music { musicName :: String, unMusic :: SDL.Mixer.Types.Music }
+
 data Audio = Audio { audioName :: String, unAudio :: SDL.Mixer.Types.Chunk }
 
 -- | Initialize the audio subsystem.
@@ -63,6 +70,6 @@ loadAudio fp = fmap (Audio fp) <$> SDL.Mixer.Samples.tryLoadWAV fp
 -- This function spawns a new OS thread. Remember to compile your program
 -- with the threaded RTS.
 playFile :: Audio -> Int -> IO ()
-playFile wav t = void $ forkOS $ do 
+playFile wav t = void $ forkOS $ do
   _v <- SDL.Mixer.Channels.playChannel (-1) (unAudio wav) 0
   threadDelay (t * 1000)
