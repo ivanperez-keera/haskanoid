@@ -18,9 +18,8 @@ holdWhen :: b -> SF a (b,Bool) -> SF a b
 holdWhen bInit sf = sf >>> holdOutput >>> hold bInit
   where holdOutput = arr (\(b,discard) -> if discard then noEvent else Event b)
 
--- Given an occasional producer of functions
--- and a source of info, apply the functions when they
--- exist
+-- Given an occasional producer of functions and a source of info, apply the
+-- functions when they exist
 mergeApply :: SF a b -> SF a (Event (b -> b)) -> SF a b
 mergeApply sf1 sf2 =
   (sf1 &&& sf2) >>> (arr (\(b,ef) -> event b ($ b) ef))
