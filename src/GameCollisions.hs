@@ -26,9 +26,8 @@ import Physics.TwoDimensions.Dimensions
 
 -- | Given a list of objects, it detects all the collisions between them.
 --
--- Note: this is a simple n*m-complex algorithm, with n the
--- number of objects and m the number of moving objects (right now,
--- only 2).
+-- Note: this is a simple n*m-complex algorithm, with n the number of objects
+-- and m the number of moving objects (right now, only 2).
 --
 detectCollisions :: IL Object -> Collisions
 detectCollisions = detectCollisionsH
@@ -43,8 +42,7 @@ detectCollisions = detectCollisionsH
                 -- Partition the object space between moving and static objects
                 (moving, _static) = partition (canCauseCollisions.snd) $ assocsIL objsT
 
--- | Detect collisions between each moving object and
--- every other object.
+-- | Detect collisions between each moving object and every other object.
 detectCollisions' :: IL Object -> [(ILKey, Object)] -> [Collision]
 detectCollisions' objsT ms = concatMap (detectCollisions'' objsT) ms
 
@@ -92,24 +90,24 @@ detectCollisions''' m o
 -- The assumption is that collision detection happens globally and that the
 -- changed velocity is figured out for each object involved in a collision
 -- based on the properties of all objects involved in any specific interaction.
--- That may not be how it works now, but the interface means it could work
--- that way. Even more physical might be to figure out the impulsive force
--- acting on each object.
+-- That may not be how it works now, but the interface means it could work that
+-- way. Even more physical might be to figure out the impulsive force acting on
+-- each object.
 --
 -- However, the whole collision infrastructure should be revisited.
 --
 -- - Statefulness ("edge") might make it more robust.
 --
--- - Think through how collision events are going to be communicated
---   to the objects themselves. Maybe an input event is the natural
---   thing to do. Except then we have to be careful to avoid switching
---   again immediately after one switch.
+-- - Think through how collision events are going to be communicated to the
+--   objects themselves. Maybe an input event is the natural thing to do.
+--   Except then we have to be careful to avoid switching again immediately
+--   after one switch.
 --
--- - Should try to avoid n^2 checks. Maybe some kind of quad-trees?
---   Maybe spawning a stateful collision detector when two objects are
---   getting close? Cf. the old tail-gating approach.
--- - Maybe a collision should also carry the identity of the object
---   one collieded with to facilitate impl. of "inCollisionWith".
+-- - Should try to avoid n^2 checks. Maybe some kind of quad-trees?  Maybe
+--   spawning a stateful collision detector when two objects are getting close?
+--   Cf. the old tail-gating approach.
+-- - Maybe a collision should also carry the identity of the object one
+--   collieded with to facilitate impl. of "inCollisionWith".
 --
 changedVelocity :: ObjectName -> Collisions -> Maybe Vel2D
 changedVelocity name cs = 
@@ -117,8 +115,7 @@ changedVelocity name cs =
     []          -> Nothing
     (_, v') : _ -> Just v'
 
-    -- IP: It should be something like the following, but that doesn't
-    -- work:
+    -- IP: It should be something like the following, but that doesn't work:
     -- vs -> Just (foldl (^+^) (0,0) (map snd vs))
 
 -- | True if the velocity of the object has been changed by any collision.
