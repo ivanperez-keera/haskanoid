@@ -230,11 +230,10 @@ data Image = Image { imgName  :: String, imgSurface :: Surface }
 data Font  = Font  { fontName :: String, unFont :: TTF.Font }
 
 -- | Ad-hoc resource loading
--- This function is ad-hoc in two senses: first, because it
--- has the paths to the files hard-coded inside. And second,
--- because it loads the specific resources that are needed,
--- not a general
 --
+-- This function is ad-hoc in two senses: first, because it has the paths to
+-- the files hard-coded inside. And second, because it loads the specific
+-- resources that are needed, not a general
 loadResources :: IO (Maybe ResourceMgr)
 loadResources = runMaybeT $ do
   -- Font initialization
@@ -317,8 +316,8 @@ updateAllResources res (GameLoading n) = do
 
   newMusic <- if oldMusicFP == newMusicFP
                 then return oldMusic
-                else do -- Loading can fail, in which case we continue
-                        -- with the old music
+                else do -- Loading can fail, in which case we continue with the
+                        -- old music
                         bgM <- loadMusic newMusicFP
                         if isNothing bgM
                           then do putStrLn $
