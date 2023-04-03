@@ -7,7 +7,7 @@
 --
 -- Defines an abstraction for the game controller and the functions to read it.
 --
--- Lower-level devices replicate the higher-level API, and should accomodate to
+-- Lower-level devices replicate the higher-level API, and should accommodate to
 -- it. Each device should:
 --
 --    - Upon initialisation, return any necessary information to poll it again.
@@ -153,7 +153,7 @@ initializeWiimote = do
 -- This operation uses the IR for the controller's position, and the main (A)
 -- button for the click.
 --
--- TODO: Allow configuring the button and using other motion mechamisms
+-- TODO: Allow configuring the button and using other motion mechanisms
 -- (accelerometers).
 --
 -- TODO: This should be split in two operations. One that presents a nice
