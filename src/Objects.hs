@@ -92,7 +92,7 @@ type Collisions = [Collision]
 -- modified by the collision.
 --
 -- Take into account that the same object could take part in several
--- simultaneous collitions, so these velocities should be added (per object).
+-- simultaneous collisions, so these velocities should be added (per object).
 data Collision = Collision
     { collisionData :: [(ObjectName, Vel2D)] } -- ObjectId x Velocity
   deriving Show
