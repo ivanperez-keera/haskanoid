@@ -3,13 +3,11 @@
 -- License    : See LICENSE file.
 -- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
 --
--- The state of the game during execution. It has two
--- parts: general info (level, points, etc.) and
--- the actual gameplay info (objects).
+-- The state of the game during execution. It has two parts: general info
+-- (level, points, etc.) and the actual gameplay info (objects).
 --
--- Because the game is always in some running state
--- (there are no menus, etc.) we assume that there's
--- always some gameplay info, even though it can be
+-- Because the game is always in some running state (there are no menus, etc.)
+-- we assume that there's always some gameplay info, even though it can be
 -- empty.
 module GameState where
 
@@ -37,9 +35,9 @@ neutralGameState = GameState
   , gameInfo    = neutralGameInfo
   }
 
--- | The gameinfo tells us the current game state (running, paused, etc.)
--- and general information, in this case, the number of lives, the level
--- and the points.
+-- | The gameinfo tells us the current game state (running, paused, etc.) and
+-- general information, in this case, the number of lives, the level and the
+-- points.
 --
 -- Since this info is then presented together to the users in a top panel, it
 -- is convenient to give this product of values a proper name.
@@ -60,9 +58,9 @@ neutralGameInfo = GameInfo
   }
 
 -- | Possible actual game statuses. The game is always in one of these.
--- Interaction and presentation depend on this. Yampa switches are
--- used to jump from one to another, and the display module
--- changes presentation depending on the status.
+-- Interaction and presentation depend on this. Yampa switches are used to jump
+-- from one to another, and the display module changes presentation depending
+-- on the status.
 data GameStatus = GamePlaying
                 | GamePaused
                 | GameLoading Int
