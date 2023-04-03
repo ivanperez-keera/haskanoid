@@ -71,18 +71,17 @@ data Controller = Controller
   , controllerQuit  :: Bool
   }
 
--- | Controller info at any given point, plus a pointer
--- to poll the main device again. This is safe,
--- since there is only one writer at a time (the device itself).
+-- | Controller info at any given point, plus a pointer to poll the main device
+-- again. This is safe, since there is only one writer at a time (the device
+-- itself).
 newtype ControllerRef =
   ControllerRef (IORef Controller, Controller -> IO Controller)
 
 -- * General API
 
--- | Initialize the available input devices. This operation
--- returns a reference to a controller, which enables
--- getting its state as many times as necessary. It does
--- not provide any information about its nature, abilities, etc.
+-- | Initialize the available input devices. This operation returns a reference
+-- to a controller, which enables getting its state as many times as necessary.
+-- It does not provide any information about its nature, abilities, etc.
 initializeInputDevices :: IO ControllerRef
 initializeInputDevices = do
     let baseDev = sdlGetController
@@ -110,13 +109,11 @@ initializeInputDevices = do
     return $ ControllerRef (nr, dev')
   where defaultInfo = Controller (0,0) False False False
 
--- | Sense from the controller, providing its current
--- state. This should return a new Controller state
--- if available, or the last one there was.
+-- | Sense from the controller, providing its current state. This should return
+-- a new Controller state if available, or the last one there was.
 -- 
--- It is assumed that the sensing function is always
--- callable, and that it knows how to update the
--- Controller info if necessary.
+-- It is assumed that the sensing function is always callable, and that it
+-- knows how to update the Controller info if necessary.
 senseInput :: ControllerRef -> IO Controller
 senseInput (ControllerRef (cref, sensor)) = do
   cinfo <- readIORef cref
@@ -129,8 +126,8 @@ type ControllerDev = IO (Maybe (Controller -> IO Controller))
 -- * WiiMote API (mid-level)
 #ifdef wiimote
 
--- | The wiimote controller as defined using this
--- abstract interface. See 'initializeWiimote'.
+-- | The wiimote controller as defined using this abstract interface. See
+-- 'initializeWiimote'.
 wiimoteDev :: ControllerDev
 wiimoteDev = initializeWiimote
 
@@ -152,8 +149,8 @@ initializeWiimote = do
 
 -- | Sense the Wiimote and update the controller.
 --
--- This operation uses the IR for the controller's position,
--- and the main (A) button for the click.
+-- This operation uses the IR for the controller's position, and the main (A)
+-- button for the click.
 --
 -- TODO: Allow configuring the button and using other motion mechamisms
 -- (accelerometers).
@@ -213,10 +210,9 @@ sdlMouseKB = return (Just sdlGetController)
 
 -- ** Sensing
 
--- | Sense the SDL keyboard and mouse and update
--- the controller. It only senses the mouse position,
--- the primary mouse button, and the p key to pause
--- the game.
+-- | Sense the SDL keyboard and mouse and update the controller. It only senses
+-- the mouse position, the primary mouse button, and the p key to pause the
+-- game.
 --
 -- We need a non-blocking controller-polling function.
 -- TODO: Check http://gameprogrammer.com/fastevents/fastevents1.html
