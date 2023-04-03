@@ -33,8 +33,7 @@ data LevelSpec = LevelSpec
   , levelMusic :: MusicResource  -- ^ Background music
   }
 
--- | Number of levels. Change this in the code to finish
--- in a different level.
+-- | Number of levels. Change this in the code to finish in a different level.
 numLevels :: Int
 numLevels = length levels
 
