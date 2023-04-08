@@ -110,6 +110,9 @@ executable haskanoid
                        simple-affine-space,
                        transformers >= 0.3 && < 0.6
 
+  default-language:
+    Haskell2010
+
   if flag(bearriver)
     build-depends:     bearriver >= 0.9.6 && < 0.15
   else
