@@ -45,7 +45,7 @@ category:            Game, Reactivity, FRP
 build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >=1.8
+cabal-version:       >=1.10
 
 data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
 
