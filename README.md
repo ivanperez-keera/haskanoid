@@ -44,9 +44,8 @@ The game is available on [hackage](https://hackage.haskell.org/package/SpaceInva
 
 ```
 $ cabal update
-$ cabal sandbox init
 $ cabal install haskanoid
-$ ./.cabal-sandbox/bin/haskanoid
+$ $HOME/.cabal/bin/haskanoid
 ```
 
 If you want to explore the code and possibly make changes, do the following:
@@ -55,9 +54,8 @@ If you want to explore the code and possibly make changes, do the following:
 $ cabal update
 $ cabal unpack haskanoid            # or git clone http://github.com/ivanperez-keera/haskanoid
 $ cd haskanoid-*                    # Game resources are here
-$ cabal sandbox init
 $ cabal install
-$ ./dist/build/haskanoid/haskanoid
+$ $HOME/.cabal/bin/haskanoid
 ```
 
 To play it with the wiimote, you need to run the program with the special
@@ -102,15 +100,22 @@ those with:
 ```
 $ cabal unpack haskanoid     ## Or git clone this-repo
 $ cd haskanoid-*
-$ cabal sandbox init
 $ cabal install --only-dependencies
-$ cabal configure && cabal haddock --executables --internal
+$ cabal haddock --haddock-executables --haddock-internal
 ```
+
+You may also want to add the flags `-f-wiimote` and `-f-kinect` to the cabal
+commands above to install without wiimote and kinect support.
 
 # Related projects
 
 * Yampa (http://github.com/ivanperez-keera/Yampa), the Arrowized Functional
 Reactive Programming implementation created by Antony Courtney and Henrik Nilsson.
+
+* Dunai (http://github.com/ivanperez-keera/dunai), an extremely powerful
+reactive programming implementation capable of doing Classic and Arrowized
+Functional Reactive Programming, Reactive Programming, Stream Programming, and
+others. It contains a Yampa replacement that is capable of running Haskanoid.
 
 * hcwiid (http://github.com/ivanperez-keera/hcwiid), a wrapper around
 the cwiid library to communicate with Wiimotes.
@@ -129,7 +134,7 @@ Play](https://play.google.com/store/apps/details?id=uk.co.keera.games.magiccooki
 
 # Hands-on
 
-In the [hands-on file](https://github.com/ivanperez-keera/haskanoid/blob/master/hands-on.md)
+In the [hands-on file](https://github.com/ivanperez-keera/haskanoid/blob/develop/docs/hands-on.md)
 you find ideas to improve haskanoid while focussing on (game)
 programming related areas that you might want to dive in deeper. The areas are:
 functional (reactive) programming, performance, human-computer interaction and

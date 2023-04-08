@@ -4,13 +4,11 @@
 -- The name of the package.
 name:                haskanoid
 
--- The package version.  See the Haskell package versioning policy (PVP)
--- for standards guiding when and how versions should be incremented.
--- http://www.haskell.org/haskellwiki/Package_versioning_policy
+-- The package version. We follow semantic versioning.
 -- PVP summary:      +-+------- breaking API changes
---                   | | +----- non-breaking API additions
---                   | | | +--- code changes with no API change
-version:             0.1.5.4
+--                   | | +----- non-breaking changes
+--                   | | |
+version:             0.1.6
 
 -- A short (one-line) description of the package.
 synopsis:            A breakout game written in Yampa using SDL
@@ -45,7 +43,7 @@ category:            Game, Reactivity, FRP
 build-type:          Simple
 
 -- Constraint on the version of Cabal needed to build this package.
-cabal-version:       >=1.8
+cabal-version:       >=1.10
 
 data-files: data/*.png data/*.wav data/*.mp3 data/*.ttf
 
@@ -56,6 +54,10 @@ Flag wiimote
 Flag kinect
   Description: Enable Kinect support (with freenect)
   Default: True
+
+Flag bearriver
+  Description: Compile with bearriver instead of Yampa
+  Default: False
 
 executable haskanoid
   -- .hs or .lhs file containing the Main module.
@@ -99,12 +101,20 @@ executable haskanoid
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5,
-                       transformers >= 0.3 && < 0.6,
-                       mtl,
+                       IfElse,
                        MissingH,
-                       Yampa >= 0.9.6 && < 0.12,
+                       mtl,
                        SDL, SDL-image, SDL-mixer, SDL-ttf,
-                       IfElse
+                       simple-affine-space,
+                       transformers >= 0.3 && < 0.6
+
+  default-language:
+    Haskell2010
+
+  if flag(bearriver)
+    build-depends:     bearriver >= 0.9.6 && < 0.15
+  else
+    build-depends:     Yampa >= 0.13 && < 0.15
 
   if flag(wiimote)
     build-depends: hcwiid

@@ -1,5 +1,12 @@
+-- |
+-- Copyright  : (c) Ivan Perez & Henrik Nilsson, 2014.
+-- License    : See LICENSE file.
+-- Maintainer : Ivan Perez <ivan.perez@keera.co.uk>
+--
+-- Auxiliary functions related to Graphics.UI.SDL.
 module Graphics.UI.Extra.SDL where
 
+-- External imports
 import Data.IORef
 import Graphics.UI.SDL as SDL
 
