@@ -4,13 +4,11 @@
 -- The name of the package.
 name:                haskanoid
 
--- The package version.  See the Haskell package versioning policy (PVP)
--- for standards guiding when and how versions should be incremented.
--- http://www.haskell.org/haskellwiki/Package_versioning_policy
+-- The package version. We follow semantic versioning.
 -- PVP summary:      +-+------- breaking API changes
---                   | | +----- non-breaking API additions
---                   | | | +--- code changes with no API change
-version:             0.1.5.4
+--                   | | +----- non-breaking changes
+--                   | | |
+version:             0.1.6
 
 -- A short (one-line) description of the package.
 synopsis:            A breakout game written in Yampa using SDL
