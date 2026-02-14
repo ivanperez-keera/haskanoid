@@ -484,7 +484,7 @@ freeBall p0 v0 = proc (ObjectInput ci cs os) -> do
 
   -- Any free moving object behaves like this (but with acceleration. This
   -- should be in some FRP.NewtonianPhysics module)
-  p <- (p0 ^+^) ^<< integral -< v
+  p <- (p0 ^+^) ^<< midpointIntegral -< v
 
   let obj = Object { objectName           = name
                    , objectKind           = Ball ballWidth
